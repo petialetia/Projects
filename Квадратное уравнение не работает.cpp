@@ -58,7 +58,7 @@ int rootfinder (double a, double b, double c, double *x1, double *x2)
                         {
                         return 0;
                         }
-                        else if ((b != 0) && (c != 0))
+                        else if (b != 0) 
                              {
                              x1 = - c / b;
                              return 1;
