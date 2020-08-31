@@ -6,8 +6,28 @@
 
 
 const double Pseudo0 = 1E-6;
+enum NRoots
+    {
+    InfinitRoots = -1,
+    NoRoots,
+    OneRoot,
+    TwoRoots
+    };
 
-int findroots (double a, double b, double c, double* x1, double* x2);
+
+
+/*!
+
+Finds roots, returns number of them
+\param[in] a Coefficient a
+\param[in] b Coefficient b
+\param[in] c Coefficient c
+\param[out] x1 First root
+\param[out] x2 Second root
+*/
+
+NRoots findroots (double a, double b, double c, double* x1, double* x2);
+
 int IsZero (double value);
 void test_findroots (double* x1, double* x2);
 
@@ -34,17 +54,17 @@ int main()
            x2 = 0;
 
 
-    int amount = findroots (a, b, c, &x1, &x2);
+    NRoots amount = findroots (a, b, c, &x1, &x2);
 
     switch (amount)
         {
-        case  2: printf ("2 roots: %.3lg and %.3lg\n", x1, x2);
+        case  TwoRoots: printf ("2 roots: %.3lg and %.3lg\n", x1, x2);
                  break;
-        case  1: printf           ("Only 1 root: %.3lg\n", x1);
+        case  OneRoot: printf           ("Only 1 root: %.3lg\n", x1);
                  break;
-        case  0: printf                         ("No roots\n");
+        case  NoRoots: printf                         ("No roots\n");
                  break;
-        case -1: printf             ("Any number is a root\n");
+        case  InfinitRoots: printf             ("Any number is a root\n");
                  break;
         }
 
@@ -56,7 +76,7 @@ int main()
 //-----------------------------------------------------------------------------
 
 
-int findroots (double a, double b, double c, double* x1, double* x2)
+NRoots findroots (double a, double b, double c, double* x1, double* x2)
     {
 
 
@@ -67,19 +87,19 @@ int findroots (double a, double b, double c, double* x1, double* x2)
     assert (isfinite(c));
 
 
-    if (IsZero (a) == 1)
+    if (IsZero (a))
        {
-       if (IsZero (b) == 1)
+       if (IsZero (b))
           {
-          if (IsZero (c) == 1)
-             return -1;
+          if (IsZero (c))
+             return InfinitRoots;
           else
-             return 0;
+             return NoRoots;
           }
        else
           {
           *x1 = -c/b;
-          return 1;
+          return OneRoot;
           }
        }
     else
@@ -93,18 +113,18 @@ int findroots (double a, double b, double c, double* x1, double* x2)
           {
           *x1 = (-b + sqrt(discr))/(2*a);
           *x2 = (-b - sqrt(discr))/(2*a);
-          return 2;
+          return TwoRoots;
           }
        else
           {
-          if (IsZero (discr) == 1)
+          if (IsZero (discr))
              {
              *x1 = -b/(2*a);
-             return 1;
+             return OneRoot;
              }
           else
              {
-             return 0;
+             return NoRoots;
              }
           }
        }
@@ -130,62 +150,63 @@ int IsZero (double value)
 
 void test_findroots (double* x1, double* x2)
         {
-        #define test                                                                                                                   \
-                if (res == exp)                                                                                                        \
-                   {                                                                                                                   \
-                   printf ("Test #%d is OK\n", num);                                                                                   \
-                   }                                                                                                                   \
-                else                                                                                                                   \
-                   {                                                                                                                   \
+        #define test(arg1, arg2)                                                                                                      \
+                if (arg1 == arg2)                                                                                                     \
+                   {                                                                                                                  \
+                   printf ("Test #%d is OK\n", num);                                                                                  \
+                   }                                                                                                                  \
+                else                                                                                                                  \
+                   {                                                                                                                  \
                    printf ("Test #%d FAILED, findroots (%.3lg, %.3lg, %.3lg, x1, x2) = %d, shoud be %d\n", num, at, bt, ct, res, exp);\
                    }
         double at = 0,
                bt = 0,
                ct = 0;
-        int                             num = 1,
-            res = findroots (at, bt, ct, x1, x2),
-                                       exp = -1;
-        test
+           int num = 1,
+               res = findroots (at, bt, ct, x1, x2),
+               exp = -1;
+
+        test(res,exp)
 
             at = 1; bt = 0; ct = -4; num = 2; exp = 2;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = 1; bt = 2; ct = 1; num = 3; exp = 1;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = 1; bt = 2; ct = 2; num = 4; exp = 0;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = 0; bt = 0; ct = 1; num = 5; exp = 0;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = 0; bt = 2; ct = 1; num = 6; exp = 1;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = 0.1; bt = 0.02; ct = -0.08; num = 7; exp = 2;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = 0.1; bt = 0.02; ct = -0.008; num = 8; exp = 2;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
             at = -1; bt = -2; ct = -8; num = 9; exp = 0;
             res = findroots (at, bt, ct, x1, x2);
 
-        test
+        test(res,exp)
 
         #undef test
 
