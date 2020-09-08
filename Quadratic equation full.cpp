@@ -1,7 +1,5 @@
-#include <stdio.h>
 #include <math.h>
 #include <assert.h>
-
 //-----------------------------------------------------------------------------
 
 
@@ -29,6 +27,7 @@ Finds roots, returns number of them
 NRoots findroots (double a, double b, double c, double* x1, double* x2);
 
 int IsZero (double value);
+NRoots test0 (double* x1, double* x2);
 void test_findroots (double* x1, double* x2);
 
 
@@ -37,9 +36,9 @@ void test_findroots (double* x1, double* x2);
 
 int main()
     {
-    printf                           ("Hey there\n");
-    printf ("Let's solve your quadratic equation\n");
-    printf       ("Enter coefficients a, b and c\n");
+    printf                            ("Hey there\n");
+    printf ("Let me solve your quadratic equation\n");
+    printf        ("Enter coefficients a, b and c\n");
 
 
     double a = 0,
@@ -60,13 +59,28 @@ int main()
         {
         case  TwoRoots: printf ("2 roots: %.3lg and %.3lg\n", x1, x2);
                  break;
-        case  OneRoot: printf           ("Only 1 root: %.3lg\n", x1);
+        case  OneRoot: printf            ("Only 1 root: %.3lg\n", x1);
                  break;
-        case  NoRoots: printf                         ("No roots\n");
+        case  NoRoots: printf                          ("No roots\n");
                  break;
-        case  InfinitRoots: printf             ("Any number is a root\n");
+        case  InfinitRoots: printf         ("Any number is a root\n");
                  break;
+        default: printf                    ("Something went wrong\n");
         }
+
+
+    double oldx1 = x1,
+           oldx2 = x2;
+
+
+    if (test0 (&x1, &x2) == 1)
+       {
+       printf ("Test #0 is OK\n");
+       }
+    else
+       {
+       printf ("Test #0 FAILED, error in case d = Pseudo0\n");
+       }
 
     test_findroots (&x1, &x2);
 
@@ -108,25 +122,29 @@ NRoots findroots (double a, double b, double c, double* x1, double* x2)
 
        double discr = b*b - 4*a*c;
 
+       #define Dtest(discr, a, b, x1, x2)\
+                                         \
+       if (discr > Pseudo0)              \
+          {                              \
+          *x1 = (-b + sqrt(discr))/(2*a);\
+          *x2 = (-b - sqrt(discr))/(2*a);\
+          return TwoRoots;               \
+          }                              \
+       else                              \
+          {                              \
+          if (IsZero (discr))            \
+             {                           \
+             *x1 = -b/(2*a);             \
+             return OneRoot;             \
+             }                           \
+          else                           \
+             {                           \
+             return NoRoots;             \
+             }                           \
+          }
 
-       if (discr > Pseudo0)
-          {
-          *x1 = (-b + sqrt(discr))/(2*a);
-          *x2 = (-b - sqrt(discr))/(2*a);
-          return TwoRoots;
-          }
-       else
-          {
-          if (IsZero (discr))
-             {
-             *x1 = -b/(2*a);
-             return OneRoot;
-             }
-          else
-             {
-             return NoRoots;
-             }
-          }
+       Dtest(discr, a, b, x1, x2)
+
        }
     }
 
@@ -148,8 +166,20 @@ int IsZero (double value)
 //-----------------------------------------------------------------------------
 
 
+NRoots test0 (double* x1, double* x2)
+    {
+    Dtest(Pseudo0, 1, 2, x1, x2)
+    }
+
+
+
+
+//-----------------------------------------------------------------------------
+
+
 void test_findroots (double* x1, double* x2)
         {
+        #undef Dtest
         #define test(arg1, arg2)                                                                                                      \
                 if (arg1 == arg2)                                                                                                     \
                    {                                                                                                                  \
