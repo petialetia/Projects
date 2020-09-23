@@ -4,6 +4,12 @@
 #include <ctype.h>
 #include <string.h>
 
+//My Heroes:
+//Эвелина
+//Вася
+//Никита
+//Серёжа
+
 struct str
 {
     char*  begi = nullptr;
