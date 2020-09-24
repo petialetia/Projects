@@ -5,26 +5,97 @@
 #include <string.h>
 
 //My Heroes:
-//Эвелина
-//Вася
-//Никита
-//Серёжа
+//Elya
+//Vasya
+//Nikita
+//Sergey
 
 struct str
 {
-    char*  begi = nullptr;
-    size_t leng = 0;
+    char*  beginning = nullptr;
+    size_t length = 0;
 };
 
-size_t measureorigin (FILE* input);
-char* copypoem (FILE* input, size_t* amount);
-size_t countlines (char* pointer, size_t amount);
-void fillstray (str* stray, char* pointer, size_t amount, size_t* lines);
-str* copystray (size_t lines, str* stray);
-void quicksort (str* s, int last, int flag, int (*cmp)(str str1, str str2, int flag), void (*swaper)(str* s1, str* s2));
-int unicomp (str str1, str str2, int flag);
+/*!
+Measures the size of the origin, returns it
+\param[in] input    Pointer to origin
+*/
+
+size_t measure_origin (FILE* input);
+
+/*!
+Copies the origin into buffer, returns pointer to the beginning of buffer
+\param[in] input     Pointer to origin
+\param[in] amount    Size of origin
+*/
+
+char* copy_poem (FILE* input, size_t* amount);
+
+/*!
+Counts number of lines, replaces '\n' to '\0', returns number of lines
+\param[in]     pointer    Pointer to buffer with origin
+\param[in,out] amount     Size of origin
+*/
+
+size_t count_lines (char* pointer, size_t amount);
+
+/*!
+Fills buffer of structs with pointers to beginnings of the lines and sizes of lines
+\param[in]     struct_array    Pointer to beginning of buffer of structs
+\param[in]     pointer         Pointer to buffer with origin
+\param[in]     amount          Size of origin
+\param[in,out] lines           Number of lines
+*/
+
+void fill_struct_array (str* struct_array, char* pointer, size_t amount, size_t* lines);
+
+/*!
+Creates same buffer with structs for revers sorting, returns pointer to it
+\param[in] lines           Number of lines
+\param[in] struct_array    Pointer to beginning of buffer of structs
+*/
+
+str* copy_struct_array (size_t lines, str* struct_array);
+
+/*!
+Quick sorts array of structs
+\param[in] s         Pointer to the beginning of buffer with structs
+\param[in] last      Number of elements in the buffer
+\param[in] step      Step for the comparator
+\param[in] cmp       Comparator
+\param[in] swaper    Function to swap structs
+*/
+
+void quick_sort (str* s, int last, int step, int (*cmp)(str str1, str str2, int flag), void (*swaper)(str* s1, str* s2));
+
+/*!
+Universal comparator for structs
+\param[in] str1    Pointer to first struct
+\param[in] str2    Pointer to second struct
+\param[in] step    Step of coming throw the symbols, 1 - front coming, -1 - reverse coming
+*/
+
+int unicomp (str str1, str str2, int step);
+
+/*!
+Function to swap structs
+\param[in] s1    Pointer to first struct
+\param[in] s2    Pointer to second struct
+*/
+
 void swaper (str* s1, str* s2);
-void writeresult (char* ponter, size_t amount, str* stray, str* revay, size_t lines, FILE* output);
+
+/*!
+Writes results of sorting, frees memory from the buffers
+\param[in] pointer          Pointer to buffer with origin
+\param[in] amount           Size of origin
+\param[in] struct_array     Pointer to the beginning of buffer with structs
+\param[in] reverse_array    Pointer to the buffer with structs for revers sorting
+\param[in] lines            Number of lines
+\param[in] output           Pointer to output file
+*/
+
+void write_result (char* ponter, size_t amount, str* struct_array, str* reverse_array, size_t lines, FILE* output);
 
 //-----------------------------------------------------------------------------
 
@@ -39,28 +110,26 @@ int main ()
     assert (input  != 0);
     assert (output != 0);
 
-    size_t amount = measureorigin (input);
-    char* pointer = copypoem (input, &amount);
-
-    //pointer[amount-1] = 0;
+    size_t amount = measure_origin (input);
+    char* pointer = copy_poem (input, &amount);
 
     fclose (input);
 
-    size_t lines = countlines (pointer, amount);
+    size_t lines = count_lines (pointer, amount);
 
 
 
-    str* stray = (str*) calloc (lines, sizeof(str));
-    assert (stray != 0);
+    str* struct_array = (str*) calloc (lines, sizeof(str));
+    assert (struct_array != 0);
 
-    fillstray (stray, pointer, amount, &lines);
+    fill_struct_array (struct_array, pointer, amount, &lines);
 
-    str* revay = copystray (lines, stray);
+    str* reverse_array = copy_struct_array (lines, struct_array);
 
-    quicksort (stray, lines, 1 , unicomp, swaper);
-    quicksort (revay, lines, -1, unicomp, swaper);
+    quick_sort (struct_array, lines, 1 , unicomp, swaper);
+    quick_sort (reverse_array, lines, -1, unicomp, swaper);
 
-    writeresult (pointer, amount, stray, revay, lines, output);
+    write_result (pointer, amount, struct_array, reverse_array, lines, output);
 
 //-----------------------------------------------------------------------------
 
@@ -82,7 +151,7 @@ int main ()
     fprintf (tefi, "What good is love and peace on Earth?\nWhen it's exclusive\nGreen Day");
     fclose (tefi);
     FILE* fite = fopen("C:\\Users\\petialetia\\Desktop\\hamlet\\TEST.txt", "r");
-    size_t a = measureorigin (fite);
+    size_t a = measure_origin (fite);
     if (a == 69)
         {
         testok
@@ -91,7 +160,7 @@ int main ()
         {
         pressf
         }
-    char* p = copypoem (fite, &a);
+    char* p = copy_poem (fite, &a);
     if (a == 68)
         {
         testok
@@ -110,7 +179,7 @@ int main ()
         pressf
         }
     fclose (fite);
-    size_t l = countlines (p, a);
+    size_t l = count_lines (p, a);
     if (l == 3)
         {
         testok
@@ -122,7 +191,7 @@ int main ()
     str* straus = (str*) calloc (l, sizeof(str));
     assert (straus != 0);
 
-    fillstray (straus, p, a, &l);
+    fill_struct_array (straus, p, a, &l);
     if (l == 3)
         {
         testok
@@ -132,7 +201,7 @@ int main ()
         pressf
         }
     char char1[38] = "What good is love and peace on Earth?";
-    if (strcmp (char1, straus[0].begi) == 0)
+    if (strcmp (char1, straus[0].beginning) == 0)
         {
         testok
         }
@@ -141,7 +210,7 @@ int main ()
         pressf
         }
     char char2[20] = "When it's exclusive";
-    if (strcmp (char2, straus[1].begi) == 0)
+    if (strcmp (char2, straus[1].beginning) == 0)
         {
         testok
         }
@@ -150,7 +219,7 @@ int main ()
         pressf
         }
     char char3[10] = "Green Day";
-    if (strcmp (char3, straus[2].begi) == 0)
+    if (strcmp (char3, straus[2].beginning) == 0)
         {
         testok
         }
@@ -158,10 +227,10 @@ int main ()
         {
         pressf
         }
-    str* revaus = copystray (l, straus);
+    str* revaus = copy_struct_array (l, straus);
     for (size_t i = 0; i < l; i++)
         {
-        if (strcmp (revaus[i].begi, straus[i].begi) == 0)
+        if (strcmp (revaus[i].beginning, straus[i].beginning) == 0)
             {
             testok
             }
@@ -170,8 +239,8 @@ int main ()
             pressf
             }
         }
-    quicksort (straus, l, 1 , unicomp, swaper);
-    if (strcmp (char3, straus[0].begi) == 0)
+    quick_sort (straus, l, 1 , unicomp, swaper);
+    if (strcmp (char3, straus[0].beginning) == 0)
         {
         testok
         }
@@ -179,7 +248,7 @@ int main ()
         {
         pressf
         }
-    if (strcmp (char1, straus[1].begi) == 0)
+    if (strcmp (char1, straus[1].beginning) == 0)
         {
         testok
         }
@@ -187,7 +256,7 @@ int main ()
         {
         pressf
         }
-    if (strcmp (char2, straus[2].begi) == 0)
+    if (strcmp (char2, straus[2].beginning) == 0)
         {
         testok
         }
@@ -195,8 +264,8 @@ int main ()
         {
         pressf
         }
-    quicksort (revaus, l, -1 , unicomp, swaper);
-    if (strcmp (char2, revaus[0].begi) == 0)
+    quick_sort (revaus, l, -1 , unicomp, swaper);
+    if (strcmp (char2, revaus[0].beginning) == 0)
         {
         testok
         }
@@ -204,7 +273,7 @@ int main ()
         {
         pressf
         }
-    if (strcmp (char1, revaus[1].begi) == 0)
+    if (strcmp (char1, revaus[1].beginning) == 0)
         {
         testok
         }
@@ -212,7 +281,7 @@ int main ()
         {
         pressf
         }
-    if (strcmp (char3, revaus[2].begi) == 0)
+    if (strcmp (char3, revaus[2].beginning) == 0)
         {
         testok
         }
@@ -220,6 +289,10 @@ int main ()
         {
         pressf
         }
+
+    free (p);
+    free (straus);
+    free (revaus);
 
 //-----------------------------------------------------------------------------
 
@@ -235,7 +308,7 @@ int main ()
 
 //-----------------------------------------------------------------------------
 
-size_t measureorigin (FILE* input)
+size_t measure_origin (FILE* input)
     {
     fseek (input, 0, SEEK_END);
     int temp = ftell(input);
@@ -244,7 +317,11 @@ size_t measureorigin (FILE* input)
     return temp;
     }
 
-char* copypoem (FILE* input, size_t* amount)
+
+//-----------------------------------------------------------------------------
+
+
+char* copy_poem (FILE* input, size_t* amount)
     {
     char* pointer = (char*) calloc (*amount+1, sizeof(char));
     assert (pointer != 0);
@@ -254,7 +331,11 @@ char* copypoem (FILE* input, size_t* amount)
     return pointer;
     }
 
-size_t countlines (char* pointer, size_t amount)
+
+//-----------------------------------------------------------------------------
+
+
+size_t count_lines (char* pointer, size_t amount)
     {
     size_t i = 0;
     for (;amount > 0; amount--, pointer++)
@@ -272,7 +353,11 @@ size_t countlines (char* pointer, size_t amount)
     return i;
     }
 
-void fillstray (str* stray, char* pointer, size_t amount, size_t* lines)
+
+//-----------------------------------------------------------------------------
+
+
+void fill_struct_array (str* struct_array, char* pointer, size_t amount, size_t* lines)
     {
     size_t cnt = 0;
     size_t temp = 0;
@@ -282,12 +367,12 @@ void fillstray (str* stray, char* pointer, size_t amount, size_t* lines)
             {
             flag = 0;
             temp = 0;
-            stray[cnt].begi = pointer;
+            struct_array[cnt].beginning = pointer;
             }
         else if ((*(pointer) == '\0') && (flag == 0))
                 {
                 flag = 1;
-                stray[cnt].leng = temp;
+                struct_array[cnt].length = temp;
                 cnt++;
                 assert (cnt <= *lines);
                 }
@@ -299,19 +384,27 @@ void fillstray (str* stray, char* pointer, size_t amount, size_t* lines)
     *lines = cnt;
     }
 
-str* copystray (size_t lines, str* stray)
+
+//-----------------------------------------------------------------------------
+
+
+str* copy_struct_array (size_t lines, str* struct_array)
     {
     str* s = (str*) calloc (lines, sizeof (str));
     assert (s != 0);
     for (size_t i = 0; i < lines; i++)
         {
-        s[i].begi = stray[i].begi;
-        s[i].leng = stray[i].leng;
+        s[i].beginning = struct_array[i].beginning;
+        s[i].length = struct_array[i].length;
         }
     return s;
     }
 
-void quicksort (str* s, int last, int flag, int (*cmp)(str str1, str str2, int flag), void (*swaper)(str* s1, str* s2))
+
+//-----------------------------------------------------------------------------
+
+
+void quick_sort (str* s, int last, int flag, int (*cmp)(str str1, str str2, int flag), void (*swaper)(str* s1, str* s2))
     {
     assert (last>0);
     assert (s);
@@ -342,13 +435,17 @@ void quicksort (str* s, int last, int flag, int (*cmp)(str str1, str str2, int f
 
     if (i < last)
         {
-        quicksort (s + i, last-i, flag, cmp, swaper);
+        quick_sort (s + i, last-i, flag, cmp, swaper);
         }
     if (0 < j)
         {
-        quicksort (s, j+1, flag, cmp, swaper);
+        quick_sort (s, j+1, flag, cmp, swaper);
         }
     }
+
+
+//-----------------------------------------------------------------------------
+
 
 int unicomp (str str1, str str2, int flag)
     {
@@ -360,17 +457,17 @@ int unicomp (str str1, str str2, int flag)
     char* y = nullptr;
     if (flag == -1)
         {
-        left  = temp1.begi + (temp1.leng - 1);
-        right = temp2.begi + (temp2.leng - 1);
-        x = temp1.begi;
-        y = temp2.begi;
+        left  = temp1.beginning + (temp1.length - 1);
+        right = temp2.beginning + (temp2.length - 1);
+        x = temp1.beginning;
+        y = temp2.beginning;
         }
     else if (flag == 1)
             {
-            left  = temp1.begi;
-            right = temp2.begi;
-            x = temp1.begi + temp1.leng - 1;
-            y = temp2.begi + temp2.leng - 1;
+            left  = temp1.beginning;
+            right = temp2.beginning;
+            x = temp1.beginning + temp1.length - 1;
+            y = temp2.beginning + temp2.length - 1;
             }
     for (;;)
         {
@@ -399,34 +496,42 @@ int unicomp (str str1, str str2, int flag)
         }
     }
 
+
+//-----------------------------------------------------------------------------
+
+
 void swaper (str* s1, str* s2)
     {
     str* left  =  s1;
     str* right =  s2;
     str* temp = (str*) calloc (1, sizeof (str));
-    (*temp). begi = (*left). begi;
-    (*temp). leng = (*left). leng;
-    (*left). begi = (*right).begi;
-    (*left). leng = (*right).leng;
-    (*right).begi = (*temp). begi;
-    (*right).leng = (*temp). leng;
+    (*temp). beginning = (*left). beginning;
+    (*temp). length   = (*left). length;
+    (*left). beginning = (*right).beginning;
+    (*left). length   = (*right).length;
+    (*right).beginning = (*temp). beginning;
+    (*right).length   = (*temp). length;
     free (temp);
     }
 
-void writeresult (char* pointer, size_t amount, str* stray, str* revay, size_t lines, FILE* output)
+
+//-----------------------------------------------------------------------------
+
+
+void write_result (char* pointer, size_t amount, str* struct_array, str* reverse_array, size_t lines, FILE* output)
     {
     fprintf (output,"\n\n\nFrontsorted Hamlet\n\n\n");
     for (size_t temp = 0;temp <lines;temp++)
         {
-        fprintf (output, "%s\n", stray[temp].begi);
+        fprintf (output, "%s\n", struct_array[temp].beginning);
         }
-    free (stray);
+    free (struct_array);
     fprintf (output,"\n\n\nReversesorted Hamlet\n\n\n");
     for (size_t temp = 0;temp <lines;temp++)
         {
-        fprintf (output, "%s\n", revay[temp].begi);
+        fprintf (output, "%s\n", reverse_array[temp].beginning);
         }
-    free (revay);
+    free (reverse_array);
     fprintf (output,"\n\n\nOriginal Hamlet, literaturavedi uspakoites\n\n\n");
     for (size_t i = 0; i < amount-1; i++)
         {
