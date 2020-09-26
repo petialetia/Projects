@@ -13,6 +13,7 @@ int main (int argC, char* argV[])
 
     if (argC > 1)
         {
+
         for (int temp = 1; temp < argC; temp++)
             {
             if (temp == argC - 1)
