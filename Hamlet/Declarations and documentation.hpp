@@ -9,12 +9,33 @@
 //Vasya
 //Nikita
 //Sergey
+//Adam
+//Ilya
 
 struct str
     {
     char*  beginning = nullptr;
     size_t length = 0;
     };
+
+struct for_text
+    {
+    FILE* input             = nullptr;
+    FILE* output            = nullptr;
+    size_t file_length      = 0;
+    char* pointer_on_buffer = nullptr;
+    size_t lines            = 0;
+    str* struct_array       = nullptr;
+    };
+
+/*!
+Function for searching a specific string in command line, returns number of that string in command line
+\param[in] argC    Number of strings in command line
+\param[in] argV    Strings from command line
+\param[in] str     String program needs to find
+*/
+
+size_t find_string (int argC, char* argV[], char* str);
 
 /*!
 Writes information about program for user
@@ -26,7 +47,7 @@ void help_printf();
 Reads names of files program needs to read and write in
 \param[in] argC             Number of strings in command line
 \param[in] argV[]           Strings from command line
-\param[in] in_fopen         Function to open file for reading or writing in
+\param[in] u_fopen          Function to open file for reading or writing in
 \param[in] str              String, program need to find
 \param[in] standart_name    Name by default for file
 */
@@ -72,12 +93,15 @@ Counts number of lines, returns number of lines
 size_t count_lines (char* pointer, size_t amount);
 
 /*!
-Replaces '\n' with '\0' in buffer, returns number of lines
+Replaces c_old with c_new in buffer
 \param[in] pointer    Pointer to buffer with origin
 \param[in] amount     Size of origin
+\param[in] c_old      Char, needed to be replaced
+\param[in] c_new      Char, which will replace c_old
+\param[in] lines      Number of lines
 */
 
-size_t replace_enter (char* pointer, size_t amount);
+void replace_char_from_buffer (char* pointer, size_t amount, char c_old, char c_new, size_t lines = 0);
 
 /*!
 Fills buffer of structs with pointers to beginnings of the lines and sizes of lines
@@ -87,26 +111,16 @@ Fills buffer of structs with pointers to beginnings of the lines and sizes of li
 \param[in,out] lines                     Number of lines
 */
 
-void fill_struct_str_array (str* struct_array, char* pointer_on_buffer, size_t file_length, size_t* lines);
+void fill_str_array (str* struct_array, char* pointer_on_buffer, size_t file_length, size_t* lines);
 
 /*!
-Function fo searching a specific string in command line, returns true, if finds, else returns false
-\param[in] argC    Number of strings in command line
-\param[in] argV    Strings from command line
-\param[in] str     String program needs to find
-*/
-
-bool find_string (int argC, char* argV[], char* str);
-
-/*!
-Quick sorts array of structs
+Quick sort for array of structs
 \param[in] s_array    Pointer on the beginning of buffer with structs
 \param[in] length     Number of elements in the buffer
 \param[in] cmp        Comparator
-\param[in] swaper     Function to swap structs
 */
 
-void quick_sort (str* s_array, int length, int (*cmp)(str str1, str str2), void (*swaper)(str* s1, str* s2));
+void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2)/*, void (*swaper)(str* s1, str* s2)*/);
 
 /*!
 Comparator for front sorting
@@ -114,7 +128,7 @@ Comparator for front sorting
 \param[in] str2    Second struct
 */
 
-int front_compare (str str1, str str2);
+int front_compare (const void* str1, const void* str2);
 
 /*!
 Comparator for reverse sorting
@@ -122,15 +136,16 @@ Comparator for reverse sorting
 \param[in] str2    Second struct
 */
 
-int reverse_compare (str str1, str str2);
+int reverse_compare (const void* str1, const void* str2);
 
 /*!
-Function to swap structs
-\param[in] s1    Pointer on first struct
-\param[in] s2    Pointer on second struct
+Universal function to swap things
+\param[in] a1      Pointer on first thing
+\param[in] a2      Pointer on second thing
+\param[in] size    Size of the thing
 */
 
-void swaper (str* s1, str* s2);
+void swaper (void* a1, void* a2, size_t size);
 
 /*!
 Writes results of sorting
@@ -149,5 +164,7 @@ Writes origin
 */
 
 void write_origin (char* pointer, size_t amount, FILE* output);
+
+void test_me ();
 
 void ftest (bool test);
