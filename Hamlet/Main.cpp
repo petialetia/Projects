@@ -63,7 +63,7 @@ int main (int argC, char* argV[])
 
         if (find_string (argC, argV, "reverse") == 0)
             {
-            quick_sort (hamlet->struct_array, hamlet->lines, front_compare/*, swaper*/);
+            quick_sort (hamlet->struct_array, hamlet->lines, front_compare);
 
             fprintf (hamlet->output,"\n\n\nFront Sorted Origin\n\n\n");
             write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
@@ -71,7 +71,7 @@ int main (int argC, char* argV[])
 
         if (find_string (argC, argV, "front") == 0)
             {
-            qsort (hamlet->struct_array, hamlet->lines, sizeof(str), reverse_compare/*, swaper*/);
+            qsort (hamlet->struct_array, hamlet->lines, sizeof(str), reverse_compare);
 
             fprintf (hamlet->output,"\n\n\nReverse Sorted Origin\n\n\n");
             write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
@@ -201,10 +201,6 @@ FILE* out_fopen (char* filename)
 
 
 //-----------------------------------------------------------------------------
-
-
-//struct stat tempvariable;
-//stat(&tempvariable);
 
 
 size_t find_length_of_file (FILE* input)
@@ -359,11 +355,11 @@ void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const vo
 
     if (i < length)
         {
-        quick_sort (s_array + i, length-i, cmp/*, swaper*/);
+        quick_sort (s_array + i, length-i, cmp);
         }
     if (0 < j)
         {
-        quick_sort (s_array, j+1, cmp/*, swaper*/);
+        quick_sort (s_array, j+1, cmp);
         }
     }
 
@@ -480,18 +476,6 @@ void swaper (void* a1, void* a2, size_t size)
     free(temp);
     }
 
-/*int x = 7;
-int y = 8;
-swap(&x, &y, sizeof(int));
-
-void swap(void* a, void* b, size_t sz) {
-    void* temp = calloc(1, sz);
-    memcpy(temp, a, sz);
-    memcpy(a, b, sz);
-    memcpy(b, temp, sz);
-    free(temp); */
-
-
 
 //-----------------------------------------------------------------------------
 
@@ -592,11 +576,11 @@ void test_me ()
     char char3[10] = "Green Day";
     ftest ((test->lines == 3) && (strcmp (char1, test->struct_array[0].beginning) == 0) && (strcmp (char2, test->struct_array[1].beginning) == 0) && (strcmp (char3, test->struct_array[2].beginning) == 0));
 
-    quick_sort (test->struct_array, test->lines, front_compare/*, swaper*/);
+    quick_sort (test->struct_array, test->lines, front_compare);
     ftest ((strcmp (char3, test->struct_array[0].beginning) == 0) && (strcmp (char1, test->struct_array[1].beginning) == 0) && (strcmp (char2, test->struct_array[2].beginning) == 0));
 
 
-    qsort (test->struct_array, test->lines, sizeof(str), reverse_compare/*, swaper*/);
+    qsort (test->struct_array, test->lines, sizeof(str), reverse_compare);
     ftest ((strcmp (char2, test->struct_array[0].beginning) == 0) && (strcmp (char1, test->struct_array[1].beginning) == 0) && (strcmp (char3, test->struct_array[2].beginning) == 0));
 
 
