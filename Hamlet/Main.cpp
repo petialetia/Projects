@@ -8,181 +8,124 @@
 
 int main (int argC, char* argV[])
     {
-
     assert (argC != 0);
     assert (argV != nullptr);
 
-    if (find_string(argC, argV, "--help") == 1)
+    for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
+
+    if (find_string (argC, argV, "--help") > 0)
         {
-        help_printf();
+        help_printf ();
         }
     else
         {
-        FILE* input  = nullptr;
-        FILE* output = nullptr;
         if (argC > 1)
             {
-            char in [3] = "in" ;
-            char out[4] = "out";
 
 
             char standart_name[18] = "Hamlet.txt";
-            input  = read_name_of_file (argC, argV, in_fopen,  in,  standart_name);
+            hamlet->input = read_name_of_file (argC, argV, in_fopen, "in", standart_name);
 
 
-            strcpy (standart_name,"Sorted Hamlet.txt");
-            output = read_name_of_file (argC, argV, out_fopen, out, standart_name);
+            strcpy (standart_name, "Sorted Hamlet.txt");
+            hamlet->output = read_name_of_file (argC, argV, out_fopen, "out", standart_name);
             }
         else
             {
-            input  = in_fopen();
-            output = out_fopen();
+            hamlet->input  = in_fopen ();
+            hamlet->output = out_fopen ();
             }
-        assert (input  != nullptr);
-        assert (output != nullptr);
+        assert (hamlet->input  != nullptr);
+        assert (hamlet->output != nullptr);
 
-        size_t file_length = find_length_of_file (input);
-        assert (file_length != 0);
+        hamlet->file_length = find_length_of_file (hamlet->input);
+        assert (hamlet->file_length != 0);
 
-        char* pointer_on_buffer = (char*) calloc (file_length+1, sizeof(char));
-        assert (pointer_on_buffer != nullptr);
+        hamlet->pointer_on_buffer = (char*) calloc (hamlet->file_length + 1, sizeof(char));
+        assert (hamlet->pointer_on_buffer != nullptr);
 
-        copy_file (input, pointer_on_buffer, &file_length);
+        copy_file (hamlet->input, hamlet->pointer_on_buffer, &(hamlet->file_length));
 
-        fclose (input);
+        fclose (hamlet->input);
 
-        size_t lines = count_lines (pointer_on_buffer, file_length);
-        assert (lines != 0);
+        hamlet->lines = count_lines (hamlet->pointer_on_buffer, hamlet->file_length);
+        assert (hamlet->lines != 0);
 
-        size_t deleted_enters = replace_enter (pointer_on_buffer, file_length);
-        assert (deleted_enters != 0);
-        assert (deleted_enters == lines);
+        replace_char_from_buffer (hamlet->pointer_on_buffer, hamlet->file_length, '\n', '\0', hamlet->lines);
 
 
 
-        str* struct_array = (str*) calloc (lines, sizeof(str));
-        assert (struct_array != nullptr);
+        hamlet->struct_array = (str*) calloc (hamlet->lines, sizeof(str));
+        assert (hamlet->struct_array != nullptr);
 
-        fill_struct_str_array (struct_array, pointer_on_buffer, file_length, &lines);
+        fill_str_array (hamlet->struct_array, hamlet->pointer_on_buffer, hamlet->file_length, &(hamlet->lines));
 
 
-        if (find_string(argC, argV, "reverse") == 0)
+        if (find_string (argC, argV, "reverse") == 0)
             {
-            quick_sort (struct_array, lines, front_compare,   swaper);
+            quick_sort (hamlet->struct_array, hamlet->lines, front_compare/*, swaper*/);
 
-            fprintf (output,"\n\n\nFront Sorted Origin\n\n\n");
-            write_result_sorted (struct_array, lines, output);
+            fprintf (hamlet->output,"\n\n\nFront Sorted Origin\n\n\n");
+            write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
             }
 
-        if (find_string(argC, argV, "front") == 0)
+        if (find_string (argC, argV, "front") == 0)
             {
-            quick_sort (struct_array, lines, reverse_compare, swaper);
+            qsort (hamlet->struct_array, hamlet->lines, sizeof(str), reverse_compare/*, swaper*/);
 
-            fprintf (output,"\n\n\nReverse Sorted Origin\n\n\n");
-            write_result_sorted (struct_array, lines, output);
+            fprintf (hamlet->output,"\n\n\nReverse Sorted Origin\n\n\n");
+            write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
             }
 
 
-        if (find_string(argC, argV, "no_origin") == 0)
+        if (find_string (argC, argV, "no_origin") == 0)
             {
-            fprintf (output,"\n\n\nOrigin Itself\n\n\n");
-            write_origin (pointer_on_buffer, file_length, output);
+            fprintf (hamlet->output,"\n\n\nOrigin Itself\n\n\n");
+            write_origin (hamlet->pointer_on_buffer, hamlet->file_length, hamlet->output);
             }
 
 
 
-        free (struct_array);
-        free (pointer_on_buffer);
+        free (hamlet->struct_array);
+        free (hamlet->pointer_on_buffer);
+        free (hamlet);
 
-
-
-//-----------------------------------------------------------------------------
-
-//  Tests
-
-//-----------------------------------------------------------------------------
-
-
-        if (find_string(argC, argV, "test") == 1)
+        if (find_string (argC, argV, "test") > 0)
             {
-            FILE* tefi = fopen("C:\\Users\\petialetia\\Desktop\\hamlet\\TEST.txt", "w");
-            assert (tefi != nullptr);
-            fprintf (tefi, "What good is love and peace on Earth?\nWhen it's exclusive\nGreen Day");
-            fclose (tefi);
-
-
-            FILE* fite = fopen("C:\\Users\\petialetia\\Desktop\\hamlet\\TEST.txt", "r");
-            assert (fite != nullptr);
-
-
-            size_t a = find_length_of_file (fite);
-            assert (a != 0);
-            ftest (a == 69);
-
-
-            char* p = (char*) calloc (a+1, sizeof(char));
-            assert (p != nullptr);
-
-            copy_file (fite, p, &a);
-            char chars[68] = "What good is love and peace on Earth?\nWhen it's exclusive\nGreen Day";
-            ftest ((strcmp (chars, p) == 0) && (a == 68));
-            fclose (fite);
-
-
-            size_t l = count_lines (p, a);
-            assert (l != 0);
-            ftest (l == 3);
-
-
-            size_t y = replace_enter (p, a);
-            assert (y == l);
-            size_t g = 0,
-                  am = a;
-            for (char* po = p; am>0; po++, am--)
-                {
-                if (*po == '\n')
-                    {
-                    g++;
-                    }
-                }
-            ftest (g == 0);
-
-
-            str* straus = (str*) calloc (l, sizeof(str));
-            assert (straus != nullptr);
-
-            fill_struct_str_array (straus, p, a, &l);
-            char char1[38] = "What good is love and peace on Earth?";
-            char char2[20] = "When it's exclusive";
-            char char3[10] = "Green Day";
-            ftest ((l == 3) && (strcmp (char1, straus[0].beginning) == 0) && (strcmp (char2, straus[1].beginning) == 0) && (strcmp (char3, straus[2].beginning) == 0));
-
-            quick_sort (straus, l, front_compare, swaper);
-            ftest ((strcmp (char3, straus[0].beginning) == 0) && (strcmp (char1, straus[1].beginning) == 0) && (strcmp (char2, straus[2].beginning) == 0));
-
-
-            quick_sort (straus, l, reverse_compare, swaper);
-            ftest ((strcmp (char2, straus[0].beginning) == 0) && (strcmp (char1, straus[1].beginning) == 0) && (strcmp (char3, straus[2].beginning) == 0));
-
-
-            free (p);
-            free (straus);
+            test_me ();
             }
         }
     }
 
-
-//-----------------------------------------------------------------------------
-
-//  END OF TESTS
-
-//-----------------------------------------------------------------------------
 
 
 
 //-----------------------------------------------------------------------------
 
 //  FUNCTIONS
+
+//-----------------------------------------------------------------------------
+
+
+size_t find_string (int argC, char* argV[], char* str)
+    {
+    assert (argC != 0);
+    assert (str != nullptr);
+
+    if (argC == 1)
+        {
+        return 0;
+        }
+    for (size_t cnt = 1; cnt < argC; cnt++)
+        {
+        if (strcmp (argV[cnt], str) == 0)
+            {
+            return cnt;
+            }
+        }
+    return 0;
+    }
+
 
 //-----------------------------------------------------------------------------
 
@@ -214,22 +157,20 @@ FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename
     assert (standart_name != nullptr);
 
     FILE* input = nullptr;
-    for (int temp = 1; temp < argC; temp++)
+
+    size_t num = find_string (argC, argV, str);
+    if (num == 0)
         {
-        if (temp == argC - 1)
-            {
-            input = u_fopen(standart_name);
-            assert (input != nullptr);
-            return input;
-            }
-        if (strcmp(argV[temp], str) == 0)
-            {
-            input = u_fopen (argV[temp+1]);
-            assert (input != nullptr);
-            return input;
-            }
+        input = u_fopen (standart_name);
         }
-    return nullptr;
+    else
+        {
+        input = u_fopen (argV[num+1]);
+        }
+
+
+    assert (input != nullptr);
+    return input;
     }
 
 
@@ -240,7 +181,7 @@ FILE* in_fopen (char* filename)
     {
     assert (filename != nullptr);
 
-    FILE* input = fopen(filename, "r");
+    FILE* input = fopen (filename, "r");
     assert (input != nullptr);
     return input;
     }
@@ -253,7 +194,7 @@ FILE* out_fopen (char* filename)
     {
     assert (filename != nullptr);
 
-    FILE* output = fopen(filename, "w");
+    FILE* output = fopen (filename, "w");
     assert (output != nullptr);
     return output;
     }
@@ -262,12 +203,16 @@ FILE* out_fopen (char* filename)
 //-----------------------------------------------------------------------------
 
 
+//struct stat tempvariable;
+//stat(&tempvariable);
+
+
 size_t find_length_of_file (FILE* input)
     {
     assert (input != nullptr);
 
     fseek (input, 0, SEEK_END);
-    int temp = ftell(input);
+    int temp = ftell (input);
     assert (temp != 0);
 
     fseek (input, 0, SEEK_SET);
@@ -284,7 +229,7 @@ void copy_file (FILE* input, char* pointer_on_buffer, size_t* file_length)
     assert (pointer_on_buffer != nullptr);
     assert (file_length != 0);
 
-    size_t size = fread(pointer_on_buffer, sizeof(char), *file_length, input);
+    size_t size = fread (pointer_on_buffer, sizeof(char), *file_length, input);
     assert (size != 0);
 
     *file_length = size+1;
@@ -316,7 +261,8 @@ size_t count_lines (char* pointer, size_t amount)
 
 //-----------------------------------------------------------------------------
 
-size_t replace_enter (char* pointer, size_t amount)
+
+void replace_char_from_buffer (char* pointer, size_t amount, char c_old, char c_new, size_t lines)
     {
     assert (pointer != nullptr);
     assert (amount != 0);
@@ -324,24 +270,28 @@ size_t replace_enter (char* pointer, size_t amount)
     size_t i = 0;
     for (;amount > 0; amount--, pointer++)
         {
-        if (*pointer == 10)
+        if (*pointer == c_old)
             {
-            *pointer = '\0';
+            *pointer = c_new;
             }
-        if (*pointer == '\0')
+        if (*pointer == c_new)
             {
             i++;
             }
         }
     assert (i != 0);
-    return i;
+
+    if (lines != 0)
+        {
+        assert (lines == i);
+        }
     }
 
 
 //-----------------------------------------------------------------------------
 
 
-void fill_struct_str_array (str* struct_array, char* pointer_on_buffer, size_t file_length, size_t* lines)
+void fill_str_array (str* struct_array, char* pointer_on_buffer, size_t file_length, size_t* lines)
     {
     assert (struct_array != nullptr);
     assert (pointer_on_buffer != nullptr);
@@ -350,19 +300,19 @@ void fill_struct_str_array (str* struct_array, char* pointer_on_buffer, size_t f
 
     size_t cnt = 0;
 
-    for (size_t temp = 0; file_length > 0; file_length--, pointer_on_buffer++)
+    for (size_t size_of_line = 0; file_length > 0; file_length--, pointer_on_buffer++)
         {
         if (*pointer_on_buffer != '\0')
             {
             struct_array[cnt].beginning = pointer_on_buffer;
             }
-        for (; *pointer_on_buffer != '\0'; pointer_on_buffer++, temp++, file_length--)
+        for (; *pointer_on_buffer != '\0'; pointer_on_buffer++, size_of_line++, file_length--)
             {
             }
         if (struct_array[cnt].beginning != nullptr)
             {
-            struct_array[cnt].length = temp;
-            temp = 0;
+            struct_array[cnt].length = size_of_line;
+            size_of_line = 0;
             cnt++;
             }
         }
@@ -376,29 +326,7 @@ void fill_struct_str_array (str* struct_array, char* pointer_on_buffer, size_t f
 //-----------------------------------------------------------------------------
 
 
-bool find_string (int argC, char* argV[], char* str)
-    {
-    assert (argC != 0);
-    assert (str != nullptr);
-
-    if (argC == 1)
-        {
-        return false;
-        }
-    for (int temp = 1; temp < argC; temp ++)
-        {
-        if (strcmp(argV[temp], str) == 0)
-            {
-            return true;
-            }
-        }
-    return false;
-    }
-
-//-----------------------------------------------------------------------------
-
-
-void quick_sort (str* s_array, int length, int (*cmp)(str str1, str str2), void (*swaper)(str* s1, str* s2))
+void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2)/*, void (*swaper)(str* s1, str* s2)*/)
     {
     assert (s_array != nullptr);
     assert (length>0);
@@ -411,17 +339,17 @@ void quick_sort (str* s_array, int length, int (*cmp)(str str1, str str2), void 
 
     do
         {
-        while (cmp(s_array[i], mid) < 0)
+        while (cmp(&s_array[i], &mid) < 0)
             {
             i++;
             }
-        while (cmp(s_array[j], mid) > 0)
+        while (cmp(&s_array[j], &mid) > 0)
             {
             j--;
             }
         if (i <= j)
             {
-            swaper (&s_array[i], &s_array[j]);
+            swaper (&s_array[i], &s_array[j], sizeof(str));
             i++;
             j--;
             }
@@ -431,11 +359,11 @@ void quick_sort (str* s_array, int length, int (*cmp)(str str1, str str2), void 
 
     if (i < length)
         {
-        quick_sort (s_array + i, length-i, cmp, swaper);
+        quick_sort (s_array + i, length-i, cmp/*, swaper*/);
         }
     if (0 < j)
         {
-        quick_sort (s_array, j+1, cmp, swaper);
+        quick_sort (s_array, j+1, cmp/*, swaper*/);
         }
     }
 
@@ -443,20 +371,20 @@ void quick_sort (str* s_array, int length, int (*cmp)(str str1, str str2), void 
 //-----------------------------------------------------------------------------
 
 
-int front_compare (str str1, str str2)
+int front_compare (const void* str1, const void* str2)
     {
-    str temp1 = str1;
-    str temp2 = str2;
+    str* temp1 = (str*) str1;
+    str* temp2 = (str*) str2;
 
     char* left  = nullptr;
     char* right = nullptr;
     char* x = nullptr;
     char* y = nullptr;
 
-    left  = temp1.beginning;
-    right = temp2.beginning;
-    x = temp1.beginning + temp1.length - 1;
-    y = temp2.beginning + temp2.length - 1;
+    left  = temp1->beginning;
+    right = temp2->beginning;
+    x = temp1->beginning + temp1->length - 1;
+    y = temp2->beginning + temp2->length - 1;
 
     for (;;)
         {
@@ -492,31 +420,31 @@ int front_compare (str str1, str str2)
 //-----------------------------------------------------------------------------
 
 
-int reverse_compare (str str1, str str2)
+int reverse_compare (const void* str1, const void* str2)
     {
-    str temp1 = str1;
-    str temp2 = str2;
+    str* temp1 = (str*) str1;
+    str* temp2 = (str*) str2;
 
     char* left  = nullptr;
     char* right = nullptr;
     char* x = nullptr;
     char* y = nullptr;
 
-    left  = temp1.beginning + (temp1.length - 1);
-    right = temp2.beginning + (temp2.length - 1);
-    x = temp1.beginning;
-    y = temp2.beginning;
+    left  = temp1->beginning + (temp1->length - 1);
+    right = temp2->beginning + (temp2->length - 1);
+    x = temp1->beginning;
+    y = temp2->beginning;
 
     for (;;)
         {
-            while ((!isalpha(*left))  && (left != x))
-                {
-                left --;
-                }
-            while ((!isalpha(*right)) && (right != y))
-                {
-                right --;
-                }
+        while ((!isalpha(*left))  && (left != x))
+            {
+            left --;
+            }
+        while ((!isalpha(*right)) && (right != y))
+            {
+            right --;
+            }
 
         if (((left == x) && (right == y)) || (tolower(left[0]) != tolower(right[0])))
             {
@@ -540,28 +468,29 @@ int reverse_compare (str str1, str str2)
 //-----------------------------------------------------------------------------
 
 
-void swaper (str* s1, str* s2)
+void swaper (void* a1, void* a2, size_t size)
     {
-    assert (s1 != nullptr);
-    assert (s2 != nullptr);
+    assert (a1 != nullptr);
+    assert (a2 != nullptr);
 
-    str* left  =  s1;
-    str* right =  s2;
-    str* temp = (str*) calloc (1, sizeof (str));
-
-
-    temp->beginning = left->beginning;
-    temp->length    = left->length;
-
-    left->beginning = right->beginning;
-    left->length    = right->length;
-
-    right->beginning = temp->beginning;
-    right->length    = temp->length;
-
-
-    free (temp);
+    void* temp = calloc(1, size);
+    memcpy (temp, a1, size);
+    memcpy (a1, a2, size);
+    memcpy (a2, temp, size);
+    free(temp);
     }
+
+/*int x = 7;
+int y = 8;
+swap(&x, &y, sizeof(int));
+
+void swap(void* a, void* b, size_t sz) {
+    void* temp = calloc(1, sz);
+    memcpy(temp, a, sz);
+    memcpy(a, b, sz);
+    memcpy(b, temp, sz);
+    free(temp); */
+
 
 
 //-----------------------------------------------------------------------------
@@ -569,7 +498,7 @@ void swaper (str* s1, str* s2)
 
 void write_result_sorted (str* str, size_t lines, FILE* output)
     {
-    for (size_t temp = 0;temp <lines;temp++)
+    for (size_t temp = 0; temp < lines; temp++)
         {
         fprintf (output, "%s\n", str[temp].beginning);
         }
@@ -596,6 +525,84 @@ void write_origin (char* pointer_on_buffer, size_t file_length, FILE* output)
             fprintf (output, "%s\n", pointer_on_buffer+temp+1);
             }
         }
+    }
+
+
+//-----------------------------------------------------------------------------
+
+//  Testing functions
+
+//-----------------------------------------------------------------------------
+
+
+void test_me ()
+    {
+
+    for_text* test = (for_text*) calloc (1, sizeof(for_text));
+
+    test->output = fopen ("C:\\Users\\petialetia\\Desktop\\hamlet\\TEST.txt", "w");
+    assert (test->output != nullptr);
+    fprintf (test->output, "What good is love and peace on Earth?\nWhen it's exclusive\nGreen Day");
+    fclose (test->output);
+
+
+    test->input = fopen ("C:\\Users\\petialetia\\Desktop\\hamlet\\TEST.txt", "r");
+    assert (test->input != nullptr);
+
+
+    test->file_length = find_length_of_file (test->input);
+    assert (test->file_length != 0);
+    ftest (test->file_length == 69);
+
+
+    test->pointer_on_buffer = (char*) calloc (test->file_length+1, sizeof(char));
+    assert (test->pointer_on_buffer != nullptr);
+
+    copy_file (test->input, test->pointer_on_buffer, &(test->file_length));
+    char chars[68] = "What good is love and peace on Earth?\nWhen it's exclusive\nGreen Day";
+    ftest ((strcmp (chars, test->pointer_on_buffer) == 0) && (test->file_length == 68));
+    fclose (test->input);
+
+
+    test->lines = count_lines (test->pointer_on_buffer, test->file_length);
+    assert (test->lines != 0);
+    ftest (test->lines == 3);
+
+
+    replace_char_from_buffer (test->pointer_on_buffer, test->file_length, '\n', '\0', test->lines);
+
+    size_t temp = 0,
+           length = test->file_length;
+    for (char* pointer = test->pointer_on_buffer;length > 0; pointer++, length--)
+        {
+        if (*pointer == '\n')
+            {
+            temp++;
+            }
+        }
+    ftest (temp == 0);
+
+
+    test->struct_array = (str*) calloc (test->lines, sizeof(str));
+    assert (test->struct_array != nullptr);
+
+    fill_str_array (test->struct_array, test->pointer_on_buffer, test->file_length, &(test->lines));
+    char char1[38] = "What good is love and peace on Earth?";
+    char char2[20] = "When it's exclusive";
+    char char3[10] = "Green Day";
+    ftest ((test->lines == 3) && (strcmp (char1, test->struct_array[0].beginning) == 0) && (strcmp (char2, test->struct_array[1].beginning) == 0) && (strcmp (char3, test->struct_array[2].beginning) == 0));
+
+    quick_sort (test->struct_array, test->lines, front_compare/*, swaper*/);
+    ftest ((strcmp (char3, test->struct_array[0].beginning) == 0) && (strcmp (char1, test->struct_array[1].beginning) == 0) && (strcmp (char2, test->struct_array[2].beginning) == 0));
+
+
+    qsort (test->struct_array, test->lines, sizeof(str), reverse_compare/*, swaper*/);
+    ftest ((strcmp (char2, test->struct_array[0].beginning) == 0) && (strcmp (char1, test->struct_array[1].beginning) == 0) && (strcmp (char3, test->struct_array[2].beginning) == 0));
+
+
+    free (test->pointer_on_buffer);
+    free (test->struct_array);
+    free (test);
     }
 
 
