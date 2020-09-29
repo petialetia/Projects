@@ -17,11 +17,28 @@ struct str
     };
 
 /*!
+Writes information about program for user
+*/
+
+void help_printf();
+
+/*!
+Reads names of files program needs to read and write in
+\param[in] argC             Number of strings in command line
+\param[in] argV[]           Strings from command line
+\param[in] in_fopen         Function to open file for reading or writing in
+\param[in] str              String, program need to find
+\param[in] standart_name    Name by default for file
+*/
+
+FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename), char* str, char* standart_name);
+
+/*!
 Opens file for reading, by default it is "hamlet.txt", returns pointer on it
 \param[in] filename    Name of file program needs to read
 */
 
-FILE* in_fopen  (char* filename = "hamlet.txt");
+FILE* in_fopen  (char* filename = "Hamlet.txt");
 
 /*!
 Opens file for writing, by default it is "Sorted Hamlet.txt", returns pointer on it
@@ -32,19 +49,19 @@ FILE* out_fopen (char* filename = "Sorted Hamlet.txt");
 
 /*!
 Measures the size of the origin, returns it
-\param[in] input    Pointer to origin
+\param[in] input    Pointer on origin
 */
 
-size_t measure_file (FILE* input);
+size_t find_length_of_file (FILE* input);
 
 /*!
 Copies the origin into buffer
-\param[in]      input      Pointer to origin
-\param[in]      pointer    Pointer to buffer
-\param[in, out] amount     Size of origin
+\param[in]      input                Pointer to origin
+\param[in]      pointer_on_buffer    Pointer to buffer
+\param[in, out] file_length          Size of origin
 */
 
-void copy_file (FILE* input, char* pointer, size_t* amount);
+void copy_file (FILE* input, char* pointer_on_buffer, size_t* file_length);
 
 /*!
 Counts number of lines, returns number of lines
@@ -64,67 +81,73 @@ size_t replace_enter (char* pointer, size_t amount);
 
 /*!
 Fills buffer of structs with pointers to beginnings of the lines and sizes of lines
-\param[in]     struct_array    Pointer to beginning of buffer of structs
-\param[in]     pointer         Pointer to buffer with origin
-\param[in]     amount          Size of origin
-\param[in,out] lines           Number of lines
+\param[in]     struct_array              Pointer on beginning of buffer of structs
+\param[in]     pointer_on_buffer         Pointer on buffer with origin
+\param[in]     file_length               Size of origin
+\param[in,out] lines                     Number of lines
 */
 
-void fill_struct_str_array (str* struct_array, char* pointer, size_t amount, size_t* lines);
+void fill_struct_str_array (str* struct_array, char* pointer_on_buffer, size_t file_length, size_t* lines);
 
 /*!
-Creates same buffer with structs for revers sorting, returns pointer on it
-\param[in] lines            Number of lines
-\param[in] struct_array     Pointer on beginning of buffer of structs
-\param[in] reverse_array    Pointer on beginning of buffer for reverse sorting
+Function fo searching a specific string in command line, returns true, if finds, else returns false
+\param[in] argC    Number of strings in command line
+\param[in] argV    Strings from command line
+\param[in] str     String program needs to find
 */
 
-void copy_struct_array (size_t lines, str* struct_array, str* reverse_array);
+bool find_string (int argC, char* argV[], char* str);
 
 /*!
 Quick sorts array of structs
-\param[in] s         Pointer on the beginning of buffer with structs
-\param[in] last      Number of elements in the buffer
-\param[in] cmp       Comparator
-\param[in] swaper    Function to swap structs
+\param[in] s_array    Pointer on the beginning of buffer with structs
+\param[in] length     Number of elements in the buffer
+\param[in] cmp        Comparator
+\param[in] swaper     Function to swap structs
 */
 
-void quick_sort (str* s, int last, int (*cmp)(str str1, str str2), void (*swaper)(str* s1, str* s2));
+void quick_sort (str* s_array, int length, int (*cmp)(str str1, str str2), void (*swaper)(str* s1, str* s2));
 
 /*!
 Comparator for front sorting
-\param[in] str1    Pointer to first struct
-\param[in] str2    Pointer to second struct
+\param[in] str1    First struct
+\param[in] str2    Second struct
 */
 
 int front_compare (str str1, str str2);
 
 /*!
 Comparator for reverse sorting
-\param[in] str1    Pointer on first struct
-\param[in] str2    Pointer on second struct
+\param[in] str1    First struct
+\param[in] str2    Second struct
 */
 
 int reverse_compare (str str1, str str2);
 
 /*!
 Function to swap structs
-\param[in] s1    Pointer to first struct
-\param[in] s2    Pointer to second struct
+\param[in] s1    Pointer on first struct
+\param[in] s2    Pointer on second struct
 */
 
 void swaper (str* s1, str* s2);
 
 /*!
 Writes results of sorting
-\param[in] pointer          Pointer on buffer with origin
-\param[in] amount           Size of origin
-\param[in] struct_array     Pointer on the beginning of buffer with structs
-\param[in] reverse_array    Pointer on the buffer with structs for revers sorting
-\param[in] lines            Number of lines
-\param[in] output           Pointer on output file
+\param[in] str       Pointer on the beginning of buffer with structs
+\param[in] lines     Number of lines
+\param[in] output    Pointer on output file
 */
 
-void write_result (char* ponter, size_t amount, str* struct_array, str* reverse_array, size_t lines, FILE* output);
+void write_result_sorted (str* str, size_t lines, FILE* output);
+
+/*!
+Writes origin
+\param[in] pointer    Pointer on buffer with origin
+\param[in] amount     Size of origin
+\param[in] output     Pointer on output file
+*/
+
+void write_origin (char* pointer, size_t amount, FILE* output);
 
 void ftest (bool test);
