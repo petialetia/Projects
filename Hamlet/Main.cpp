@@ -14,7 +14,6 @@ int main (int argC, char* argV[])
 
 
     for_text* hamlet = construct_for_text ();
-    //for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
     assert (hamlet != nullptr);
 
     keys* hamlet_keys = (keys*) calloc (1, sizeof(keys));
@@ -36,6 +35,8 @@ int main (int argC, char* argV[])
 
         free_memory (hamlet);
 
+        destructor_for_text (hamlet);
+
         hamlet_keys->test = get_arg_val (argC, argV, "-test");
 
         if (strcmp (argV[hamlet_keys->test], "1") == 0)
@@ -44,7 +45,6 @@ int main (int argC, char* argV[])
             }
         }
 
-    free (hamlet);
     free (hamlet_keys);
     }
 
@@ -515,6 +515,16 @@ void free_memory (for_text* hamlet)
 
 //-----------------------------------------------------------------------------
 
+
+void destructor_for_text (for_text* hamlet)
+    {
+    assert (hamlet != nullptr);
+    free (hamlet);
+    }
+
+
+//-----------------------------------------------------------------------------
+
 //  Testing functions
 
 //-----------------------------------------------------------------------------
@@ -523,7 +533,8 @@ void free_memory (for_text* hamlet)
 void test_me ()
     {
 
-    for_text* test = (for_text*) calloc (1, sizeof(for_text));
+    for_text* test = construct_for_text ();
+    ftest (test != nullptr);
 
     test->output = fopen ("C:\\Users\\petialetia\\Desktop\\hamlet\\TEST.txt", "w");
     assert (test->output != nullptr);
@@ -585,9 +596,8 @@ void test_me ()
     ftest ((strcmp (char2, test->struct_array[0].beginning) == 0) && (strcmp (char1, test->struct_array[1].beginning) == 0) && (strcmp (char3, test->struct_array[2].beginning) == 0));
 
 
-    free (test->pointer_on_buffer);
-    free (test->struct_array);
-    free (test);
+    free_memory (test);
+    destructor_for_text (test);
     }
 
 
