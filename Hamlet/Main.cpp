@@ -8,96 +8,31 @@
 
 int main (int argC, char* argV[])
     {
+
     assert (argC != 0);
     assert (argV != nullptr);
 
+
+
     for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
 
-    if (find_string (argC, argV, "--help") > 0)
+    keys* hamlet_keys = (keys*) calloc (1, sizeof(keys));
+
+    hamlet_keys->help = get_arg_val (argC, argV, "-help");
+
+    if ((hamlet_keys->help != 0) && (strcmp (argV[hamlet_keys->help], "1") == 0))
         {
         help_printf ();
         }
     else
         {
-        if (argC > 1)
-            {
-
-
-            char standart_name[18] = "Hamlet.txt";
-            hamlet->input = read_name_of_file (argC, argV, in_fopen, "in", standart_name);
-
-
-            strcpy (standart_name, "Sorted Hamlet.txt");
-            hamlet->output = read_name_of_file (argC, argV, out_fopen, "out", standart_name);
-            }
-        else
-            {
-            hamlet->input  = in_fopen ();
-            hamlet->output = out_fopen ();
-            }
-        assert (hamlet->input  != nullptr);
-        assert (hamlet->output != nullptr);
-
-        hamlet->file_length = find_length_of_file (hamlet->input);
-        assert (hamlet->file_length != 0);
-
-        hamlet->pointer_on_buffer = (char*) calloc (hamlet->file_length + 1, sizeof(char));
-        assert (hamlet->pointer_on_buffer != nullptr);
-
-        copy_file (hamlet->input, hamlet->pointer_on_buffer, &(hamlet->file_length));
-
-        fclose (hamlet->input);
-
-        hamlet->lines = count_lines (hamlet->pointer_on_buffer, hamlet->file_length);
-        assert (hamlet->lines != 0);
-
-        replace_char_from_buffer (hamlet->pointer_on_buffer, hamlet->file_length, '\n', '\0', hamlet->lines);
-
-
-
-        hamlet->struct_array = (str*) calloc (hamlet->lines, sizeof(str));
-        assert (hamlet->struct_array != nullptr);
-
-        fill_str_array (hamlet->struct_array, hamlet->pointer_on_buffer, hamlet->file_length, &(hamlet->lines));
-
-
-        if (find_string (argC, argV, "reverse") == 0)
-            {
-            quick_sort (hamlet->struct_array, hamlet->lines, front_compare);
-
-            fprintf (hamlet->output,"\n\n\nFront Sorted Origin\n\n\n");
-            write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
-            }
-
-        if (find_string (argC, argV, "front") == 0)
-            {
-            qsort (hamlet->struct_array, hamlet->lines, sizeof(str), reverse_compare);
-
-            fprintf (hamlet->output,"\n\n\nReverse Sorted Origin\n\n\n");
-            write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
-            }
-
-
-        if (find_string (argC, argV, "no_origin") == 0)
-            {
-            fprintf (hamlet->output,"\n\n\nOrigin Itself\n\n\n");
-            write_origin (hamlet->pointer_on_buffer, hamlet->file_length, hamlet->output);
-            }
-
-
-
-        free (hamlet->struct_array);
-        free (hamlet->pointer_on_buffer);
-        free (hamlet);
-
-        if (find_string (argC, argV, "test") > 0)
-            {
-            test_me ();
-            }
+        default_way (argC, argV, hamlet, hamlet_keys);
         }
+
+    free (hamlet);
+    free (hamlet_keys);
+
     }
-
-
 
 
 //-----------------------------------------------------------------------------
@@ -107,7 +42,27 @@ int main (int argC, char* argV[])
 //-----------------------------------------------------------------------------
 
 
-size_t find_string (int argC, char* argV[], char* str)
+size_t get_arg_val (int argC, char* argV[], char* key)
+    {
+    assert (argC != 0);
+    assert (key != nullptr);
+
+
+    for (size_t cnt = 1; cnt < argC; cnt++)
+        {
+        if (strcmp (argV[cnt], key) == 0)
+            {
+            return cnt + 1;
+            }
+        }
+    return 0;
+    }
+
+
+//-----------------------------------------------------------------------------
+
+
+/*size_t find_string (int argC, char* argV[], char* str)
     {
     assert (argC != 0);
     assert (str != nullptr);
@@ -124,7 +79,7 @@ size_t find_string (int argC, char* argV[], char* str)
             }
         }
     return 0;
-    }
+    }*/
 
 
 //-----------------------------------------------------------------------------
@@ -135,21 +90,91 @@ void help_printf()
     printf ("Program was created for sorting files with text\n");
     printf ("There are 2 ways of sorting: front and reverse\n");
     printf ("You can specify the following parameters\n");
-    printf ("1) Write \"in <name of file>\" to tell program name of file it needs to read\n");
+    printf ("1) Write \"-in <name of file>\" to tell program name of file it needs to read\n");
     printf ("\tBy default it's Hamlet.txt\n");
-    printf ("2) Write \"out <name of file>\" to tell program name of file it needs to write in results of sorting\n");
+    printf ("2) Write \"-out <name of file>\" to tell program name of file it needs to write in results of sorting\n");
     printf ("\tBy default it's Sorted Hamlet.txt\n");
-    printf ("3) Write \"front\" if you want ONLY front sorted origin\n");
-    printf ("4) Write \"reverse\" if you want ONLY reverse sorted origin\n");
-    printf ("5) Write \"no_origin\" if you want the program not to copy origin\n");
-    printf ("6) Write \"test\" for unittests to work\n");
+    printf ("3) Write \"-front 0\" if you don't want front sorted origin\n");
+    printf ("4) Write \"-reverse 0\" if you don't want reverse sorted origin\n");
+    printf ("5) Write \"-origin 0\" if you don't want the program to copy origin\n");
+    printf ("6) Write \"-test 1\" for unittests to work\n");
     }
 
 
 //-----------------------------------------------------------------------------
 
 
-FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename), char* str, char* standart_name)
+void default_way (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
+    {
+
+    read_name_of_files (argC, argV, hamlet, hamlet_keys);
+
+
+    hamlet->file_length = find_length_of_file (hamlet->input);
+    assert (hamlet->file_length != 0);
+
+
+    hamlet->pointer_on_buffer = (char*) calloc (hamlet->file_length + 1, sizeof(char));
+    assert (hamlet->pointer_on_buffer != nullptr);
+
+
+    copy_file (hamlet->input, hamlet->pointer_on_buffer, &(hamlet->file_length));
+
+
+    fclose (hamlet->input);
+
+
+    hamlet->lines = count_lines (hamlet->pointer_on_buffer, hamlet->file_length);
+    assert (hamlet->lines != 0);
+
+
+    replace_char_from_buffer (hamlet->pointer_on_buffer, hamlet->file_length, '\n', '\0', hamlet->lines);
+
+
+    hamlet->struct_array = (str*) calloc (hamlet->lines, sizeof(str));
+    assert (hamlet->struct_array != nullptr);
+
+
+    fill_str_array (hamlet->struct_array, hamlet->pointer_on_buffer, hamlet->file_length, &(hamlet->lines));
+
+
+    sort_and_write (argC, argV, hamlet, hamlet_keys);
+
+
+    free (hamlet->struct_array);
+    free (hamlet->pointer_on_buffer);
+
+    hamlet_keys->test = get_arg_val (argC, argV, "-test");
+    if (strcmp (argV[hamlet_keys->test], "1") == 0)
+        {
+        test_me ();
+        }
+    }
+
+
+//-----------------------------------------------------------------------------
+
+
+void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
+    {
+    hamlet_keys->in = get_arg_val (argC, argV, "-in");
+    char standart_name[18] = "Hamlet.txt";
+    hamlet->input = (hamlet_keys->in != 0) ? (fopen (argV[hamlet_keys->in], "r")) : (fopen (standart_name, "r"));
+
+    hamlet_keys->out = get_arg_val (argC, argV, "-out");
+    strcpy (standart_name, "Sorted Hamlet.txt");
+
+    hamlet->output = (hamlet_keys->out != 0) ? (fopen (argV[hamlet_keys->out], "w")) : (fopen (standart_name, "w"));
+
+    assert (hamlet->input  != nullptr);
+    assert (hamlet->output != nullptr);
+    }
+
+
+//-----------------------------------------------------------------------------
+
+
+/*FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename), char* str, char* standart_name)
     {
     assert (argC != 0);
     assert (argV != nullptr);
@@ -171,33 +196,33 @@ FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename
 
     assert (input != nullptr);
     return input;
-    }
+    }*/
 
 
 //-----------------------------------------------------------------------------
 
 
-FILE* in_fopen (char* filename)
+/*FILE* in_fopen (char* filename)
     {
     assert (filename != nullptr);
 
     FILE* input = fopen (filename, "r");
     assert (input != nullptr);
     return input;
-    }
+    }*/
 
 
 //-----------------------------------------------------------------------------
 
 
-FILE* out_fopen (char* filename)
+/*FILE* out_fopen (char* filename)
     {
     assert (filename != nullptr);
 
     FILE* output = fopen (filename, "w");
     assert (output != nullptr);
     return output;
-    }
+    }*/
 
 
 //-----------------------------------------------------------------------------
@@ -322,6 +347,40 @@ void fill_str_array (str* struct_array, char* pointer_on_buffer, size_t file_len
 //-----------------------------------------------------------------------------
 
 
+void sort_and_write (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
+    {
+    hamlet_keys->front = get_arg_val (argC, argV, "-front");
+    if ((hamlet_keys->front == 0) || (strcmp (argV[hamlet_keys->front], "1") == 0))
+        {
+        quick_sort (hamlet->struct_array, hamlet->lines, front_compare);
+
+        fprintf (hamlet->output,"\n\n\nFront Sorted Origin\n\n\n");
+        write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
+        }
+
+
+    hamlet_keys->reverse = get_arg_val (argC, argV, "-reverse");
+    if ((hamlet_keys->reverse == 0) || (strcmp (argV[hamlet_keys->reverse], "1") == 0))
+        {
+        qsort (hamlet->struct_array, hamlet->lines, sizeof(str), reverse_compare);
+
+        fprintf (hamlet->output,"\n\n\nReverse Sorted Origin\n\n\n");
+        write_result_sorted (hamlet->struct_array, hamlet->lines, hamlet->output);
+        }
+
+
+    hamlet_keys->origin = get_arg_val (argC, argV, "-origin");
+    if ((hamlet_keys->origin == 0) || (strcmp (argV[hamlet_keys->origin], "1") == 0))
+        {
+        fprintf (hamlet->output,"\n\n\nOrigin Itself\n\n\n");
+        write_origin (hamlet->pointer_on_buffer, hamlet->file_length, hamlet->output);
+        }
+    }
+
+
+//-----------------------------------------------------------------------------
+
+
 void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2)/*, void (*swaper)(str* s1, str* s2)*/)
     {
     assert (s_array != nullptr);
@@ -371,6 +430,7 @@ int front_compare (const void* str1, const void* str2)
     {
     str* temp1 = (str*) str1;
     str* temp2 = (str*) str2;
+
 
     char* left  = nullptr;
     char* right = nullptr;
