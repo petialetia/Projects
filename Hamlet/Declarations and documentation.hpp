@@ -40,6 +40,12 @@ struct keys
     };
 
 /*!
+Creating struct for_text, returns pointer on it
+*/
+
+for_text* construct_for_text ();
+
+/*!
 Function for searching a key in command line, returns number of next string after key in command line or 0
 \param[in] argC      Number of strings in command line
 \param[in] argV[]    Strings from command line
@@ -65,14 +71,14 @@ Function for reading names of files from command line
 void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
 
 /*!
-Function to process information from input file, sort strings and write results of sorting
+Function to process information from input file
 \param[in]      argC           Number of strings in command line
 \param[in]      argV[]         Strings from command line
 \param[in, out] hamlet         Pointer on struct with variables for work with text
 \param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
 */
 
-void process_and_sort (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
+void process_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
 
 /*!
 Measures the size of the origin, returns it
@@ -180,6 +186,12 @@ Writes origin
 */
 
 void write_origin (char* pointer, size_t amount, FILE* output);
+
+/*!
+Frees memory after sorting
+\param[in,out] hamlet    Pointer on struct with variables for work with text
+*/
+void free_memory (for_text* hamlet);
 
 void test_me ();
 
