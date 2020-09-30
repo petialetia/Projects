@@ -28,6 +28,52 @@ struct for_text
     str* struct_array       = nullptr;
     };
 
+struct keys
+    {
+    int help    = 0;
+    int in      = 0;
+    int out     = 0;
+    int reverse = 0;
+    int front   = 0;
+    int origin  = 0;
+    int test    = 0;
+    };
+
+/*!
+Function for searching a key in command line, returns number of next string after key in command line or 0
+\param[in] argC      Number of strings in command line
+\param[in] argV[]    Strings from command line
+\param[in] key       Key function needs to find
+*/
+
+size_t get_arg_val (int argC, char* argV[], char* key);
+
+/*!
+Writes information about program for user
+*/
+
+void help_printf();
+
+/*!
+Function for default-case sorting
+\param[in]      argC           Number of strings in command line
+\param[in]      argV[]         Strings from command line
+\param[in, out] hamlet         Pointer on struct with variables for work with text
+\param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
+*/
+
+void default_way (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
+
+/*!
+Function for reading names of files from command line
+\param[in]      argC           Number of strings in command line
+\param[in]      argV[]         Strings from command line
+\param[in, out] hamlet         Pointer on struct with variables for work with text
+\param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
+*/
+
+void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
+
 /*!
 Function for searching a specific string in command line, returns number of that string in command line
 \param[in] argC    Number of strings in command line
@@ -36,12 +82,6 @@ Function for searching a specific string in command line, returns number of that
 */
 
 size_t find_string (int argC, char* argV[], char* str);
-
-/*!
-Writes information about program for user
-*/
-
-void help_printf();
 
 /*!
 Reads names of files program needs to read and write in
@@ -121,6 +161,16 @@ Quick sort for array of structs
 */
 
 void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2)/*, void (*swaper)(str* s1, str* s2)*/);
+
+/*!
+Function for sorting and writing results
+\param[in]      argC           Number of strings in command line
+\param[in]      argV[]         Strings from command line
+\param[in, out] hamlet         Pointer on struct with variables for work with text
+\param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
+*/
+
+void sort_and_write (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
 
 /*!
 Comparator for front sorting
