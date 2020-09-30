@@ -30,13 +30,13 @@ struct for_text
 
 struct keys
     {
-    int help    = 0;
-    int in      = 0;
-    int out     = 0;
-    int reverse = 0;
-    int front   = 0;
-    int origin  = 0;
-    int test    = 0;
+    size_t help    = 0;
+    size_t in      = 0;
+    size_t out     = 0;
+    size_t reverse = 0;
+    size_t front   = 0;
+    size_t origin  = 0;
+    size_t test    = 0;
     };
 
 /*!
