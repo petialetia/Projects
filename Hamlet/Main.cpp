@@ -13,8 +13,8 @@ int main (int argC, char* argV[])
     assert (argV != nullptr);
 
 
-
-    for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
+    for_text* hamlet = construct_for_text ();
+    //for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
     assert (hamlet != nullptr);
 
     keys* hamlet_keys = (keys*) calloc (1, sizeof(keys));
@@ -30,7 +30,11 @@ int main (int argC, char* argV[])
         {
         read_name_of_files (argC, argV, hamlet, hamlet_keys);
 
-        process_and_sort (argC, argV, hamlet, hamlet_keys);
+        process_files (argC, argV, hamlet, hamlet_keys);
+
+        sort_and_write (argC, argV, hamlet, hamlet_keys);
+
+        free_memory (hamlet);
 
         hamlet_keys->test = get_arg_val (argC, argV, "-test");
 
@@ -48,6 +52,17 @@ int main (int argC, char* argV[])
 //-----------------------------------------------------------------------------
 
 //  FUNCTIONS
+
+//-----------------------------------------------------------------------------
+
+
+for_text* construct_for_text ()
+    {
+    for_text* pointer = (for_text*) calloc (1, sizeof(for_text));
+    assert (pointer != nullptr);
+    return pointer;
+    }
+
 
 //-----------------------------------------------------------------------------
 
@@ -110,7 +125,7 @@ void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_
 //-----------------------------------------------------------------------------
 
 
-void process_and_sort (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
+void process_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
     {
     hamlet->file_length = find_length_of_file (hamlet->input);
     assert (hamlet->file_length != 0);
@@ -138,13 +153,6 @@ void process_and_sort (int argC, char* argV[], for_text* hamlet, keys* hamlet_ke
 
 
     fill_str_array (hamlet->struct_array, hamlet->pointer_on_buffer, hamlet->file_length, &(hamlet->lines));
-
-
-    sort_and_write (argC, argV, hamlet, hamlet_keys);
-
-
-    free (hamlet->struct_array);
-    free (hamlet->pointer_on_buffer);
     }
 
 
@@ -492,6 +500,16 @@ void write_origin (char* pointer_on_buffer, size_t file_length, FILE* output)
             fprintf (output, "%s\n", pointer_on_buffer+temp+1);
             }
         }
+    }
+
+
+//-----------------------------------------------------------------------------
+
+
+void free_memory (for_text* hamlet)
+    {
+    free (hamlet->struct_array);
+    free (hamlet->pointer_on_buffer);
     }
 
 
