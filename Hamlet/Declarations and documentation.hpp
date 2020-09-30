@@ -189,9 +189,17 @@ void write_origin (char* pointer, size_t amount, FILE* output);
 
 /*!
 Frees memory after sorting
-\param[in,out] hamlet    Pointer on struct with variables for work with text
+\param[in] hamlet    Pointer on struct with variables for work with text
 */
+
 void free_memory (for_text* hamlet);
+
+/*!
+Destructor for struct for_text
+\param[in] hamlet    Pointer on struct with variables for work with text
+*/
+
+void destructor_for_text (for_text* hamlet);
 
 void test_me ();
 
