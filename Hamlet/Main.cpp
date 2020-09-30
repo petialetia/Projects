@@ -15,8 +15,10 @@ int main (int argC, char* argV[])
 
 
     for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
+    assert (hamlet != nullptr);
 
     keys* hamlet_keys = (keys*) calloc (1, sizeof(keys));
+    assert (hamlet_keys != nullptr);
 
     hamlet_keys->help = get_arg_val (argC, argV, "-help");
 
@@ -26,12 +28,20 @@ int main (int argC, char* argV[])
         }
     else
         {
-        default_way (argC, argV, hamlet, hamlet_keys);
+        read_name_of_files (argC, argV, hamlet, hamlet_keys);
+
+        process_and_sort (argC, argV, hamlet, hamlet_keys);
+
+        hamlet_keys->test = get_arg_val (argC, argV, "-test");
+
+        if (strcmp (argV[hamlet_keys->test], "1") == 0)
+            {
+            test_me ();
+            }
         }
 
     free (hamlet);
     free (hamlet_keys);
-
     }
 
 
@@ -62,29 +72,6 @@ size_t get_arg_val (int argC, char* argV[], char* key)
 //-----------------------------------------------------------------------------
 
 
-/*size_t find_string (int argC, char* argV[], char* str)
-    {
-    assert (argC != 0);
-    assert (str != nullptr);
-
-    if (argC == 1)
-        {
-        return 0;
-        }
-    for (size_t cnt = 1; cnt < argC; cnt++)
-        {
-        if (strcmp (argV[cnt], str) == 0)
-            {
-            return cnt;
-            }
-        }
-    return 0;
-    }*/
-
-
-//-----------------------------------------------------------------------------
-
-
 void help_printf()
     {
     printf ("Program was created for sorting files with text\n");
@@ -104,12 +91,27 @@ void help_printf()
 //-----------------------------------------------------------------------------
 
 
-void default_way (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
+void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
     {
+    hamlet_keys->in = get_arg_val (argC, argV, "-in");
+    char standart_name_in[] = "Hamlet.txt";
+    hamlet->input = (hamlet_keys->in != 0) ? (fopen (argV[hamlet_keys->in], "r")) : (fopen (standart_name_in, "r"));
 
-    read_name_of_files (argC, argV, hamlet, hamlet_keys);
+    hamlet_keys->out = get_arg_val (argC, argV, "-out");
+    char standart_name_out[] = "Sorted Hamlet.txt";
+
+    hamlet->output = (hamlet_keys->out != 0) ? (fopen (argV[hamlet_keys->out], "w")) : (fopen (standart_name_out, "w"));
+
+    assert (hamlet->input  != nullptr);
+    assert (hamlet->output != nullptr);
+    }
 
 
+//-----------------------------------------------------------------------------
+
+
+void process_and_sort (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
+    {
     hamlet->file_length = find_length_of_file (hamlet->input);
     assert (hamlet->file_length != 0);
 
@@ -143,86 +145,7 @@ void default_way (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
 
     free (hamlet->struct_array);
     free (hamlet->pointer_on_buffer);
-
-    hamlet_keys->test = get_arg_val (argC, argV, "-test");
-    if (strcmp (argV[hamlet_keys->test], "1") == 0)
-        {
-        test_me ();
-        }
     }
-
-
-//-----------------------------------------------------------------------------
-
-
-void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys)
-    {
-    hamlet_keys->in = get_arg_val (argC, argV, "-in");
-    char standart_name[18] = "Hamlet.txt";
-    hamlet->input = (hamlet_keys->in != 0) ? (fopen (argV[hamlet_keys->in], "r")) : (fopen (standart_name, "r"));
-
-    hamlet_keys->out = get_arg_val (argC, argV, "-out");
-    strcpy (standart_name, "Sorted Hamlet.txt");
-
-    hamlet->output = (hamlet_keys->out != 0) ? (fopen (argV[hamlet_keys->out], "w")) : (fopen (standart_name, "w"));
-
-    assert (hamlet->input  != nullptr);
-    assert (hamlet->output != nullptr);
-    }
-
-
-//-----------------------------------------------------------------------------
-
-
-/*FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename), char* str, char* standart_name)
-    {
-    assert (argC != 0);
-    assert (argV != nullptr);
-    assert (str != nullptr);
-    assert (standart_name != nullptr);
-
-    FILE* input = nullptr;
-
-    size_t num = find_string (argC, argV, str);
-    if (num == 0)
-        {
-        input = u_fopen (standart_name);
-        }
-    else
-        {
-        input = u_fopen (argV[num+1]);
-        }
-
-
-    assert (input != nullptr);
-    return input;
-    }*/
-
-
-//-----------------------------------------------------------------------------
-
-
-/*FILE* in_fopen (char* filename)
-    {
-    assert (filename != nullptr);
-
-    FILE* input = fopen (filename, "r");
-    assert (input != nullptr);
-    return input;
-    }*/
-
-
-//-----------------------------------------------------------------------------
-
-
-/*FILE* out_fopen (char* filename)
-    {
-    assert (filename != nullptr);
-
-    FILE* output = fopen (filename, "w");
-    assert (output != nullptr);
-    return output;
-    }*/
 
 
 //-----------------------------------------------------------------------------
@@ -381,7 +304,7 @@ void sort_and_write (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys
 //-----------------------------------------------------------------------------
 
 
-void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2)/*, void (*swaper)(str* s1, str* s2)*/)
+void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2))
     {
     assert (s_array != nullptr);
     assert (length>0);
