@@ -55,16 +55,6 @@ Writes information about program for user
 void help_printf();
 
 /*!
-Function for default-case sorting
-\param[in]      argC           Number of strings in command line
-\param[in]      argV[]         Strings from command line
-\param[in, out] hamlet         Pointer on struct with variables for work with text
-\param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
-*/
-
-void default_way (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
-
-/*!
 Function for reading names of files from command line
 \param[in]      argC           Number of strings in command line
 \param[in]      argV[]         Strings from command line
@@ -75,38 +65,14 @@ Function for reading names of files from command line
 void read_name_of_files (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
 
 /*!
-Function for searching a specific string in command line, returns number of that string in command line
-\param[in] argC    Number of strings in command line
-\param[in] argV    Strings from command line
-\param[in] str     String program needs to find
+Function to process information from input file, sort strings and write results of sorting
+\param[in]      argC           Number of strings in command line
+\param[in]      argV[]         Strings from command line
+\param[in, out] hamlet         Pointer on struct with variables for work with text
+\param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
 */
 
-size_t find_string (int argC, char* argV[], char* str);
-
-/*!
-Reads names of files program needs to read and write in
-\param[in] argC             Number of strings in command line
-\param[in] argV[]           Strings from command line
-\param[in] u_fopen          Function to open file for reading or writing in
-\param[in] str              String, program need to find
-\param[in] standart_name    Name by default for file
-*/
-
-FILE* read_name_of_file (int argC, char* argV[], FILE* (*u_fopen)(char* filename), char* str, char* standart_name);
-
-/*!
-Opens file for reading, by default it is "hamlet.txt", returns pointer on it
-\param[in] filename    Name of file program needs to read
-*/
-
-FILE* in_fopen  (char* filename = "Hamlet.txt");
-
-/*!
-Opens file for writing, by default it is "Sorted Hamlet.txt", returns pointer on it
-\param[in] filename    Name of file program needs to write in
-*/
-
-FILE* out_fopen (char* filename = "Sorted Hamlet.txt");
+void process_and_sort (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
 
 /*!
 Measures the size of the origin, returns it
@@ -160,7 +126,15 @@ Quick sort for array of structs
 \param[in] cmp        Comparator
 */
 
-void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2)/*, void (*swaper)(str* s1, str* s2)*/);
+void sort_and_write (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
+
+/*!
+Comparator for front sorting
+\param[in] str1    First struct
+\param[in] str2    Second struct
+*/
+
+void quick_sort (str* s_array, int length, int (*cmp)(const void* str1, const void* str2));
 
 /*!
 Function for sorting and writing results
@@ -168,14 +142,6 @@ Function for sorting and writing results
 \param[in]      argV[]         Strings from command line
 \param[in, out] hamlet         Pointer on struct with variables for work with text
 \param[in, out] hamlet_keys    Pointer on struct with variables for work with command line
-*/
-
-void sort_and_write (int argC, char* argV[], for_text* hamlet, keys* hamlet_keys);
-
-/*!
-Comparator for front sorting
-\param[in] str1    First struct
-\param[in] str2    Second struct
 */
 
 int front_compare (const void* str1, const void* str2);
