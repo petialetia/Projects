@@ -14,6 +14,7 @@ int main (int argC, char* argV[])
 
 
     for_text* hamlet = construct_for_text ();
+
     assert (hamlet != nullptr);
 
     keys* hamlet_keys = (keys*) calloc (1, sizeof(keys));
@@ -56,11 +57,33 @@ int main (int argC, char* argV[])
 //-----------------------------------------------------------------------------
 
 
-for_text* construct_for_text ()
+for_text* construct_for_text (FILE* input, FILE* output, size_t file_length, char* pointer_on_buffer, size_t lines, str* struct_array)
     {
-    for_text* pointer = (for_text*) calloc (1, sizeof(for_text));
-    assert (pointer != nullptr);
-    return pointer;
+    for_text* hamlet = (for_text*) calloc (1, sizeof(for_text));
+    assert (hamlet != nullptr);
+
+
+    hamlet->input             = input;
+    hamlet->output            = output;
+    hamlet->file_length       = file_length;
+    hamlet->pointer_on_buffer = pointer_on_buffer;
+    hamlet->lines             = lines;
+    hamlet->struct_array      = struct_array;
+
+
+    return hamlet;
+    }
+
+void construct_for_text (for_text* hamlet, FILE* input, FILE* output, size_t file_length, char* pointer_on_buffer, size_t lines, str* struct_array)
+    {
+
+    hamlet->input             = input;
+    hamlet->output            = output;
+    hamlet->file_length       = file_length;
+    hamlet->pointer_on_buffer = pointer_on_buffer;
+    hamlet->lines             = lines;
+    hamlet->struct_array      = struct_array;
+
     }
 
 
