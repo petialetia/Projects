@@ -74,7 +74,7 @@ for_text* construct_for_text (FILE* input, FILE* output, size_t file_length, cha
     return hamlet;
     }
 
-void construct_for_text (for_text* hamlet, FILE* input, FILE* output, size_t file_length, char* pointer_on_buffer, size_t lines, str* struct_array)
+for_text* construct_for_text (for_text* hamlet, FILE* input, FILE* output, size_t file_length, char* pointer_on_buffer, size_t lines, str* struct_array)
     {
 
     hamlet->input             = input;
@@ -84,6 +84,7 @@ void construct_for_text (for_text* hamlet, FILE* input, FILE* output, size_t fil
     hamlet->lines             = lines;
     hamlet->struct_array      = struct_array;
 
+    return hamlet;
     }
 
 
