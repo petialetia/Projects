@@ -40,7 +40,7 @@ struct keys
     };
 
 /*!
-Constructor for structs for_text, can request memory for it, fill the fields and return pointer on it, or fill the fields in reserved memory
+Constructor for structs for_text, can request memory for it and fill the fields, or fill the fields in reserved memory; returns pointer on changed struct,
 \param[in] hamlet               Pointer on reserved memory, if not specified, function requests memory on her own
 \param[in] input                Pointer on input file
 \param[in] output               Pointer on output file
@@ -51,7 +51,7 @@ Constructor for structs for_text, can request memory for it, fill the fields and
 */
 
 for_text* construct_for_text (                  FILE* input = nullptr, FILE* output = nullptr, size_t file_length = 0, char* pointer_on_buffer = nullptr, size_t lines = 0, str* struct_array = nullptr);
-void      construct_for_text (for_text* hamlet, FILE* input = nullptr, FILE* output = nullptr, size_t file_length = 0, char* pointer_on_buffer = nullptr, size_t lines = 0, str* struct_array = nullptr);
+for_text* construct_for_text (for_text* hamlet, FILE* input = nullptr, FILE* output = nullptr, size_t file_length = 0, char* pointer_on_buffer = nullptr, size_t lines = 0, str* struct_array = nullptr);
 
 /*!
 Function for searching a key in command line, returns number of next string after key in command line or 0
