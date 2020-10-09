@@ -1,0 +1,369 @@
+#include <stdio.h>
+#include <inttypes.h>
+#include <stdlib.h>
+#include <math.h>
+#include <assert.h>
+
+#define get_name(var) #var
+
+#define check_out(stk)                  \
+    if (stack_corrupted (stk))          \
+    {                                   \
+        stack_dump (stk);               \
+        assert (!stack_corrupted (stk));\
+    }
+
+typedef double Elem_t;
+
+const short coef = 2;
+
+const short min_capacity = 1;
+
+enum NError
+{
+    NoError,
+    Error1,
+    Error2,
+    Error3,
+    Error4,
+    Error5,
+    Error6,
+    Error7,
+    Error8
+};
+
+struct Stack_t
+{
+    Stack_t* canary1 = nullptr;
+    int size = 0;
+    int capacity = 0;
+    Elem_t*  data = nullptr;
+    char*    name_of_stack = nullptr;
+    Stack_t* canary2 = nullptr;
+};
+
+struct TortureChamber
+{
+    int executioner1[1];
+    Stack_t victim;
+    int executioner2[1];
+};
+
+//const size_t safetyness = 2*sizeof(Stack_t*);
+
+const size_t safetyness = 0;
+
+void Construct (Stack_t* stk, int start_capacity = min_capacity);
+
+void spill_poison (Stack_t* stk, uint64_t i);
+
+void Push (Stack_t* stk, Elem_t value);
+
+void extend_stack (Stack_t* stk);
+
+Elem_t Top (Stack_t* stk);
+
+void Pop (Stack_t* stk);
+
+void shrink_to_fit (Stack_t* stk);
+
+void Destroy (Stack_t* stk);
+
+
+//-----------------------------------------------------------------------------
+
+//Cheking functions
+
+//-----------------------------------------------------------------------------
+
+void stack_dump (Stack_t* stk);
+
+NError stack_corrupted (Stack_t* stk);
+
+void error_descriptor (NError number, FILE* log_file);
+
+
+//-----------------------------------------------------------------------------
+
+//MAIN
+
+//-----------------------------------------------------------------------------
+
+
+int main ()
+{
+}
+
+
+//-----------------------------------------------------------------------------
+
+//Functions
+
+//-----------------------------------------------------------------------------
+
+
+void Construct (Stack_t* stk, int start_capacity)
+{
+    if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->canary1 != nullptr) || (stk->canary2 != nullptr))
+    {
+        printf ("You're trying to construct stack, but there are some data you didn't delete\n");
+    }
+    else
+    {
+        if (start_capacity <= 0)
+        {
+            printf ("You're trying to construct stack with capacity, which is not positive\n");
+        }
+        else
+        {
+            stk->canary1 = stk;
+            stk->canary2 = stk;
+            stk->capacity = start_capacity;
+            stk->name_of_stack = get_name(stk);
+            stk->data = (Elem_t*) calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness);
+            spill_poison (stk, stk->size);
+            check_out (stk);
+        }
+    }
+}
+
+void spill_poison (Stack_t* stk, uint64_t i)
+{
+    for (; i < stk->capacity; i++)
+    {
+        stk->data[i] = NAN;
+    }
+}
+
+void Push (Stack_t* stk, Elem_t value)
+{
+    check_out (stk);
+    if (stk->size == stk->capacity)
+    {
+    extend_stack (stk);
+    }
+
+    stk->data[stk->size] = value;
+    stk->size++;
+    check_out (stk);
+}
+
+void extend_stack (Stack_t* stk)
+{
+    uint64_t old_capacity = stk->capacity;
+    stk->capacity = stk->capacity*coef;
+
+    stk->data = (Elem_t*) realloc (stk->data, stk->capacity*sizeof(Elem_t) + safetyness);
+
+    spill_poison (stk, old_capacity);
+}
+
+Elem_t Top (Stack_t* stk)
+{
+    check_out (stk);
+    if (stk->size == 0)
+    {
+        printf ("No top elements in this stack, its size equals 0");
+    }
+    else
+    {
+        return (stk->data[stk->size - 1]);
+    }
+    return NAN;
+}
+
+void Pop (Stack_t* stk)
+{
+    check_out (stk);
+
+    if (stk->size == 0)
+    {
+        printf ("You're poping stack with no elements\n");
+    }
+    else
+    {
+        stk->size--;
+
+        if ((stk->size == stk->capacity/(2*coef)) && (stk->capacity/coef >= min_capacity))
+        {
+            shrink_to_fit (stk);
+        }
+        else
+        {
+            stk->data[stk->size] = NAN;
+        }
+    }
+    check_out (stk);
+}
+
+void shrink_to_fit (Stack_t* stk)
+{
+    stk->capacity = stk->capacity/coef;
+
+    stk->data = (Elem_t*) realloc (stk->data, stk->capacity*sizeof(Elem_t) + safetyness);
+
+    spill_poison (stk, stk->capacity/2);
+}
+
+void Destroy (Stack_t* stk)
+{
+    check_out (stk);
+
+    free (stk->data);
+    stk->data = nullptr;
+    stk->size = 0;
+    stk->capacity = 0;
+    stk->name_of_stack = nullptr;
+    stk->canary1 = nullptr;
+    stk->canary2 = nullptr;
+}
+
+
+//-----------------------------------------------------------------------------
+
+void stack_dump (Stack_t* stack)
+{
+    static size_t num_of_call = 0;
+    num_of_call++;
+
+    static FILE* log_file = nullptr;
+
+    if (num_of_call == 1)
+    {
+        log_file = fopen ("LogFile.txt", "w");
+    }
+
+
+    fprintf (log_file, "Stack_t ");
+
+    fprintf (log_file, "(");
+    error_descriptor (stack_corrupted (stack), log_file);
+    fprintf (log_file, ")");
+
+    fprintf (log_file, " [%p]", stack);
+
+    fprintf (log_file, " \"%s\"\n", stack->name_of_stack);
+
+    fprintf (log_file, "{\n");
+
+    fprintf (log_file, "canary1[%p]\n", stack->canary1);
+
+    fprintf (log_file, "size = %d\n", stack->size);
+
+    fprintf (log_file, "capacity = %d\n", stack->capacity);
+
+    fprintf (log_file, "data[%p]\n", stack->data);
+
+    fprintf (log_file, "\t{\n");
+
+    if (stack->data != nullptr)
+    {
+        for (size_t i = 0; i < stack->capacity; i++)
+        {
+            fprintf (log_file, "\t");
+
+            if (isnan(stack->data[i]))
+            {
+                fprintf (log_file, " ");
+                fprintf (log_file, "[%u] = ", i);
+                fprintf (log_file, "NAN (Poison!)");
+            }
+
+            else
+            {
+                fprintf (log_file, "*");
+                fprintf (log_file, "[%u] = ", i);
+                fprintf (log_file, "%lg", stack->data[i]);
+            }
+
+            fprintf (log_file, "\n");
+        }
+    }
+    else
+    {
+        fprintf (log_file, "\tUnknown location of values in stack\n");
+    }
+
+    fprintf (log_file, "\t}\n");
+
+    fprintf (log_file, "canary2[%p]\n", stack->canary2);
+
+    fprintf (log_file, "}\n");
+
+}
+
+NError stack_corrupted (Stack_t* stk)
+{
+    if (stk == nullptr)
+    {
+        return Error1;
+    }
+
+    if (stk->size < 0)
+    {
+        return Error2;
+    }
+
+    if (stk->capacity <= 0)
+    {
+        return Error3;
+    }
+
+    if (stk->data == nullptr)
+    {
+        return Error4;
+    }
+
+    if (stk->size > stk->capacity)
+    {
+        return Error5;
+    }
+
+    if ((isnan(stk->data[stk->size-1])) && (stk->size != 0))
+    {
+        return Error6;
+    }
+
+    if ((!isnan(stk->data[stk->size])) && (stk->size != stk->capacity))
+    {
+        return Error7;
+    }
+
+    if ((stk->canary1 != stk) || (stk->canary2 != stk))
+    {
+        return Error8;
+    }
+
+    return NoError;
+}
+
+void error_descriptor (NError number, FILE* log_file)
+{
+    switch (number)
+    {
+        case Error1: fprintf (log_file, "ERROR 1: Pointer on struct equals nullptr");
+                     break;
+        case Error2: fprintf (log_file, "ERROR 2: Size of stack is negative");
+                     break;
+        case Error3: fprintf (log_file, "ERROR 3: Capacity of stack isn't positive");
+                     break;
+        case Error4: fprintf (log_file, "ERROR 4: Pointer on array equals nullptr");
+                     break;
+        case Error5: fprintf (log_file, "ERROR 5: Size of stack is bigger than capacity of stack");
+                     break;
+        case Error6: fprintf (log_file, "ERROR 6: Number of elements in stack is lesser than size of stack");
+                     break;
+        case Error7: fprintf (log_file, "ERROR 7: Number of elements in stack is bigger than size of stack");
+                     break;
+        case Error8: fprintf (log_file, "ERROR 8: Canary protection worked, your stack is corrupted");
+                     break;
+
+        case NoError: fprintf (log_file, "OK");
+                      break;
+
+        default: fprintf (log_file, "Something went wrong");
+    }
+}
+
+#undef get_name(var)
+#undef check_out(stk)
