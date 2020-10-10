@@ -6,11 +6,11 @@
 
 #define get_name(var) #var
 
-#define check_out(stk)                  \
-    if (stack_corrupted (stk))          \
-    {                                   \
-        stack_dump (stk);               \
-        assert (!stack_corrupted (stk));\
+#define check_out(stk)                     \
+    if (is_stack_corrupted (stk))          \
+    {                                      \
+        stack_dump (stk);                  \
+        assert (!is_stack_corrupted (stk));\
     }
 
 typedef double Elem_t;
@@ -78,7 +78,7 @@ void Destroy (Stack_t* stk);
 
 void stack_dump (Stack_t* stk);
 
-NError stack_corrupted (Stack_t* stk);
+NError is_stack_corrupted (Stack_t* stk);
 
 void error_descriptor (NError number, FILE* log_file);
 
@@ -237,7 +237,7 @@ void stack_dump (Stack_t* stack)
     fprintf (log_file, "Stack_t ");
 
     fprintf (log_file, "(");
-    error_descriptor (stack_corrupted (stack), log_file);
+    error_descriptor (is_stack_corrupted (stack), log_file);
     fprintf (log_file, ")");
 
     fprintf (log_file, " [%p]", stack);
@@ -292,7 +292,7 @@ void stack_dump (Stack_t* stack)
 
 }
 
-NError stack_corrupted (Stack_t* stk)
+NError is_stack_corrupted (Stack_t* stk)
 {
     if (stk == nullptr)
     {
