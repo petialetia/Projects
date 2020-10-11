@@ -298,6 +298,7 @@ char count_hash_in_elements (Stack_t* stk)
     {
         new_hash = array[i] ^ new_hash;
     }
+
     *((char*)(stk->data + stk->capacity)) = old_hash;
     return new_hash;
 }
@@ -312,6 +313,7 @@ void Push (Stack_t* stk, Elem_t value)
 
     stk->data[stk->size] = value;
     stk->size++;
+
     replace_hash_in_Stack_t (stk);
     replace_hash_in_elements (stk);
     check_out (stk);
@@ -367,8 +369,10 @@ void Pop (Stack_t* stk)
             stk->data[stk->size] = NAN;
         }
     }
+
     replace_hash_in_Stack_t (stk);
     replace_hash_in_elements (stk);
+
     check_out (stk);
 }
 
