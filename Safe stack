@@ -1,8 +1,10 @@
 #include <stdio.h>
-#include <inttypes.h>
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+
+//My heroes:
+//Nikita
 
 #define get_name(var) #var
 
@@ -29,16 +31,20 @@ enum NError
     Error5,
     Error6,
     Error7,
-    Error8
+    Error8,
+    Error9,
+    Error10,
+    Error11
 };
 
 struct Stack_t
 {
     Stack_t* canary1 = nullptr;
-    int size = 0;
-    int capacity = 0;
+    int      size = 0;
+    int      capacity = 0;
     Elem_t*  data = nullptr;
     char*    name_of_stack = nullptr;
+    char     hash = 0;
     Stack_t* canary2 = nullptr;
 };
 
@@ -49,36 +55,121 @@ struct TortureChamber
     int executioner2[1];
 };
 
-//const size_t safetyness = 2*sizeof(Stack_t*);
+const size_t safetyness = 2*sizeof(Stack_t*) + sizeof(char);
 
-const size_t safetyness = 0;
+/*!
+Construct for stack
+\param[in] stk               Pointer on struct Stack_t
+\param[in] start_capacity    Start capacity for stack, by default it is min_capacity
+*/
 
 void Construct (Stack_t* stk, int start_capacity = min_capacity);
 
-void spill_poison (Stack_t* stk, uint64_t i);
+/*!
+Function, which makes blanks elements in array equals NAN (POISON!)
+\param[in] stk                 Pointer on struct Stack_t
+\param[in] start_position      Position in array where from spills poison
+*/
+
+void spill_poison (Stack_t* stk, size_t start_position);
+
+/*!
+Updates value of hash in stack after changing
+\param[in] stk     Pointer on struct Stack_t
+*/
+
+void replace_hash_in_Stack_t (Stack_t* stk);
+
+/*!
+Counts value of hash in stack, returns it
+\param[in] stk     Pointer on struct Stack_t
+*/
+
+char count_hash_in_Stack_t (Stack_t* stk);
+
+/*!
+Updates value of hash in array after changing
+\param[in] stk     Pointer on struct Stack_t
+*/
+
+void replace_hash_in_elements (Stack_t* stk);
+
+/*!
+Counts value of hash in array, returns it
+\param[in] stk     Pointer on struct Stack_t
+*/
+
+char count_hash_in_elements (Stack_t* stk);
+
+/*!
+Function to add new value into stack
+\param[in] stk       Pointer on struct Stack_t
+\param[in] value     Value needed to be added
+*/
 
 void Push (Stack_t* stk, Elem_t value);
 
+/*!
+Extends capacity of array if it's necessarily
+\param[in] stk     Pointer on struct Stack_t
+*/
+
 void extend_stack (Stack_t* stk);
+
+/*!
+Returns last pushed value into stack
+\param[in] stk     Pointer on struct Stack_t
+*/
 
 Elem_t Top (Stack_t* stk);
 
+/*!
+Deletes last pushed value into stack
+\param[in] stk     Pointer on struct Stack_t
+*/
+
 void Pop (Stack_t* stk);
 
+/*!
+Function to reduce capacity of array
+\param[in] stk     Pointer on struct Stack_t
+*/
+
 void shrink_to_fit (Stack_t* stk);
+
+/*!
+Destroyer for stack
+\param[in] stk     Pointer on struct Stack_t
+*/
 
 void Destroy (Stack_t* stk);
 
 
 //-----------------------------------------------------------------------------
 
-//Cheking functions
+//Cheсking functions
 
 //-----------------------------------------------------------------------------
 
+/*!
+Prints all about stack in LogFile.txt
+\param[in] stk     Pointer on struct Stack_t
+*/
+
 void stack_dump (Stack_t* stk);
 
+/*!
+Analyzes stack, finds errors, returns number of error
+\param[in] stk     Pointer on struct Stack_t
+*/
+
 NError is_stack_corrupted (Stack_t* stk);
+
+/*!
+By number of error prints description about it
+\param[in] number      Number of an error
+\param[in] log_file    Pointer on LogFile.txt
+*/
 
 void error_descriptor (NError number, FILE* log_file);
 
@@ -92,6 +183,34 @@ void error_descriptor (NError number, FILE* log_file);
 
 int main ()
 {
+    struct Stack_t stk;
+
+    Construct (&stk);
+
+    Push (&stk, 10);
+
+    Destroy (&stk);
+
+    Construct (&stk);
+
+    for (size_t i = 1; i <= 17; i++)
+    {
+        Push (&stk, i);
+    }
+
+    for (size_t i = 1; i <= 9; i++)
+    {
+        Pop (&stk);
+    }
+
+    for (size_t i = 1; i <= 10; i++)
+    {
+        Push (&stk, i);
+    }
+
+    stack_dump (&stk);
+
+    Destroy (&stk);
 }
 
 
@@ -104,7 +223,7 @@ int main ()
 
 void Construct (Stack_t* stk, int start_capacity)
 {
-    if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->canary1 != nullptr) || (stk->canary2 != nullptr))
+    if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->canary1 != nullptr) || (stk->canary2 != nullptr) || (stk->hash != 0))
     {
         printf ("You're trying to construct stack, but there are some data you didn't delete\n");
     }
@@ -118,21 +237,69 @@ void Construct (Stack_t* stk, int start_capacity)
         {
             stk->canary1 = stk;
             stk->canary2 = stk;
+
             stk->capacity = start_capacity;
             stk->name_of_stack = get_name(stk);
-            stk->data = (Elem_t*) calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness);
+
+            stk->data = (Elem_t*) (calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness) + sizeof(Stack_t*));
+            *((Stack_t**)((char*)stk->data - sizeof(Stack_t*))) = stk;
+            *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))) = stk;
+
             spill_poison (stk, stk->size);
+            replace_hash_in_Stack_t (stk);
+            replace_hash_in_elements (stk);
             check_out (stk);
         }
     }
 }
 
-void spill_poison (Stack_t* stk, uint64_t i)
+void spill_poison (Stack_t* stk, size_t start_position)
 {
-    for (; i < stk->capacity; i++)
+    for (; start_position < stk->capacity; start_position++)
     {
-        stk->data[i] = NAN;
+        stk->data[start_position] = NAN;
     }
+}
+
+void replace_hash_in_Stack_t (Stack_t* stk)
+{
+    stk->hash = count_hash_in_Stack_t (stk);
+}
+
+char count_hash_in_Stack_t (Stack_t* stk)
+{
+    char old_hash = stk->hash;
+    stk->hash = 0;
+    char* array = (char*) stk;
+    char new_hash = 0;
+
+    for (size_t i = 0; i < sizeof (Stack_t); i++)
+    {
+        new_hash = array[i] ^ new_hash;
+    }
+
+    stk->hash = old_hash;
+    return new_hash;
+}
+
+void replace_hash_in_elements (Stack_t* stk)
+{
+    *((char*)(stk->data + stk->capacity)) = count_hash_in_elements (stk);
+}
+
+char count_hash_in_elements (Stack_t* stk)
+{
+    char old_hash = *((char*)(stk->data + stk->capacity));
+    *((char*)(stk->data + stk->capacity)) = 0;
+    char* array = ((char*)stk->data - sizeof(Stack_t*));
+    char new_hash = 0;
+
+    for (size_t i = 0; i < (stk->capacity * sizeof(Elem_t)) + safetyness; i++)
+    {
+        new_hash = array[i] ^ new_hash;
+    }
+    *((char*)(stk->data + stk->capacity)) = old_hash;
+    return new_hash;
 }
 
 void Push (Stack_t* stk, Elem_t value)
@@ -145,17 +312,24 @@ void Push (Stack_t* stk, Elem_t value)
 
     stk->data[stk->size] = value;
     stk->size++;
+    replace_hash_in_Stack_t (stk);
+    replace_hash_in_elements (stk);
     check_out (stk);
 }
 
 void extend_stack (Stack_t* stk)
 {
-    uint64_t old_capacity = stk->capacity;
+    size_t old_capacity = stk->capacity;
+
+    Stack_t* canary_right = *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char)));
+
     stk->capacity = stk->capacity*coef;
 
-    stk->data = (Elem_t*) realloc (stk->data, stk->capacity*sizeof(Elem_t) + safetyness);
+    stk->data = (Elem_t*) (realloc ((char*)stk->data - sizeof(Stack_t*), stk->capacity*sizeof(Elem_t) + safetyness) + sizeof(Stack_t*));
 
     spill_poison (stk, old_capacity);
+
+    *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))) = canary_right;
 }
 
 Elem_t Top (Stack_t* stk)
@@ -163,7 +337,7 @@ Elem_t Top (Stack_t* stk)
     check_out (stk);
     if (stk->size == 0)
     {
-        printf ("No top elements in this stack, its size equals 0");
+        printf ("No top elements in this stack, it's size equals 0");
     }
     else
     {
@@ -193,35 +367,43 @@ void Pop (Stack_t* stk)
             stk->data[stk->size] = NAN;
         }
     }
+    replace_hash_in_Stack_t (stk);
+    replace_hash_in_elements (stk);
     check_out (stk);
 }
 
 void shrink_to_fit (Stack_t* stk)
 {
+    Stack_t* canary_right = *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char)));
+
     stk->capacity = stk->capacity/coef;
 
-    stk->data = (Elem_t*) realloc (stk->data, stk->capacity*sizeof(Elem_t) + safetyness);
+    stk->data = (Elem_t*) (realloc ((char*)stk->data - sizeof(Stack_t*), stk->capacity*sizeof(Elem_t) + safetyness) + sizeof (Stack_t*));
 
     spill_poison (stk, stk->capacity/2);
+
+    *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))) = canary_right;
 }
 
 void Destroy (Stack_t* stk)
 {
     check_out (stk);
 
-    free (stk->data);
+    free ((char*)stk->data - sizeof(Stack_t*));
+
     stk->data = nullptr;
     stk->size = 0;
     stk->capacity = 0;
     stk->name_of_stack = nullptr;
     stk->canary1 = nullptr;
     stk->canary2 = nullptr;
+    stk->hash = 0;
 }
 
 
 //-----------------------------------------------------------------------------
 
-void stack_dump (Stack_t* stack)
+void stack_dump (Stack_t* stk)
 {
     static size_t num_of_call = 0;
     num_of_call++;
@@ -237,32 +419,36 @@ void stack_dump (Stack_t* stack)
     fprintf (log_file, "Stack_t ");
 
     fprintf (log_file, "(");
-    error_descriptor (is_stack_corrupted (stack), log_file);
+
+    error_descriptor (is_stack_corrupted (stk), log_file);
+
     fprintf (log_file, ")");
 
-    fprintf (log_file, " [%p]", stack);
+    fprintf (log_file, " [%p]", stk);
 
-    fprintf (log_file, " \"%s\"\n", stack->name_of_stack);
+    fprintf (log_file, " \"%s\"\n", stk->name_of_stack);
 
     fprintf (log_file, "{\n");
 
-    fprintf (log_file, "canary1[%p]\n", stack->canary1);
+    fprintf (log_file, "canary1[%p]\n", stk->canary1);
 
-    fprintf (log_file, "size = %d\n", stack->size);
+    fprintf (log_file, "size = %d\n", stk->size);
 
-    fprintf (log_file, "capacity = %d\n", stack->capacity);
+    fprintf (log_file, "capacity = %d\n", stk->capacity);
 
-    fprintf (log_file, "data[%p]\n", stack->data);
+    fprintf (log_file, "data[%p]\n", stk->data);
 
     fprintf (log_file, "\t{\n");
 
-    if (stack->data != nullptr)
+    if (stk->data != nullptr)
     {
-        for (size_t i = 0; i < stack->capacity; i++)
+        fprintf (log_file, "\tcanary1[%p]\n", *((Stack_t**)((char*)stk->data - sizeof(Stack_t*))));
+
+        for (size_t i = 0; i < stk->capacity; i++)
         {
             fprintf (log_file, "\t");
 
-            if (isnan(stack->data[i]))
+            if (isnan(stk->data[i]))
             {
                 fprintf (log_file, " ");
                 fprintf (log_file, "[%u] = ", i);
@@ -273,11 +459,19 @@ void stack_dump (Stack_t* stack)
             {
                 fprintf (log_file, "*");
                 fprintf (log_file, "[%u] = ", i);
-                fprintf (log_file, "%lg", stack->data[i]);
+                fprintf (log_file, "%lg", stk->data[i]);
             }
 
             fprintf (log_file, "\n");
         }
+        fprintf (log_file, "\thash = %d\n", *((char*)(stk->data + stk->capacity)));
+
+        if (is_stack_corrupted (stk) == Error11)
+        {
+            fprintf (log_file, "\t*True hash = %d*\n", count_hash_in_elements (stk));
+        }
+
+        fprintf (log_file, "\tcanary2[%p]\n", *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))));
     }
     else
     {
@@ -286,7 +480,14 @@ void stack_dump (Stack_t* stack)
 
     fprintf (log_file, "\t}\n");
 
-    fprintf (log_file, "canary2[%p]\n", stack->canary2);
+    fprintf (log_file, "hash = %d\n", stk->hash);
+
+    if (is_stack_corrupted (stk) == Error9)
+    {
+        fprintf (log_file, "*True hash = %d*\n", count_hash_in_Stack_t (stk));
+    }
+
+    fprintf (log_file, "canary2[%p]\n", stk->canary2);
 
     fprintf (log_file, "}\n");
 
@@ -334,6 +535,21 @@ NError is_stack_corrupted (Stack_t* stk)
         return Error8;
     }
 
+    if (stk->hash != count_hash_in_Stack_t (stk))
+    {
+        return Error9;
+    }
+
+    if ((*((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))) != stk) || (*((Stack_t**)((char*)stk->data - sizeof(Stack_t*))) != stk))
+    {
+        return Error10;
+    }
+
+    if (*((char*)(stk->data + stk->capacity)) != count_hash_in_elements (stk))
+    {
+        return Error11;
+    }
+
     return NoError;
 }
 
@@ -341,22 +557,28 @@ void error_descriptor (NError number, FILE* log_file)
 {
     switch (number)
     {
-        case Error1: fprintf (log_file, "ERROR 1: Pointer on struct equals nullptr");
-                     break;
-        case Error2: fprintf (log_file, "ERROR 2: Size of stack is negative");
-                     break;
-        case Error3: fprintf (log_file, "ERROR 3: Capacity of stack isn't positive");
-                     break;
-        case Error4: fprintf (log_file, "ERROR 4: Pointer on array equals nullptr");
-                     break;
-        case Error5: fprintf (log_file, "ERROR 5: Size of stack is bigger than capacity of stack");
-                     break;
-        case Error6: fprintf (log_file, "ERROR 6: Number of elements in stack is lesser than size of stack");
-                     break;
-        case Error7: fprintf (log_file, "ERROR 7: Number of elements in stack is bigger than size of stack");
-                     break;
-        case Error8: fprintf (log_file, "ERROR 8: Canary protection worked, your stack is corrupted");
-                     break;
+        case Error1:  fprintf (log_file, "ERROR 1: Pointer on struct equals nullptr");
+                      break;
+        case Error2:  fprintf (log_file, "ERROR 2: Size of stack is negative");
+                      break;
+        case Error3:  fprintf (log_file, "ERROR 3: Capacity of stack isn't positive");
+                      break;
+        case Error4:  fprintf (log_file, "ERROR 4: Pointer on array equals nullptr");
+                      break;
+        case Error5:  fprintf (log_file, "ERROR 5: Size of stack is bigger than capacity of stack");
+                      break;
+        case Error6:  fprintf (log_file, "ERROR 6: Number of elements in stack is lesser than size of stack");
+                      break;
+        case Error7:  fprintf (log_file, "ERROR 7: Number of elements in stack is bigger than size of stack");
+                      break;
+        case Error8:  fprintf (log_file, "ERROR 8: Canary protection worked, your stack is corrupted");
+                      break;
+        case Error9:  fprintf (log_file, "Error 9: Hash counted incorrectly, stack is corrupted");
+                      break;
+        case Error10: fprintf (log_file, "Error 10: Canary protection worked, elements in stack are corrupted");
+                      break;
+        case Error11: fprintf (log_file, "Error 11: Hash counted incorrectly, elements in stack are corrupted");
+                      break;
 
         case NoError: fprintf (log_file, "OK");
                       break;
