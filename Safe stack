@@ -3,9 +3,6 @@
 #include <math.h>
 #include <assert.h>
 
-//My heroes:
-//Nikita
-
 #define get_name(var) #var
 
 #define check_out(stk)                     \
@@ -183,34 +180,6 @@ void error_descriptor (NError number, FILE* log_file);
 
 int main ()
 {
-    struct Stack_t stk;
-
-    Construct (&stk);
-
-    Push (&stk, 10);
-
-    Destroy (&stk);
-
-    Construct (&stk);
-
-    for (size_t i = 1; i <= 17; i++)
-    {
-        Push (&stk, i);
-    }
-
-    for (size_t i = 1; i <= 9; i++)
-    {
-        Pop (&stk);
-    }
-
-    for (size_t i = 1; i <= 10; i++)
-    {
-        Push (&stk, i);
-    }
-
-    stack_dump (&stk);
-
-    Destroy (&stk);
 }
 
 
@@ -223,32 +192,39 @@ int main ()
 
 void Construct (Stack_t* stk, int start_capacity)
 {
-    if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->canary1 != nullptr) || (stk->canary2 != nullptr) || (stk->hash != 0))
+    if (stk == nullptr)
     {
-        printf ("You're trying to construct stack, but there are some data you didn't delete\n");
+        printf ("Your pointer is invalid\n");
     }
     else
     {
-        if (start_capacity <= 0)
+        if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->canary1 != nullptr) || (stk->canary2 != nullptr) || (stk->hash != 0))
         {
-            printf ("You're trying to construct stack with capacity, which is not positive\n");
+            printf ("You're trying to construct stack, but there are some data you didn't delete\n");
         }
         else
         {
-            stk->canary1 = stk;
-            stk->canary2 = stk;
+            if (start_capacity <= 0)
+            {
+                printf ("You're trying to construct stack with capacity, which is not positive\n");
+            }
+            else
+            {
+                stk->canary1 = stk;
+                stk->canary2 = stk;
 
-            stk->capacity = start_capacity;
-            stk->name_of_stack = get_name(stk);
+                stk->capacity = start_capacity;
+                stk->name_of_stack = get_name(stk);
 
-            stk->data = (Elem_t*) (calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness) + sizeof(Stack_t*));
-            *((Stack_t**)((char*)stk->data - sizeof(Stack_t*))) = stk;
-            *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))) = stk;
+                stk->data = (Elem_t*) ((char*) calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness) + sizeof(Stack_t*));
+                *((Stack_t**)((char*)stk->data - sizeof(Stack_t*))) = stk;
+                *((Stack_t**) ((char*) (stk->data + stk->capacity) + sizeof(char))) = stk;
 
-            spill_poison (stk, stk->size);
-            replace_hash_in_Stack_t (stk);
-            replace_hash_in_elements (stk);
-            check_out (stk);
+                spill_poison (stk, stk->size);
+                replace_hash_in_Stack_t (stk);
+                replace_hash_in_elements (stk);
+                check_out (stk);
+            }
         }
     }
 }
@@ -327,7 +303,7 @@ void extend_stack (Stack_t* stk)
 
     stk->capacity = stk->capacity*coef;
 
-    stk->data = (Elem_t*) (realloc ((char*)stk->data - sizeof(Stack_t*), stk->capacity*sizeof(Elem_t) + safetyness) + sizeof(Stack_t*));
+    stk->data = (Elem_t*) ((char*) realloc ((char*)stk->data - sizeof(Stack_t*), stk->capacity*sizeof(Elem_t) + safetyness) + sizeof(Stack_t*));
 
     spill_poison (stk, old_capacity);
 
@@ -382,7 +358,7 @@ void shrink_to_fit (Stack_t* stk)
 
     stk->capacity = stk->capacity/coef;
 
-    stk->data = (Elem_t*) (realloc ((char*)stk->data - sizeof(Stack_t*), stk->capacity*sizeof(Elem_t) + safetyness) + sizeof (Stack_t*));
+    stk->data = (Elem_t*) ((char*) realloc ((char*)stk->data - sizeof(Stack_t*), stk->capacity*sizeof(Elem_t) + safetyness) + sizeof (Stack_t*));
 
     spill_poison (stk, stk->capacity/2);
 
