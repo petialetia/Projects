@@ -252,32 +252,39 @@ void Construct (Stack_t* stk, int start_capacity)
         }
         else
         {
-            if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->hash != 0))
+            if (start_capacity > 1024)
             {
-                printf ("You're trying to construct stack, but there are some data you didn't delete\n");
+                printf ("You're trying to construct stack with too big start capacity\n");
             }
             else
             {
-                if (start_capacity <= 0)
+                if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->hash != 0))
                 {
-                    printf ("You're trying to construct stack with capacity, which is not positive\n");
+                    printf ("You're trying to construct stack, but there are some data you didn't delete\n");
                 }
                 else
                 {
-                    stk->canary1 = stk;
-                    stk->canary2 = stk;
+                    if (start_capacity <= 0)
+                    {
+                        printf ("You're trying to construct stack with capacity, which is not positive\n");
+                    }
+                    else
+                    {
+                        stk->canary1 = stk;
+                        stk->canary2 = stk;
 
-                    stk->capacity = start_capacity;
-                    stk->name_of_stack = get_name(stk);
+                        stk->capacity = start_capacity;
+                        stk->name_of_stack = get_name(stk);
 
-                    stk->data = (Elem_t*) ((char*) calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness) + sizeof(Stack_t*));
-                    *get_ptr_on_left_canary_in_elem (stk) = stk;
-                    *get_ptr_on_right_canary_in_elem (stk) = stk;
+                        stk->data = (Elem_t*) ((char*) calloc (1, (start_capacity * sizeof(Elem_t)) + safetyness) + sizeof(Stack_t*));
+                        *get_ptr_on_left_canary_in_elem (stk) = stk;
+                        *get_ptr_on_right_canary_in_elem (stk) = stk;
 
-                    spill_poison (stk, stk->size);
-                    replace_hash_in_Stack_t (stk);
-                    replace_hash_in_elements (stk);
-                    check_out (stk);
+                        spill_poison (stk, stk->size);
+                        replace_hash_in_Stack_t (stk);
+                        replace_hash_in_elements (stk);
+                        check_out (stk);
+                    }
                 }
             }
         }
