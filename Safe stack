@@ -1,7 +1,9 @@
+//#include "C:\Users\petialetia\Desktop\TX\txlib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <assert.h>
+#include <windows.h>
 
 #define SUPERPROTECT
 
@@ -32,6 +34,7 @@ enum Error
 {
     No_Error,
     STK_EQUALS_NULLPTR,
+    NO_ACCESS_STK,
     DEAD_CANARY_IN_STACK,
     INCORRECT_HASH_IN_STACK,
     DATA_EQUALS_NULLPTR,
@@ -82,6 +85,13 @@ Construct for stack
 void Construct (Stack_t* stk, int start_capacity = min_capacity);
 
 #ifdef SUPERPROTECT
+
+/*!
+Returns true if you can use the pointer, else returns false
+\param[in] ptr     Pointer on something
+*/
+
+bool can_ptr_be_used (const void* ptr);
 
 /*!
 Returns pointer on left canary in array of elements in stack
@@ -227,6 +237,46 @@ void error_descriptor (Error status, FILE* log_file);
 int main ()
 {
     Stack_t stk;
+
+    //stk = *(Stack_t*)(stk.canary2);
+
+    Construct (&stk);
+
+    //printf ("HEY\n");
+
+    Push (&stk, 30);
+
+    //printf ("%p\n", &stk);
+
+    //stk = (stk.canary2);
+
+    //printf ("%p\n", &stk);
+
+    //Push ((Stack_t*)&stk.canary2, 10);
+
+    //stk = *(Stack_t*)(stk.canary2);
+
+    Pop (&stk);
+
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+    Push (&stk, 20);
+
+    stack_dump (&stk);
+
+    Destroy (&stk);
+
+    Construct (&stk);
+
+    Destroy (&stk);
 }
 
 
@@ -246,21 +296,21 @@ void Construct (Stack_t* stk, int start_capacity)
     }
     else
     {
-        if ((stk->canary1 != (Stack_t*) &coef) || (stk->canary2 != (Stack_t*) &coef))
+        if (!can_ptr_be_used(stk))
         {
-            printf ("Your pointer is invalid\n");
+            printf ("Your pointer can not be read\n");
         }
         else
         {
-            if (start_capacity > 1024)
+            if ((stk->canary1 != (Stack_t*) &coef) || (stk->canary2 != (Stack_t*) &coef))
             {
-                printf ("You're trying to construct stack with too big start capacity\n");
+                printf ("Your pointer is invalid or you didn't destroy stack before construct new\n");
             }
             else
             {
-                if ((stk->size != 0) || (stk->capacity != 0) || (stk->data != nullptr) || (stk->name_of_stack != nullptr) || (stk->hash != 0))
+                if (start_capacity > 1024)
                 {
-                    printf ("You're trying to construct stack, but there are some data you didn't delete\n");
+                    printf ("You're trying to construct stack with too big start capacity\n");
                 }
                 else
                 {
@@ -324,6 +374,25 @@ void Construct (Stack_t* stk, int start_capacity)
 #endif
 
 #ifdef SUPERPROTECT
+
+bool can_ptr_be_used (const void* ptr)
+{
+    MEMORY_BASIC_INFORMATION mbi;
+
+    if (!VirtualQuery (ptr, &mbi, sizeof (mbi)))
+    {
+        return false;
+    }
+
+    if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS))
+    {
+        return false;
+    }
+
+    DWORD read_rights = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
+
+    return (mbi.Protect & read_rights);
+}
 
 Stack_t** get_ptr_on_left_canary_in_elem (Stack_t* stk)
 {
@@ -577,11 +646,11 @@ void stack_dump (Stack_t* stk)
 
     if (status == STK_EQUALS_NULLPTR)
     {
-        fprintf (log_file, "\nPointer on stack might equals nullptr, variables are lost\n");
+        fprintf (log_file, "\nPointer on stack equals nullptr, variables are lost\n");
     }
     else
     {
-        if (status == DEAD_CANARY_IN_STACK)
+        if ((status == DEAD_CANARY_IN_STACK) || (status == NO_ACCESS_STK))
         {
             fprintf (log_file, "\nPointer on stack might be invalid, variables are lost\n");
         }
@@ -664,6 +733,11 @@ Error is_stack_corrupted (Stack_t* stk)
         return STK_EQUALS_NULLPTR;
     }
 
+    if (!can_ptr_be_used(stk))
+    {
+        return NO_ACCESS_STK;
+    }
+
     if ((stk->canary1 != stk) || (stk->canary2 != stk))
     {
         return DEAD_CANARY_IN_STACK;
@@ -709,7 +783,7 @@ Error is_stack_corrupted (Stack_t* stk)
         return TOO_BIG_SIZE;
     }
 
-    if ((!isnan(stk->data[stk->size])) && (stk->size != stk->capacity))
+    if ((!(isnan(stk->data[stk->size]))) && (stk->size != stk->capacity))
     {
         return TOO_SMALL_SIZE;
     }
@@ -723,25 +797,27 @@ void error_descriptor (Error status, FILE* log_file)
     {
         case STK_EQUALS_NULLPTR:         fprintf (log_file, "ERROR 1: Pointer on struct equals nullptr");
                                          break;
-        case DEAD_CANARY_IN_STACK:       fprintf (log_file, "ERROR 2: Canary protection worked, your stack is corrupted");
+        case NO_ACCESS_STK:              fprintf (log_file, "ERROR 2: No access to variables on pointer");
                                          break;
-        case INCORRECT_HASH_IN_STACK:    fprintf (log_file, "Error 3: Hash counted incorrectly, stack is corrupted");
+        case DEAD_CANARY_IN_STACK:       fprintf (log_file, "ERROR 3: Canary protection worked, your stack is corrupted or not constructed");
                                          break;
-        case DATA_EQUALS_NULLPTR:        fprintf (log_file, "ERROR 4: Pointer on array equals nullptr");
+        case INCORRECT_HASH_IN_STACK:    fprintf (log_file, "Error 4: Hash counted incorrectly, stack is corrupted");
                                          break;
-        case INCORRECT_HASH_IN_ELEM:     fprintf (log_file, "Error 5: Hash counted incorrectly, elements in stack are corrupted");
+        case DATA_EQUALS_NULLPTR:        fprintf (log_file, "ERROR 5: Pointer on array equals nullptr");
                                          break;
-        case DEAD_CANARY_IN_ELEM:        fprintf (log_file, "Error 6: Canary protection worked, elements in stack are corrupted");
+        case INCORRECT_HASH_IN_ELEM:     fprintf (log_file, "Error 6: Hash counted incorrectly, elements in stack are corrupted");
                                          break;
-        case NEGATIVE_SIZE:              fprintf (log_file, "ERROR 7: Size of stack is negative");
+        case DEAD_CANARY_IN_ELEM:        fprintf (log_file, "Error 7: Canary protection worked, elements in stack are corrupted");
                                          break;
-        case NOT_POSITIVE_CAPACITY:      fprintf (log_file, "ERROR 8: Capacity of stack isn't positive");
+        case NEGATIVE_SIZE:              fprintf (log_file, "ERROR 8: Size of stack is negative");
                                          break;
-        case SIZE_BIGGER_THAN_CAPACITY:  fprintf (log_file, "ERROR 9: Size of stack is bigger than capacity of stack");
+        case NOT_POSITIVE_CAPACITY:      fprintf (log_file, "ERROR 9: Capacity of stack isn't positive");
                                          break;
-        case TOO_BIG_SIZE:               fprintf (log_file, "ERROR 10: Number of elements in stack is lesser than size of stack");
+        case SIZE_BIGGER_THAN_CAPACITY:  fprintf (log_file, "ERROR 10: Size of stack is bigger than capacity of stack");
                                          break;
-        case TOO_SMALL_SIZE:             fprintf (log_file, "ERROR 11: Number of elements in stack is bigger than size of stack");
+        case TOO_BIG_SIZE:               fprintf (log_file, "ERROR 11: Number of elements in stack is lesser than size of stack");
+                                         break;
+        case TOO_SMALL_SIZE:             fprintf (log_file, "ERROR 12: Number of elements in stack is bigger than size of stack");
                                          break;
 
 
