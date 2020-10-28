@@ -129,16 +129,7 @@ FILE* add_postfix_asm (char* argV[], keys* keys)
         {
             if (strcmp (argV[keys->in] + i, ".asm") == 0)
             {
-                standart_name_out[i]   = 'B' ;
-                standart_name_out[i+1] = 'y' ;
-                standart_name_out[i+2] = 't' ;
-                standart_name_out[i+3] = 'e' ;
-                standart_name_out[i+4] = '.' ;
-                standart_name_out[i+5] = 'c' ;
-                standart_name_out[i+6] = 'o' ;
-                standart_name_out[i+7] = 'd' ;
-                standart_name_out[i+8] = 'e' ;
-                standart_name_out[i+9] = '\0';
+                strcpy (standart_name_out + i, "Byte.code");
                 break;
             }
         }

@@ -95,19 +95,7 @@ FILE* add_postfix_disasm (char* argV[], keys* keys)
         {
             if (strcmp (argV[keys->in] + i, ".code") == 0)
             {
-                standart_name_out[i]    = 'R' ;
-                standart_name_out[i+1]  = 'e' ;
-                standart_name_out[i+2]  = 'v' ;
-                standart_name_out[i+3]  = 'e' ;
-                standart_name_out[i+4]  = 'r' ;
-                standart_name_out[i+5]  = 's' ;
-                standart_name_out[i+6]  = 'e' ;
-                standart_name_out[i+7]  = 'd' ;
-                standart_name_out[i+8]  = '.' ;
-                standart_name_out[i+9]  = 'a' ;
-                standart_name_out[i+10] = 's' ;
-                standart_name_out[i+11] = 'm' ;
-                standart_name_out[i+12] = '\0';
+                strcpy (standart_name_out + i, "Reversed.asm");
                 break;
             }
         }
