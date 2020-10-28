@@ -46,7 +46,7 @@ struct Stack_t
 
     #ifdef SUPERPROTECT
 
-    Stack_t* canary1 = (Stack_t*) &coef;
+    Stack_t* canary1 = nullptr;
 
     #endif
 
@@ -58,7 +58,7 @@ struct Stack_t
 
     char*    name_of_stack = nullptr;
     char     hash = 0;
-    Stack_t* canary2 = (Stack_t*) &coef;
+    Stack_t* canary2 = nullptr;
 
     #endif
 };
@@ -242,7 +242,7 @@ void Construct (Stack_t* stk, int start_capacity)
         }
         else
         {
-            if ((stk->canary1 != (Stack_t*) &coef) || (stk->canary2 != (Stack_t*) &coef))
+            if ((stk->canary1 != nullptr) || (stk->canary2 != nullptr))
             {
                 printf ("Your pointer is invalid or you didn't destroy stack before construct new\n");
             }
@@ -542,8 +542,8 @@ void Destroy (Stack_t* stk)
     stk->size = 0;
     stk->capacity = 0;
     stk->name_of_stack = nullptr;
-    stk->canary1 = (Stack_t*) &coef;
-    stk->canary2 = (Stack_t*) &coef;
+    stk->canary1 = nullptr;
+    stk->canary2 = nullptr;
     stk->hash = 0;
 }
 

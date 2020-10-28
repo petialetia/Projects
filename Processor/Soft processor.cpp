@@ -65,14 +65,6 @@ CPU_struct* construct_cpu_struct (text* text_file)
 {
     CPU_struct* cpu = (CPU_struct*) calloc (1, sizeof (CPU_struct));
 
-    (cpu->stack).canary1 = (Stack_t*) &coef;
-
-    (cpu->stack).canary2 = (Stack_t*) &coef;
-
-    (cpu->stack_of_calls).canary1 = (Stack_t*) &coef;
-
-    (cpu->stack_of_calls).canary2 = (Stack_t*) &coef;
-
     Construct (&cpu->stack);
 
     Construct (&cpu->stack_of_calls);

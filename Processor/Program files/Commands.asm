@@ -1,104 +1,29 @@
 in
 pop rax
-in
+push 1
 pop rbx
-in
-pop rcx
-push rax
 push 0
-je :Linear
-jmp :FindDiskr
-
-HLT:
+pop rcx
+call FUNC
+push rbx
+out
 hlt
 
-Linear:
-push rbx
-push 0
-je :OnlyC
+FUNC:
+push rcx
 push 1
-out
-push -1
-push rcx
-mul
-push rbx
-div
-out
-jmp :HLT
-
-
-OnlyC:
-push rcx
-push 0
-je :InfinitRoots
-jmp :NoRoots
-
-InfinitRoots:
-push 8
-out
-jmp :HLT
-
-NoRoots:
-push 0
-out
-jmp :HLT
-
-FindDiskr:
-push rbx
-push 2
-pow
-push rax
-push rcx
-mul
-push 4
-mul
-sub
-pop rdx
-push rdx
-push 0
-jb :NoRoots
-push rdx
-push 0
-je :OneRoot
-jmp :TwoRoots
-
-OneRoot:
-push 1
-out
-push rbx
-push -1
-mul
-push rax
-div
-push 2
-div
-out
-jmp :HLT
-
-TwoRoots:
-push 2
-out
-push rbx
-push -1
-mul
-push rdx
-sqrt
 add
-push rax
-div
-push 2
-div
-out
-
+pop rcx
 push rbx
-push -1
+push rcx
 mul
-push rdx
-sqrt
-sub
+pop rbx
+
+push rcx
 push rax
-div
-push 2
-div
-out
-jmp :HLT
+jb :1
+jmp :2
+1:
+call FUNC
+2:
+ret
