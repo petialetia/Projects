@@ -2,7 +2,7 @@
 
 void process_files_asm (int argC, char* argV[], text* text_file, keys* hamlet_keys);
 
-FILE* preparation (int argC, char* argV[], text* text_file, keys* keys);
+FILE* preparation_to_compilation (int argC, char* argV[], text* text_file, keys* keys);
 
 FILE* open_file_asm (char* argV[], text* text_file, keys* keys);
 
@@ -46,7 +46,7 @@ main (int argC, char* argV[])
 
 void process_files_asm (int argC, char* argV[], text* text_file, keys* keys)
 {
-    FILE* output = preparation (argC, argV, text_file, keys);
+    FILE* output = preparation_to_compilation (argC, argV, text_file, keys);
 
     char* code = (char*) calloc (text_file->lines*(sizeof (char) + sizeof (double)) + size_of_header, 1);
 
@@ -57,7 +57,7 @@ void process_files_asm (int argC, char* argV[], text* text_file, keys* keys)
     free (code);
 }
 
-FILE* preparation (int argC, char* argV[], text* text_file, keys* keys)
+FILE* preparation_to_compilation (int argC, char* argV[], text* text_file, keys* keys)
 {
     keys->in = get_arg_val (argC, argV, "in");
 
@@ -161,7 +161,7 @@ void compilation (text* text_file, FILE* output, char* code)
 
     for (size_t i = 0; i < max_num_of_labels; i++)
     {
-        labels[i].addr = -1;
+        memset (&labels[i].addr, -1, 1);
     }
 
     size_t ofs = 0;

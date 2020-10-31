@@ -259,8 +259,8 @@ DEF_CMD (call, 17,
 
     {
         standart_asm_cmd(call)
-        int shift = 0;
-        size_t scan = sscanf (ptr, "%d", &shift);
+        int offset = 0;
+        size_t scan = sscanf (ptr, "%d", &offset);
 
         if (scan == 0)
         {
@@ -285,7 +285,7 @@ DEF_CMD (call, 17,
 
         else
         {
-            code[ofs] = shift;
+            code[ofs] = offset;
         }
 
         ofs += sizeof (char);
