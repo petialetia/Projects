@@ -181,7 +181,7 @@ Deletes last pushed value into stack
 Elem_t Pop (Stack_t* stk);
 
 /*!
-Function to reduce capacity of array
+Function to reduce capacity of array, returns last pushed value into stack
 \param[in] stk     Pointer on struct Stack_t
 */
 
