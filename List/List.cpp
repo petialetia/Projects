@@ -159,8 +159,6 @@ main ()
 
     InsertBefore (&list, 1, 205);
 
-    list_dump (&list);
-
     Destroy (&list);
 
     Construct (&list);
