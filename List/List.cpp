@@ -30,6 +30,10 @@ enum list_status
     #include "Commands.hpp"
 
     #undef DEF_CMD
+
+    IncorrectListNode,
+
+    IncorrectEmptyNode
 };
 
 struct list_node
@@ -41,16 +45,18 @@ struct list_node
 
 struct List_t
 {
-    size_t      size         = 0;
-    size_t      capacity     = 0;
-    list_node*  data         = nullptr;
-    char*       name_of_list = nullptr;
-    list_status status       = NoError;
-    bool        mod          = 0;
+    size_t      size                    = 0;
+    size_t      capacity                = 0;
+    list_node*  data                    = nullptr;
+    char*       name_of_list            = nullptr;
 
-    size_t      head         = 0;
-    size_t      tail         = 0;
-    size_t      free         = 0;
+    list_status status                  = NoError;
+    size_t      index_of_incorrect_node = 0;
+    bool        mod                     = 0;
+
+    size_t      head                    = 0;
+    size_t      tail                    = 0;
+    size_t      free                    = 0;
 };
 
 void Construct (List_t* list, int start_capacity = MIN_CAPACITY);
@@ -75,6 +81,8 @@ void InsertAfter (List_t* list, size_t index, Elem_t val);
 
 size_t FindIndex (List_t* list, size_t num);
 
+Elem_t GetVal (List_t* list, size_t num);
+
 void ChangeMod (List_t* list);
 
 void sort_list (List_t* list);
@@ -89,11 +97,19 @@ void list_swaper (List_t* list, size_t current_node_index, size_t current_node_n
 
 void swaper (void* left, void* right, size_t size);
 
+bool is_list_looped (List_t* list);
+
+bool are_free_nodes_looped (List_t* list);
+
+size_t find_incorrect_list_node (List_t* list);
+
+size_t find_incorrect_free_node (List_t* list);
+
 list_status is_list_corrupted (List_t* list);
 
 void list_dump (List_t* list);
 
-void error_descriptor (list_status status, FILE* log_file);
+void error_descriptor (List_t* list, FILE* log_file);
 
 
 //-----------------------------------------------------------------------------
@@ -107,44 +123,23 @@ main ()
 
     InsertFront (&list, 120);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 210);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 220);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 230);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 240);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 520);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 320);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 260);
 
-    InsertBefore (&list, 1, 20);
+    InsertBefore (&list, 1, 203);
 
-    InsertBefore (&list, 1, 20);
-
-    Erase (&list, 10);
-
-    Erase (&list, 2);
-
-    Erase (&list, 8);
-
-    Erase (&list, 6);
-
-    Erase (&list, 4);
-
-    Erase (&list, 1);
-
-    ChangeMod (&list);
-
-    /*for (size_t i = 0; i <= 11; i++)
-    {
-        printf ("%u\n", FindIndex (&list, i));
-    }*/
-
-    list_dump (&list);
+    InsertBefore (&list, 1, 205);
 
     Destroy (&list);
 
@@ -276,6 +271,8 @@ void InsertBack (List_t* list, Elem_t val)
 
     list->free = list->data[list->free].next;
 
+    list->data[list->free].prev = 0;
+
     list->data[list->tail].next = 0;
 
     if (list->head == 0)
@@ -309,6 +306,8 @@ void InsertFront (List_t* list, Elem_t val)
     list->head = list->free;
 
     list->free = list->data[list->free].next;
+
+    list->data[list->free].prev = 0;
 
     list->data[list->head].next = head;
 
@@ -389,6 +388,8 @@ void InsertBefore (List_t* list, size_t index, Elem_t val)
 
         list->free = list->data[list->free].next;
 
+        list->data[list->free].prev = 0;
+
         list->data[new_node_index].val = val;
 
         list->data[new_node_index].prev = list->data[index].prev;
@@ -430,6 +431,8 @@ void InsertAfter (List_t* list, size_t index, Elem_t val)
         size_t new_node_index = list->free;
 
         list->free = list->data[list->free].next;
+
+        list->data[list->free].prev = 0;
 
         list->data[new_node_index].val = val;
 
@@ -481,14 +484,14 @@ size_t FindIndex (List_t* list, size_t num)
 
     if (num == 0)
     {
-        printf ("Zero node is system, don't touch it\n");
+        printf ("Number of system zero node is given to FindIndex\n");
         check_out (list);
         return 0;
     }
 
     if (num > list->size)
     {
-        printf ("No node with this number\n");
+        printf ("Number of empty or nonexistent node is given to FindIndex\n");
         check_out (list);
         return 0;
     }
@@ -511,6 +514,42 @@ size_t FindIndex (List_t* list, size_t num)
     return num;
 }
 
+Elem_t GetVal (List_t* list, size_t num)
+{
+    check_out (list);
+
+    if (num == 0)
+    {
+        printf ("Number of system zero node is given to GetVal\n");
+        check_out (list);
+        return NAN;
+    }
+
+    if (num > list->size)
+    {
+        printf ("Number of empty or nonexistent node is given to GetVal\n");
+        check_out (list);
+        return NAN;
+    }
+
+    if (list->mod != 0)
+    {
+        size_t index = list->head;
+
+        for (size_t i = 1; i < num; i++)
+        {
+            index = list->data[index].next;
+        }
+
+        check_out (list);
+        return list->data[index].val;
+    }
+
+    check_out (list);
+
+    return list->data[num].val;
+}
+
 void ChangeMod (List_t* list)
 {
     check_out (list);
@@ -522,8 +561,18 @@ void ChangeMod (List_t* list)
     }
     else
     {
-        sort_list (list);
-        list->mod = 0;
+        if (list->size == 0)
+        {
+            list->mod = 0;
+            printf ("Empty list is given to ChangeMod\n");
+            check_out (list);
+            return;
+        }
+        else
+        {
+            sort_list (list);
+            list->mod = 0;
+        }
     }
 
     check_out (list);
@@ -578,7 +627,11 @@ void move_head (List_t* list)
 void move_mid_node (List_t* list, size_t current_node_index, size_t current_node_num)
 {
     list->data[list->data[current_node_index].prev].next = current_node_num;
-    list->data[list->data[current_node_index].next].prev = current_node_num;
+
+    if (list->data[current_node_index].next != current_node_num)
+    {
+        list->data[list->data[current_node_index].next].prev = current_node_num;
+    }
 
     list_swaper (list, current_node_index, current_node_num);
 
@@ -614,6 +667,11 @@ void list_swaper (List_t* list, size_t current_node_index, size_t current_node_n
     if (list->data[current_node_num].prev != 0)
     {
         list->data[list->data[current_node_num].prev].next = current_node_index;
+
+        if (list->data[current_node_num].prev == current_node_index)
+        {
+            list->data[current_node_num].prev = current_node_num;
+        }
     }
 
     if (list->data[current_node_num].next != 0)
@@ -637,6 +695,182 @@ void swaper (void* left, void* right, size_t size)
     free(temp);
 }
 
+bool is_list_looped (List_t* list)
+{
+    if (list->size == 0)
+    {
+        return 0;
+    }
+
+    size_t ptr1 = list->head;
+    size_t ptr2 = list->head;
+
+    #define checking_for_loop_in_list(direction)                   \
+                                                                   \
+    for (;;)                                                       \
+    {                                                              \
+        if (list->data[ptr2].direction == 0)                       \
+        {                                                          \
+            break;                                                 \
+        }                                                          \
+        else                                                       \
+        {                                                          \
+            ptr1= list->data[ptr1].direction;                      \
+            ptr2= list->data[list->data[ptr2].direction].direction;\
+                                                                   \
+            if (ptr2 == 0)                                         \
+            {                                                      \
+                break;                                             \
+            }                                                      \
+                                                                   \
+            if (ptr1 == ptr2)                                      \
+            {                                                      \
+                return 1;                                          \
+            }                                                      \
+        }                                                          \
+    }
+
+    checking_for_loop_in_list (next);
+
+    ptr1 = list->tail;
+
+    ptr2 = list->tail;
+
+    checking_for_loop_in_list (prev);
+
+    #undef cheking_for_loop_in_list
+
+    return 0;
+}
+
+bool are_free_nodes_looped (List_t* list)
+{
+    if (list->size == list->capacity)
+    {
+        return 0;
+    }
+
+    #define checking_for_loop_in_free_nodes(direction)\
+                                                      \
+    for (;;)                                          \
+    {                                                 \
+        if (list->data[ptr2].direction == 0)          \
+        {                                             \
+            break;                                    \
+        }                                             \
+        else                                          \
+        {                                             \
+            ptr1= list->data[ptr1].direction;         \
+            ptr2= list->data[ptr2].direction;         \
+                                                      \
+            if (list->data[ptr2].direction == 0)      \
+            {                                         \
+                break;                                \
+            }                                         \
+                                                      \
+            ptr2= list->data[ptr2].direction;         \
+                                                      \
+                                                      \
+            if (ptr1 == ptr2)                         \
+            {                                         \
+                return 1;                             \
+            }                                         \
+        }                                             \
+    }
+
+    size_t ptr1 = list->free;
+    size_t ptr2 = list->free;
+
+    checking_for_loop_in_free_nodes (next);
+
+    ptr1 = ptr2;
+
+    checking_for_loop_in_free_nodes (prev);
+
+    #undef checking_for_loop_in_free_nodes
+
+    return 0;
+
+}
+
+size_t find_incorrect_list_node (List_t* list)
+{
+    if (list->mod == 0)
+    {
+        for (size_t i = 1; i < list->size; i++)
+        {
+            if (isnan(list->data[i].val) || (list->data[i].next != (i + 1)) || (list->data[i].prev != i -1))
+            {
+                return i;
+            }
+        }
+
+        if (list->data[list->size].prev != list->size -1)
+        {
+            return list->size;
+        }
+    }
+    else
+    {
+        size_t current_node_index = list->head;
+
+        size_t previous_next = 0;
+
+        for (size_t i = 1; i < list->size; i++)
+        {
+            if (isnan(list->data[current_node_index].val)             ||
+               (list->data[current_node_index].next > list->capacity) ||
+               (list->data[current_node_index].next == 0)             ||
+               (list->data[current_node_index].prev != previous_next))
+            {
+                return current_node_index;
+            }
+
+            previous_next = current_node_index;
+            current_node_index = list->data[current_node_index].next;
+
+        }
+
+        if (list->data[current_node_index].prev != previous_next) //current_node_index == list->tail
+        {
+            return current_node_index;
+        }
+    }
+
+    return 0;
+}
+
+size_t find_incorrect_free_node (List_t* list)
+{
+    size_t current_node_index = list->free;
+
+    size_t previous_next = 0;
+
+    for (size_t i = 1; i < list->capacity - list->size; i++)
+    {
+        if  (!isnan(list->data[current_node_index].val)            ||
+            (list->data[current_node_index].next > list->capacity) ||
+            (list->data[current_node_index].next == 0)             ||
+            (list->data[current_node_index].prev != previous_next))
+        {
+            return current_node_index;
+        }
+
+        previous_next = current_node_index;
+        current_node_index = list->data[current_node_index].next;
+
+    }
+
+    if ((list->data[current_node_index].prev != previous_next) || //current_node_index == index of last free node
+        (list->data[current_node_index].next != 0)             ||
+        (!isnan(list->data[current_node_index].val)))
+    {
+        return current_node_index;
+    }
+
+    return 0;
+}
+
 list_status is_list_corrupted (List_t* list)
 {
     #define DEF_CMD(name, condition, error_description)\
@@ -648,6 +882,20 @@ list_status is_list_corrupted (List_t* list)
     #include "Commands.hpp"
 
     #undef DEF_CMD
+
+    list->index_of_incorrect_node = find_incorrect_list_node (list);
+
+    if (list->index_of_incorrect_node > 0)
+    {
+        return IncorrectListNode;
+    }
+
+    list->index_of_incorrect_node = find_incorrect_free_node (list);
+
+    if (list->index_of_incorrect_node > 0)
+    {
+        return IncorrectEmptyNode;
+    }
 
     return NoError;
 }
@@ -666,7 +914,7 @@ void list_dump (List_t* list)
 
     fprintf (log_file, "List_t (");
 
-    error_descriptor (list->status, log_file);
+    error_descriptor (list, log_file);
 
     fprintf (log_file, ")");
 
@@ -736,40 +984,32 @@ void list_dump (List_t* list)
 
                 fprintf (log_file, "\tprev = %u\n\n", list->data[0].prev);
 
-                if (list->status == ZeroNodeCorrupted)
+                for (size_t i = 1; i < list->capacity + 1; i++)
                 {
-                    fprintf (log_file, "\tZeroNode is incorrect, next nodes might be corrupted\n");
-                }
-
-                else
-                {
-
-                    for (size_t i = 1; i < list->capacity + 1; i++)
+                    if (isnan(list->data[i].val))
                     {
-                        if (isnan(list->data[i].val))
-                        {
-                            fprintf (log_file, "\t [%u]\n", i);
+                        fprintf (log_file, "\t [%u]\n", i);
 
-                            fprintf (log_file, "\tval = ");
+                        fprintf (log_file, "\tval = ");
 
-                            fprintf (log_file, "NAN (POISON!)\n");
-                        }
-                        else
-                        {
-                            fprintf (log_file, "\t*[%u]\n", i);
-
-                            fprintf (log_file, "\tval = ");
-
-                            fprintf (log_file, "%lg\n", list->data[i].val);
-                        }
-
-                        fprintf (log_file, "\tnext = %u\n", list->data[i].next);
-
-                        fprintf (log_file, "\tprev = %u\n", list->data[i].prev);
-
-                        fprintf (log_file, "\n");
+                        fprintf (log_file, "NAN (POISON!)\n");
                     }
+                    else
+                    {
+                        fprintf (log_file, "\t*[%u]\n", i);
+
+                        fprintf (log_file, "\tval = ");
+
+                        fprintf (log_file, "%lg\n", list->data[i].val);
+                    }
+
+                    fprintf (log_file, "\tnext = %u\n", list->data[i].next);
+
+                    fprintf (log_file, "\tprev = %u\n", list->data[i].prev);
+
+                    fprintf (log_file, "\n");
                 }
+
 
                 fprintf (log_file, "\t}\n");
             }
@@ -779,9 +1019,9 @@ void list_dump (List_t* list)
     }
 }
 
-void error_descriptor (list_status status, FILE* log_file)
+void error_descriptor (List_t* list, FILE* log_file)
 {
-    switch (status)
+    switch (list->status)
     {
         #define DEF_CMD(name, condition, error_description)                    \
         case name: fprintf (log_file, "Error %u: %s", name, error_description);\
@@ -791,8 +1031,14 @@ void error_descriptor (list_status status, FILE* log_file)
 
         #undef DEF_CMD
 
-        case NoError: fprintf (log_file, "OK");
-                      break;
+        case IncorrectListNode:  fprintf (log_file, "Error %u: List node with index %u is incorrect", IncorrectListNode, list->index_of_incorrect_node);
+                                 break;
+
+        case IncorrectEmptyNode: fprintf (log_file, "Error %u: Empty node with index %u is incorrect", IncorrectEmptyNode, list->index_of_incorrect_node);
+                                 break;
+
+        case NoError:            fprintf (log_file, "OK");
+                                 break;
 
         default: fprintf (log_file, "Something went wrong");
     }
