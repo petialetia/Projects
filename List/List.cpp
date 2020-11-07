@@ -16,7 +16,7 @@
 
 typedef double Elem_t;
 
-const size_t MIN_CAPACITY = 10;
+const size_t MIN_CAPACITY = 100;
 
 const size_t MAX_CAPACITY = 10000000;
 
@@ -71,13 +71,21 @@ void InsertBack (List_t* list, Elem_t val);
 
 void InsertFront (List_t* list, Elem_t val);
 
+void insertion_front (List_t* list, Elem_t val);
+
 void Erase (List_t* list, size_t index);
 
-bool is_index_correct (List_t* list, size_t index);
+void erasing (List_t* list, size_t index);
 
 void InsertBefore (List_t* list, size_t index, Elem_t val);
 
+void insertion_before (List_t* list, size_t index, Elem_t val);
+
 void InsertAfter (List_t* list, size_t index, Elem_t val);
+
+void insertion_after (List_t* list, size_t index, Elem_t val);
+
+bool is_index_correct (List_t* list, size_t index);
 
 size_t FindIndex (List_t* list, size_t num);
 
@@ -99,17 +107,27 @@ void swaper (void* left, void* right, size_t size);
 
 bool is_list_looped (List_t* list);
 
-bool are_free_nodes_looped (List_t* list);
+bool are_empty_nodes_looped (List_t* list);
 
 size_t find_incorrect_list_node (List_t* list);
 
-size_t find_incorrect_free_node (List_t* list);
+size_t find_incorrect_node_in_unsorted_list (List_t* list);
+
+size_t find_incorrect_empty_node (List_t* list);
 
 list_status is_list_corrupted (List_t* list);
 
 void list_dump (List_t* list);
 
 void error_descriptor (List_t* list, FILE* log_file);
+
+void print_info_about_list (List_t* list, FILE* log_file);
+
+void print_params_of_list (List_t* list, FILE* log_file);
+
+void print_zero_node (List_t* list, FILE* log_file);
+
+void print_list_nodes (List_t* list, FILE* log_file);
 
 
 //-----------------------------------------------------------------------------
@@ -140,6 +158,8 @@ main ()
     InsertBefore (&list, 1, 203);
 
     InsertBefore (&list, 1, 205);
+
+    list_dump (&list);
 
     Destroy (&list);
 
@@ -178,14 +198,18 @@ void Construct (List_t* list, int start_capacity)
                 }
                 else
                 {
-                    if ((list->size   != 0)       || (list->capacity != 0) || (list->data != nullptr) || (list->name_of_list != nullptr) ||
-                        (list->status != NoError) || (list->mod      != 0) || (list->head != 0)       || (list->tail != 0)               || (list->free != 0))
+                    if ((list->size                    != 0)       || (list->capacity     != 0)       ||
+                        (list->data                    != nullptr) || (list->name_of_list != nullptr) ||
+                        (list->status                  != NoError) || (list->mod          != 0)       ||
+                        (list->index_of_incorrect_node != 0)       || (list->head         != 0)       ||
+                        (list->tail                    != 0)       || (list->free         != 0))
                     {
                         printf ("You're trying to construct list, but there are some data you didn't delete\n");
                     }
                     else
                     {
                         list->capacity = start_capacity;
+
                         list->name_of_list = get_name(list);
 
                         list->free = 1;
@@ -196,6 +220,8 @@ void Construct (List_t* list, int start_capacity)
 
                         spill_poison (list, list->size+1);
                         check_out (list);
+
+                        #undef get_name
                     }
                 }
             }
@@ -294,6 +320,13 @@ void InsertFront (List_t* list, Elem_t val)
         list->mod = 1;
     }
 
+    insertion_front (list, val);
+
+    check_out (list);
+}
+
+void insertion_front (List_t* list, Elem_t val)
+{
     list->data[list->free].val = val;
 
     if (list->head != 0)
@@ -317,8 +350,6 @@ void InsertFront (List_t* list, Elem_t val)
     }
 
     list->size++;
-
-    check_out (list);
 }
 
 void Erase (List_t* list, size_t index)
@@ -332,38 +363,7 @@ void Erase (List_t* list, size_t index)
             list->mod = 1;
         }
 
-        if (list->data[index].next != 0)
-        {
-            list->data[list->data[index].next].prev = list->data[index].prev;
-        }
-        else
-        {
-            list->tail = list->data[index].prev;
-        }
-
-        if (list->data[index].prev != 0)
-        {
-            list->data[list->data[index].prev].next = list->data[index].next;
-        }
-        else
-        {
-            list->head = list->data[index].next;
-        }
-
-        list->data[index].next = list->free;
-
-        if (list->free != 0)
-        {
-            list->data[list->free].prev = index;
-        }
-
-        list->free = index;
-
-        list->data[index].prev = 0;
-
-        list->data[index].val = NAN;
-
-        list->size--;
+        erasing (list, index);
     }
     else
     {
@@ -371,6 +371,39 @@ void Erase (List_t* list, size_t index)
     }
 
     check_out (list);
+}
+
+void erasing (List_t* list, size_t index)
+{
+    if (list->data[index].next != 0)
+    {
+        list->data[list->data[index].next].prev = list->data[index].prev;
+    }
+    else
+    {
+        list->tail = list->data[index].prev;
+    }
+    if (list->data[index].prev != 0)
+    {
+        list->data[list->data[index].prev].next = list->data[index].next;
+    }
+    else
+    {
+        list->head = list->data[index].next;
+    }
+
+    list->data[index].next = list->free;
+
+    if (list->free != 0)
+    {
+        list->data[list->free].prev = index;
+    }
+
+    list->free = index;
+    list->data[index].prev = 0;
+    list->data[index].val = NAN;
+
+    list->size--;
 }
 
 void InsertBefore (List_t* list, size_t index, Elem_t val)
@@ -384,30 +417,7 @@ void InsertBefore (List_t* list, size_t index, Elem_t val)
             list->mod = 1;
         }
 
-        size_t new_node_index = list->free;
-
-        list->free = list->data[list->free].next;
-
-        list->data[list->free].prev = 0;
-
-        list->data[new_node_index].val = val;
-
-        list->data[new_node_index].prev = list->data[index].prev;
-
-        list->data[new_node_index].next = index;
-
-        list->data[index].prev = new_node_index;
-
-        if (index != list->head)
-        {
-            list->data[list->data[new_node_index].prev].next = new_node_index;
-        }
-        else
-        {
-            list->head = new_node_index;
-        }
-
-        list->size++;
+        insertion_before (list, index, val);
     }
     else
     {
@@ -415,6 +425,34 @@ void InsertBefore (List_t* list, size_t index, Elem_t val)
     }
 
     check_out (list);
+}
+
+void insertion_before (List_t* list, size_t index, Elem_t val)
+{
+    size_t new_node_index = list->free;
+
+    list->free = list->data[list->free].next;
+
+    list->data[list->free].prev = 0;
+
+    list->data[new_node_index].val = val;
+
+    list->data[new_node_index].prev = list->data[index].prev;
+
+    list->data[new_node_index].next = index;
+
+    list->data[index].prev = new_node_index;
+
+    if (index != list->head)
+    {
+        list->data[list->data[new_node_index].prev].next = new_node_index;
+    }
+    else
+    {
+        list->head = new_node_index;
+    }
+
+    list->size++;
 }
 
 void InsertAfter (List_t* list, size_t index, Elem_t val)
@@ -428,30 +466,7 @@ void InsertAfter (List_t* list, size_t index, Elem_t val)
             list->mod = 1;
         }
 
-        size_t new_node_index = list->free;
-
-        list->free = list->data[list->free].next;
-
-        list->data[list->free].prev = 0;
-
-        list->data[new_node_index].val = val;
-
-        list->data[new_node_index].prev = index;
-
-        list->data[new_node_index].next = list->data[index].next;
-
-        list->data[index].next = new_node_index;
-
-        if (index != list->tail)
-        {
-            list->data[list->data[new_node_index].next].prev = new_node_index;
-        }
-        else
-        {
-            list->tail = new_node_index;
-        }
-
-        list->size++;
+        insertion_after (list, index, val);
     }
     else
     {
@@ -459,6 +474,34 @@ void InsertAfter (List_t* list, size_t index, Elem_t val)
     }
 
     check_out (list);
+}
+
+void insertion_after (List_t* list, size_t index, Elem_t val)
+{
+    size_t new_node_index = list->free;
+
+    list->free = list->data[list->free].next;
+
+    list->data[list->free].prev = 0;
+
+    list->data[new_node_index].val = val;
+
+    list->data[new_node_index].prev = index;
+
+    list->data[new_node_index].next = list->data[index].next;
+
+    list->data[index].next = new_node_index;
+
+    if (index != list->tail)
+    {
+        list->data[list->data[new_node_index].next].prev = new_node_index;
+    }
+    else
+    {
+        list->tail = new_node_index;
+    }
+
+    list->size++;
 }
 
 bool is_index_correct (List_t* list, size_t index)
@@ -504,13 +547,10 @@ size_t FindIndex (List_t* list, size_t num)
         {
             index = list->data[index].next;
         }
-
         check_out (list);
         return index;
     }
-
     check_out (list);
-
     return num;
 }
 
@@ -540,13 +580,10 @@ Elem_t GetVal (List_t* list, size_t num)
         {
             index = list->data[index].next;
         }
-
         check_out (list);
         return list->data[index].val;
     }
-
     check_out (list);
-
     return list->data[num].val;
 }
 
@@ -743,7 +780,7 @@ bool is_list_looped (List_t* list)
     return 0;
 }
 
-bool are_free_nodes_looped (List_t* list)
+bool are_empty_nodes_looped (List_t* list)
 {
     if (list->size == list->capacity)
     {
@@ -805,42 +842,49 @@ size_t find_incorrect_list_node (List_t* list)
             }
         }
 
-        if (list->data[list->size].prev != list->size -1)
+        if (list->data[list->size].prev != list->size -1)  //list->size == list->tail
         {
             return list->size;
         }
     }
     else
     {
-        size_t current_node_index = list->head;
-
-        size_t previous_next = 0;
-
-        for (size_t i = 1; i < list->size; i++)
-        {
-            if (isnan(list->data[current_node_index].val)             ||
-               (list->data[current_node_index].next > list->capacity) ||
-               (list->data[current_node_index].next == 0)             ||
-               (list->data[current_node_index].prev != previous_next))
-            {
-                return current_node_index;
-            }
-
-            previous_next = current_node_index;
-            current_node_index = list->data[current_node_index].next;
-
-        }
-
-        if (list->data[current_node_index].prev != previous_next) //current_node_index == list->tail
-        {
-            return current_node_index;
-        }
+        return find_incorrect_node_in_unsorted_list (list);
     }
 
     return 0;
 }
 
-size_t find_incorrect_free_node (List_t* list)
+size_t find_incorrect_node_in_unsorted_list (List_t* list)
+{
+    size_t current_node_index = list->head;
+
+    size_t previous_next = 0;
+
+    for (size_t i = 1; i < list->size; i++)
+    {
+        if (isnan(list->data[current_node_index].val)              ||
+            (list->data[current_node_index].next > list->capacity) ||
+            (list->data[current_node_index].next == 0)             ||
+            (list->data[current_node_index].prev != previous_next))
+        {
+            return current_node_index;
+        }
+
+        previous_next = current_node_index;
+        current_node_index = list->data[current_node_index].next;
+
+    }
+
+    if (list->data[current_node_index].prev != previous_next) //current_node_index == list->tail
+    {
+        return current_node_index;
+    }
+
+    return 0;
+}
+
+size_t find_incorrect_empty_node (List_t* list)
 {
     size_t current_node_index = list->free;
 
@@ -890,7 +934,7 @@ list_status is_list_corrupted (List_t* list)
         return IncorrectListNode;
     }
 
-    list->index_of_incorrect_node = find_incorrect_free_node (list);
+    list->index_of_incorrect_node = find_incorrect_empty_node (list);
 
     if (list->index_of_incorrect_node > 0)
     {
@@ -924,98 +968,9 @@ void list_dump (List_t* list)
     {
         fprintf (log_file, "\nPointer on list equals nullptr, variables are lost\n");
     }
-
     else
-
     {
-        if ((list->status == NoAccessPtr))
-        {
-            fprintf (log_file, "\nPointer on list might be invalid, variables are lost\n");
-        }
-        else
-        {
-
-            if (list->name_of_list != nullptr)
-            {
-                fprintf (log_file, " \"%s\"\n{\n", list->name_of_list);
-            }
-            else
-            {
-                fprintf (log_file, " <Nameless>\n{\n", list->name_of_list);
-            }
-
-            fprintf (log_file, "mod = %u\n", list->mod);
-
-            fprintf (log_file, "size = %u\n", list->size);
-
-            fprintf (log_file, "capacity = %u\n", list->capacity);
-
-            fprintf (log_file, "head = %u\n", list->head);
-
-            fprintf (log_file, "tail = %u\n", list->tail);
-
-            fprintf (log_file, "free = %u\n", list->free);
-
-            fprintf (log_file, "data[%p]\n", list->data);
-
-            fprintf (log_file, "\t{\n");
-
-            if ((list->status == DataEqualsNullptr) || (list->data == nullptr))
-            {
-                fprintf (log_file, "\tData equals nullptr, elements are lost\n\t}\n");
-            }
-
-            else
-            {
-                fprintf (log_file, "\t!!![0]!!!\n");
-
-                fprintf (log_file, "\tval = ");
-
-                if (isnan(list->data[0].val))
-                {
-                    fprintf (log_file, "NAN (POISON!)\n");
-                }
-                else
-                {
-                    fprintf (log_file, "%lg\n", list->data[0].val);
-                }
-
-                fprintf (log_file, "\tnext = %u\n", list->data[0].next);
-
-                fprintf (log_file, "\tprev = %u\n\n", list->data[0].prev);
-
-                for (size_t i = 1; i < list->capacity + 1; i++)
-                {
-                    if (isnan(list->data[i].val))
-                    {
-                        fprintf (log_file, "\t [%u]\n", i);
-
-                        fprintf (log_file, "\tval = ");
-
-                        fprintf (log_file, "NAN (POISON!)\n");
-                    }
-                    else
-                    {
-                        fprintf (log_file, "\t*[%u]\n", i);
-
-                        fprintf (log_file, "\tval = ");
-
-                        fprintf (log_file, "%lg\n", list->data[i].val);
-                    }
-
-                    fprintf (log_file, "\tnext = %u\n", list->data[i].next);
-
-                    fprintf (log_file, "\tprev = %u\n", list->data[i].prev);
-
-                    fprintf (log_file, "\n");
-                }
-
-
-                fprintf (log_file, "\t}\n");
-            }
-
-            fprintf (log_file, "}\n");
-        }
+        print_info_about_list (list, log_file);
     }
 }
 
@@ -1044,5 +999,108 @@ void error_descriptor (List_t* list, FILE* log_file)
     }
 }
 
-#undef get_name
+void print_info_about_list (List_t* list, FILE* log_file)
+{
+    if ((list->status == NoAccessPtr))
+    {
+        fprintf (log_file, "\nPointer on list might be invalid, variables are lost\n");
+    }
+    else
+    {
+        print_params_of_list (list, log_file);
+
+        if ((list->status == DataEqualsNullptr) || (list->data == nullptr))
+        {
+            fprintf (log_file, "\tData equals nullptr, elements are lost\n\t}\n");
+        }
+        else
+        {
+            print_zero_node (list, log_file);
+
+            print_list_nodes (list, log_file);
+        }
+
+        fprintf (log_file, "}\n");
+    }
+}
+
+void print_params_of_list (List_t* list, FILE* log_file)
+{
+    if (list->name_of_list != nullptr)
+    {
+        fprintf (log_file, " \"%s\"\n{\n", list->name_of_list);
+    }
+    else
+    {
+        fprintf (log_file, " <Nameless>\n{\n", list->name_of_list);
+    }
+
+    fprintf (log_file, "mod = %u\n", list->mod);
+
+    fprintf (log_file, "size = %u\n", list->size);
+
+    fprintf (log_file, "capacity = %u\n", list->capacity);
+
+    fprintf (log_file, "head = %u\n", list->head);
+
+    fprintf (log_file, "tail = %u\n", list->tail);
+
+    fprintf (log_file, "free = %u\n", list->free);
+
+    fprintf (log_file, "data[%p]\n", list->data);
+
+    fprintf (log_file, "\t{\n");
+}
+
+void print_zero_node (List_t* list, FILE* log_file)
+{
+    fprintf (log_file, "\t!!![0]!!!\n");
+
+    fprintf (log_file, "\tval = ");
+
+    if (isnan(list->data[0].val))
+    {
+        fprintf (log_file, "NAN (POISON!)\n");
+    }
+    else
+    {
+        fprintf (log_file, "%lg\n", list->data[0].val);
+    }
+
+    fprintf (log_file, "\tnext = %u\n", list->data[0].next);
+
+    fprintf (log_file, "\tprev = %u\n\n", list->data[0].prev);
+}
+
+void print_list_nodes (List_t* list, FILE* log_file)
+{
+    for (size_t i = 1; i < list->capacity + 1; i++)
+    {
+        if (isnan(list->data[i].val))
+        {
+            fprintf (log_file, "\t [%u]\n", i);
+
+            fprintf (log_file, "\tval = ");
+
+            fprintf (log_file, "NAN (POISON!)\n");
+        }
+        else
+        {
+            fprintf (log_file, "\t*[%u]\n", i);
+
+            fprintf (log_file, "\tval = ");
+
+            fprintf (log_file, "%lg\n", list->data[i].val);
+        }
+
+        fprintf (log_file, "\tnext = %u\n", list->data[i].next);
+
+        fprintf (log_file, "\tprev = %u\n", list->data[i].prev);
+
+        fprintf (log_file, "\n");
+    }
+
+    fprintf (log_file, "\t}\n");
+}
+
 #undef check_out
