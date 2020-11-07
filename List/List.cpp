@@ -61,6 +61,8 @@ struct List_t
 
 void Construct (List_t* list, int start_capacity = MIN_CAPACITY);
 
+bool can_list_be_constructed (List_t* list, int start_capacity);
+
 bool can_ptr_be_used (const void* ptr);
 
 void spill_poison (List_t* list, size_t start_position);
@@ -159,6 +161,8 @@ main ()
 
     InsertBefore (&list, 1, 205);
 
+    ChangeMod (&list);
+
     Destroy (&list);
 
     Construct (&list);
@@ -172,61 +176,60 @@ main ()
 
 void Construct (List_t* list, int start_capacity)
 {
+    if (can_list_be_constructed (list, start_capacity))
+    {
+        list->capacity = start_capacity;
+
+        list->name_of_list = get_name(list);
+
+        list->free = 1;
+
+        list->data = (list_node*) calloc (start_capacity + 1, sizeof (list_node));
+
+        list->data[0].val = NAN;
+
+        spill_poison (list, list->size+1);
+        check_out (list);
+    }
+
+    #undef get_name
+
+    return;
+}
+
+bool can_list_be_constructed (List_t* list, int start_capacity)
+{
     if (list == nullptr)
     {
         printf ("Your pointer equals nullptr\n");
+        return 0;
     }
-    else
+    if (!can_ptr_be_used(list))
     {
-        if (!can_ptr_be_used(list))
-        {
-            printf ("Your pointer can not be read\n");
-        }
-        else
-        {
-            if (start_capacity > MAX_CAPACITY)
-            {
-                printf ("You're trying to construct list with too big start capacity\n");
-            }
-            else
-            {
-                if (start_capacity < MIN_CAPACITY)
-                {
-                    printf ("You're trying to construct list with too small capacity\n");
-                }
-                else
-                {
-                    if ((list->size                    != 0)       || (list->capacity     != 0)       ||
-                        (list->data                    != nullptr) || (list->name_of_list != nullptr) ||
-                        (list->status                  != NoError) || (list->mod          != 0)       ||
-                        (list->index_of_incorrect_node != 0)       || (list->head         != 0)       ||
-                        (list->tail                    != 0)       || (list->free         != 0))
-                    {
-                        printf ("You're trying to construct list, but there are some data you didn't delete\n");
-                    }
-                    else
-                    {
-                        list->capacity = start_capacity;
-
-                        list->name_of_list = get_name(list);
-
-                        list->free = 1;
-
-                        list->data = (list_node*) calloc (start_capacity + 1, sizeof (list_node));
-
-                        list->data[0].val = NAN;
-
-                        spill_poison (list, list->size+1);
-                        check_out (list);
-
-                        #undef get_name
-                    }
-                }
-            }
-        }
+        printf ("Your pointer can not be read\n");
+        return 0;
     }
+    if (start_capacity > MAX_CAPACITY)
+    {
+        printf ("You're trying to construct list with too big start capacity\n");
+        return 0;
+    }
+    if (start_capacity < MIN_CAPACITY)
+    {
+        printf ("You're trying to construct list with too small capacity\n");
+        return 0;
+    }
+    if ((list->size                    != 0)       || (list->capacity     != 0)       ||
+        (list->data                    != nullptr) || (list->name_of_list != nullptr) ||
+        (list->status                  != NoError) || (list->mod          != 0)       ||
+        (list->index_of_incorrect_node != 0)       || (list->head         != 0)       ||
+        (list->tail                    != 0)       || (list->free         != 0))
+    {
+        printf ("You're trying to construct list, but there are some data you didn't delete\n");
+        return 0;
+    }
+    return 1;
 }
-
 
 bool can_ptr_be_used (const void* ptr)
 {
