@@ -14,9 +14,15 @@
         assert (0);                         \
     }
 
+#define POISON NAN
+
 typedef double Elem_t;
 
-const size_t MIN_CAPACITY = 100;
+/*#define POISON 0
+
+typedef int Elem_t;*/
+
+const size_t MIN_CAPACITY = 10;
 
 const size_t MAX_CAPACITY = 10000000;
 
@@ -27,7 +33,7 @@ enum list_status
     #define DEF_CMD(name, condition, error_description)\
     name,
 
-    #include "Commands.hpp"
+    #include "Errors.hpp"
 
     #undef DEF_CMD
 
@@ -38,9 +44,9 @@ enum list_status
 
 struct list_node
 {
-    Elem_t val  = NAN;
-    size_t next = 0;
-    size_t prev = 0;
+    Elem_t val  = POISON;
+    int next = 0;
+    int prev = 0;
 };
 
 struct List_t
@@ -69,27 +75,29 @@ void spill_poison (List_t* list, size_t start_position);
 
 void Destroy (List_t* list);
 
+void insertion (List_t* list, size_t left, size_t right, Elem_t val);
+
 void InsertBack (List_t* list, Elem_t val);
 
 void InsertFront (List_t* list, Elem_t val);
-
-void insertion_front (List_t* list, Elem_t val);
 
 void Erase (List_t* list, size_t index);
 
 void erasing (List_t* list, size_t index);
 
+void EraseFront (List_t* list);
+
+void EraseBack (List_t* list);
+
 void InsertBefore (List_t* list, size_t index, Elem_t val);
 
-void insertion_before (List_t* list, size_t index, Elem_t val);
-
 void InsertAfter (List_t* list, size_t index, Elem_t val);
-
-void insertion_after (List_t* list, size_t index, Elem_t val);
 
 bool is_index_correct (List_t* list, size_t index);
 
 size_t FindIndex (List_t* list, size_t num);
+
+size_t finding_index (List_t* list, size_t num);
 
 Elem_t GetVal (List_t* list, size_t num);
 
@@ -97,15 +105,9 @@ void ChangeMod (List_t* list);
 
 void sort_list (List_t* list);
 
-void move_head (List_t* list);
+void move_list_nodes (List_t* list, Elem_t* vals_buffer);
 
-void move_mid_node (List_t* list, size_t current_node_index, size_t current_node_num);
-
-void move_tail (List_t* list);
-
-void list_swaper (List_t* list, size_t current_node_index, size_t current_node_num);
-
-void swaper (void* left, void* right, size_t size);
+void move_empty_nodes (List_t* list);
 
 bool is_list_looped (List_t* list);
 
@@ -131,6 +133,14 @@ void print_zero_node (List_t* list, FILE* log_file);
 
 void print_list_nodes (List_t* list, FILE* log_file);
 
+void create_txt_file_for_graphviz (List_t* list);
+
+void print_nodes (List_t* list, FILE* graphviz_file);
+
+void print_links (List_t* list, FILE* graphviz_file);
+
+void print_ptrs (List_t* list, FILE* graphviz_file);
+
 
 //-----------------------------------------------------------------------------
 
@@ -141,25 +151,27 @@ main ()
 
     Construct (&list);
 
-    InsertFront (&list, 120);
+    InsertBack (&list, 29);
 
     InsertBefore (&list, 1, 210);
 
-    InsertBefore (&list, 1, 220);
+    InsertAfter (&list, 1, 20);
 
-    InsertBefore (&list, 1, 230);
+    InsertAfter (&list, 1, 120);
 
-    InsertBefore (&list, 1, 240);
+    InsertBefore (&list, 1, 310);
 
-    InsertBefore (&list, 1, 520);
+    InsertFront (&list, 2222);
 
-    InsertBefore (&list, 1, 320);
+    Erase (&list, 1);
 
-    InsertBefore (&list, 1, 260);
+    Erase (&list, 2);
 
-    InsertBefore (&list, 1, 203);
+    InsertBefore (&list, 3, 230);
 
-    InsertBefore (&list, 1, 205);
+    InsertFront (&list, 200);
+
+    list_dump (&list);
 
     ChangeMod (&list);
 
@@ -186,7 +198,7 @@ void Construct (List_t* list, int start_capacity)
 
         list->data = (list_node*) calloc (start_capacity + 1, sizeof (list_node));
 
-        list->data[0].val = NAN;
+        list->data[0].val = POISON;
 
         spill_poison (list, list->size+1);
         check_out (list);
@@ -252,24 +264,18 @@ bool can_ptr_be_used (const void* ptr)
 
 void spill_poison (List_t* list, size_t start_position)
 {
-    list->data[start_position].next = start_position + 1;
-
-    list->data[start_position].val = NAN;
-
-    start_position++;
-
     for (; start_position < list->capacity; start_position++)
     {
         list->data[start_position].next = start_position + 1;
 
-        list->data[start_position].prev = start_position - 1;
+        list->data[start_position].prev = -1;
 
-        list->data[start_position].val = NAN;
+        list->data[start_position].val = POISON;
     }
 
-    list->data[start_position].prev = start_position - 1;
+    list->data[start_position].prev = -1;
 
-    list->data[start_position].val = NAN;
+    list->data[start_position].val = POISON;
 }
 
 void Destroy (List_t* list)
@@ -281,33 +287,46 @@ void Destroy (List_t* list)
     memset (list, 0, sizeof (List_t));
 }
 
+void insertion (List_t* list, size_t left, size_t right, Elem_t val)
+{
+    size_t new_node_index = list->free;
+
+    list->free = list->data[list->free].next;
+
+    list->data[list->free].prev = -1;
+
+    list->data[new_node_index].val = val;
+
+    list->data[new_node_index].prev = left;
+
+    list->data[new_node_index].next = right;
+
+    if (right > 0)
+    {
+        list->data[right].prev = new_node_index;
+    }
+    else
+    {
+        list->tail = new_node_index;
+    }
+
+    if (left > 0)
+    {
+        list->data[left].next = new_node_index;
+    }
+    else
+    {
+        list->head = new_node_index;
+    }
+
+    list->size++;
+}
+
 void InsertBack (List_t* list, Elem_t val)
 {
     check_out (list)
 
-    list->data[list->free].val = val;
-
-    list->data[list->free].prev = list->tail;
-
-    if (list->tail != 0)
-    {
-        list->data[list->tail].next = list->free;
-    }
-
-    list->tail = list->free;
-
-    list->free = list->data[list->free].next;
-
-    list->data[list->free].prev = 0;
-
-    list->data[list->tail].next = 0;
-
-    if (list->head == 0)
-    {
-        list->head = list->tail;
-    }
-
-    list->size++;
+    insertion (list, list->tail, 0, val);
 
     check_out (list);
 }
@@ -321,36 +340,9 @@ void InsertFront (List_t* list, Elem_t val)
         list->mod = 1;
     }
 
-    insertion_front (list, val);
+    insertion (list, 0, list->head, val);
 
     check_out (list);
-}
-
-void insertion_front (List_t* list, Elem_t val)
-{
-    list->data[list->free].val = val;
-
-    if (list->head != 0)
-    {
-        list->data[list->head].prev = list->free;
-    }
-
-    size_t head = list->head;
-
-    list->head = list->free;
-
-    list->free = list->data[list->free].next;
-
-    list->data[list->free].prev = 0;
-
-    list->data[list->head].next = head;
-
-    if (list->tail == 0)
-    {
-        list->tail = list->head;
-    }
-
-    list->size++;
 }
 
 void Erase (List_t* list, size_t index)
@@ -395,16 +387,48 @@ void erasing (List_t* list, size_t index)
 
     list->data[index].next = list->free;
 
-    if (list->free != 0)
-    {
-        list->data[list->free].prev = index;
-    }
-
     list->free = index;
-    list->data[index].prev = 0;
-    list->data[index].val = NAN;
+    list->data[index].prev = -1;
+    list->data[index].val = POISON;
 
     list->size--;
+}
+
+void EraseFront (List_t* list)
+{
+    check_out (list);
+
+    if (list->size > 0)
+    {
+        if ((list->mod == 0) && (list->size > 1))
+        {
+            list->mod = 1;
+        }
+
+        erasing (list, list->head);
+    }
+    else
+    {
+        printf ("Empty list is given to EraseFront\n");
+    }
+
+    check_out (list);
+}
+
+void EraseBack (List_t* list)
+{
+    check_out (list);
+
+    if (list->size > 0)
+    {
+        erasing (list, list->tail);
+    }
+    else
+    {
+        printf ("Empty list is given to EraseBack\n");
+    }
+
+    check_out (list);
 }
 
 void InsertBefore (List_t* list, size_t index, Elem_t val)
@@ -418,7 +442,7 @@ void InsertBefore (List_t* list, size_t index, Elem_t val)
             list->mod = 1;
         }
 
-        insertion_before (list, index, val);
+        insertion (list, list->data[index].prev, index, val);
     }
     else
     {
@@ -426,34 +450,6 @@ void InsertBefore (List_t* list, size_t index, Elem_t val)
     }
 
     check_out (list);
-}
-
-void insertion_before (List_t* list, size_t index, Elem_t val)
-{
-    size_t new_node_index = list->free;
-
-    list->free = list->data[list->free].next;
-
-    list->data[list->free].prev = 0;
-
-    list->data[new_node_index].val = val;
-
-    list->data[new_node_index].prev = list->data[index].prev;
-
-    list->data[new_node_index].next = index;
-
-    list->data[index].prev = new_node_index;
-
-    if (index != list->head)
-    {
-        list->data[list->data[new_node_index].prev].next = new_node_index;
-    }
-    else
-    {
-        list->head = new_node_index;
-    }
-
-    list->size++;
 }
 
 void InsertAfter (List_t* list, size_t index, Elem_t val)
@@ -467,7 +463,7 @@ void InsertAfter (List_t* list, size_t index, Elem_t val)
             list->mod = 1;
         }
 
-        insertion_after (list, index, val);
+        insertion (list, index, list->data[index].next, val);
     }
     else
     {
@@ -475,34 +471,6 @@ void InsertAfter (List_t* list, size_t index, Elem_t val)
     }
 
     check_out (list);
-}
-
-void insertion_after (List_t* list, size_t index, Elem_t val)
-{
-    size_t new_node_index = list->free;
-
-    list->free = list->data[list->free].next;
-
-    list->data[list->free].prev = 0;
-
-    list->data[new_node_index].val = val;
-
-    list->data[new_node_index].prev = index;
-
-    list->data[new_node_index].next = list->data[index].next;
-
-    list->data[index].next = new_node_index;
-
-    if (index != list->tail)
-    {
-        list->data[list->data[new_node_index].next].prev = new_node_index;
-    }
-    else
-    {
-        list->tail = new_node_index;
-    }
-
-    list->size++;
 }
 
 bool is_index_correct (List_t* list, size_t index)
@@ -513,7 +481,7 @@ bool is_index_correct (List_t* list, size_t index)
     }
     else
     {
-        if (isnan(list->data[index].val))
+        if (list->data[index].prev == -1)
         {
             return false;
         }
@@ -540,6 +508,14 @@ size_t FindIndex (List_t* list, size_t num)
         return 0;
     }
 
+    check_out (list);
+
+    return finding_index (list, num);
+
+}
+
+size_t finding_index (List_t* list, size_t num)
+{
     if (list->mod != 0)
     {
         size_t index = list->head;
@@ -548,10 +524,10 @@ size_t FindIndex (List_t* list, size_t num)
         {
             index = list->data[index].next;
         }
-        check_out (list);
+
         return index;
     }
-    check_out (list);
+
     return num;
 }
 
@@ -563,14 +539,14 @@ Elem_t GetVal (List_t* list, size_t num)
     {
         printf ("Number of system zero node is given to GetVal\n");
         check_out (list);
-        return NAN;
+        return POISON;
     }
 
     if (num > list->size)
     {
         printf ("Number of empty or nonexistent node is given to GetVal\n");
         check_out (list);
-        return NAN;
+        return POISON;
     }
 
     if (list->mod != 0)
@@ -618,119 +594,62 @@ void ChangeMod (List_t* list)
 
 void sort_list (List_t* list)
 {
-    if (list->head != 1)
+    Elem_t* vals_buffer = (Elem_t*) calloc (list->size, sizeof (Elem_t));
+
+    for (size_t i = 0, current_node_index = list->head; i < list->size; i++)
     {
-        move_head (list);
+        vals_buffer[i] = list->data[current_node_index].val;
+
+        current_node_index = list->data[current_node_index].next;
     }
 
-    size_t current_node_index = list->data[list->head].next;
+    move_list_nodes (list, vals_buffer);
 
-    for (size_t i = 2; i < list->size; i++)
-    {
-        if (current_node_index != i)
-        {
-            move_mid_node (list, current_node_index, i);
-        }
+    free (vals_buffer);
 
-        current_node_index = list->data[i].next;
-    }
-
-    if (list->tail != list->size)
-    {
-        move_tail (list);
-    }
-}
-
-void move_head (List_t* list)
-{
-    list->data[list->data[list->head].next].prev = 1;
-
-    list_swaper (list, list->head, 1);
-
-    if (list->tail == 1)
-    {
-        list->tail = list->head;
-    }
-    else
-    {
-        if (list->free == 1)
-        {
-            list->free = list->head;
-        }
-    }
+    move_empty_nodes (list);
 
     list->head = 1;
-}
-
-void move_mid_node (List_t* list, size_t current_node_index, size_t current_node_num)
-{
-    list->data[list->data[current_node_index].prev].next = current_node_num;
-
-    if (list->data[current_node_index].next != current_node_num)
-    {
-        list->data[list->data[current_node_index].next].prev = current_node_num;
-    }
-
-    list_swaper (list, current_node_index, current_node_num);
-
-    if (list->tail == current_node_num)
-    {
-        list->tail = current_node_index;
-    }
-    else
-    {
-        if (list->free == current_node_num)
-        {
-            list->free = current_node_index;
-        }
-    }
-}
-
-void move_tail (List_t* list)
-{
-    list->data[list->data[list->tail].prev].next = list->size;
-
-    list_swaper (list, list->tail, list->size);
-
-    if (list->free == list->size)
-    {
-        list->free = list->tail;
-    }
 
     list->tail = list->size;
+
+    list->free = list->size + 1;
 }
 
-void list_swaper (List_t* list, size_t current_node_index, size_t current_node_num)
+void move_list_nodes (List_t* list, Elem_t* vals_buffer)
 {
-    if (list->data[current_node_num].prev != 0)
+    for (size_t i = 0, current_node_index = 1; current_node_index < list->size; i++, current_node_index++)
     {
-        list->data[list->data[current_node_num].prev].next = current_node_index;
+        list->data[current_node_index].val = vals_buffer[i];
 
-        if (list->data[current_node_num].prev == current_node_index)
-        {
-            list->data[current_node_num].prev = current_node_num;
-        }
+        list->data[current_node_index].next = i + 2;
+
+        list->data[current_node_index].prev = i;
     }
 
-    if (list->data[current_node_num].next != 0)
-    {
-        list->data[list->data[current_node_num].next].prev = current_node_index;
-    }
+    list->data[list->size].val = vals_buffer[list->size - 1];
 
-    swaper (&list->data[current_node_index].val,  &list->data[current_node_num].val,  sizeof(Elem_t));
-    swaper (&list->data[current_node_index].next, &list->data[current_node_num].next, sizeof(size_t));
-    swaper (&list->data[current_node_index].prev, &list->data[current_node_num].prev, sizeof(size_t));
+    list->data[list->size].next = 0;
+
+    list->data[list->size].prev = list->size - 1;
 }
 
-void swaper (void* left, void* right, size_t size)
+void move_empty_nodes (List_t* list)
 {
-    void* temp = calloc (1, size);
+    for (size_t i = list->size + 1; i < list->capacity; i++)
+    {
+        list->data[i].val = POISON;
 
-    memcpy (temp,  left,  size);
-    memcpy (left,  right, size);
-    memcpy (right, temp,  size);
+        list->data[i].next = i + 1;
 
-    free(temp);
+        list->data[i].prev = -1;
+    }
+
+    list->data[list->capacity].next = 0;
+
+    list->data[list->capacity].val = POISON;
+
+    list->data[list->capacity].prev = -1;
 }
 
 bool is_list_looped (List_t* list)
@@ -743,7 +662,7 @@ bool is_list_looped (List_t* list)
     size_t ptr1 = list->head;
     size_t ptr2 = list->head;
 
-    #define checking_for_loop_in_list(direction)                   \
+    #define checking_for_loop(direction)                           \
                                                                    \
     for (;;)                                                       \
     {                                                              \
@@ -768,13 +687,13 @@ bool is_list_looped (List_t* list)
         }                                                          \
     }
 
-    checking_for_loop_in_list (next);
+    checking_for_loop (next);
 
     ptr1 = list->tail;
 
     ptr2 = list->tail;
 
-    checking_for_loop_in_list (prev);
+    checking_for_loop (prev);
 
     #undef cheking_for_loop_in_list
 
@@ -788,44 +707,13 @@ bool are_empty_nodes_looped (List_t* list)
         return 0;
     }
 
-    #define checking_for_loop_in_free_nodes(direction)\
-                                                      \
-    for (;;)                                          \
-    {                                                 \
-        if (list->data[ptr2].direction == 0)          \
-        {                                             \
-            break;                                    \
-        }                                             \
-        else                                          \
-        {                                             \
-            ptr1= list->data[ptr1].direction;         \
-            ptr2= list->data[ptr2].direction;         \
-                                                      \
-            if (list->data[ptr2].direction == 0)      \
-            {                                         \
-                break;                                \
-            }                                         \
-                                                      \
-            ptr2= list->data[ptr2].direction;         \
-                                                      \
-                                                      \
-            if (ptr1 == ptr2)                         \
-            {                                         \
-                return 1;                             \
-            }                                         \
-        }                                             \
-    }
-
     size_t ptr1 = list->free;
+
     size_t ptr2 = list->free;
 
-    checking_for_loop_in_free_nodes (next);
+    checking_for_loop (next);
 
-    ptr1 = ptr2;
-
-    checking_for_loop_in_free_nodes (prev);
-
-    #undef checking_for_loop_in_free_nodes
+    #undef checking_for_loop
 
     return 0;
 
@@ -837,7 +725,7 @@ size_t find_incorrect_list_node (List_t* list)
     {
         for (size_t i = 1; i < list->size; i++)
         {
-            if (isnan(list->data[i].val) || (list->data[i].next != (i + 1)) || (list->data[i].prev != i -1))
+            if ((list->data[i].next != (i + 1)) || (list->data[i].prev != i - 1))
             {
                 return i;
             }
@@ -864,8 +752,7 @@ size_t find_incorrect_node_in_unsorted_list (List_t* list)
 
     for (size_t i = 1; i < list->size; i++)
     {
-        if (isnan(list->data[current_node_index].val)              ||
-            (list->data[current_node_index].next > list->capacity) ||
+        if ((list->data[current_node_index].next > list->capacity) ||
             (list->data[current_node_index].next == 0)             ||
             (list->data[current_node_index].prev != previous_next))
         {
@@ -889,26 +776,21 @@ size_t find_incorrect_empty_node (List_t* list)
 {
     size_t current_node_index = list->free;
 
-    size_t previous_next = 0;
-
     for (size_t i = 1; i < list->capacity - list->size; i++)
     {
-        if  (!isnan(list->data[current_node_index].val)            ||
-            (list->data[current_node_index].next > list->capacity) ||
-            (list->data[current_node_index].next == 0)             ||
-            (list->data[current_node_index].prev != previous_next))
+        if ((list->data[current_node_index].next > list->capacity) ||
+            (list->data[current_node_index].next ==  0)            ||
+            (list->data[current_node_index].prev != -1))
         {
             return current_node_index;
         }
 
-        previous_next = current_node_index;
         current_node_index = list->data[current_node_index].next;
 
     }
 
-    if ((list->data[current_node_index].prev != previous_next) || //current_node_index == index of last free node
-        (list->data[current_node_index].next != 0)             ||
-        (!isnan(list->data[current_node_index].val)))
+    if ((list->data[current_node_index].prev != -1) || //current_node_index == index of last free node
+        (list->data[current_node_index].next !=  0))
     {
         return current_node_index;
     }
@@ -924,7 +806,7 @@ list_status is_list_corrupted (List_t* list)
         return name;                                   \
     }
 
-    #include "Commands.hpp"
+    #include "Errors.hpp"
 
     #undef DEF_CMD
 
@@ -973,6 +855,8 @@ void list_dump (List_t* list)
     {
         print_info_about_list (list, log_file);
     }
+
+    create_txt_file_for_graphviz (list);
 }
 
 void error_descriptor (List_t* list, FILE* log_file)
@@ -983,7 +867,7 @@ void error_descriptor (List_t* list, FILE* log_file)
         case name: fprintf (log_file, "Error %u: %s", name, error_description);\
                    break;
 
-        #include "Commands.hpp"
+        #include "Errors.hpp"
 
         #undef DEF_CMD
 
@@ -1059,31 +943,26 @@ void print_zero_node (List_t* list, FILE* log_file)
 
     fprintf (log_file, "\tval = ");
 
-    if (isnan(list->data[0].val))
-    {
-        fprintf (log_file, "NAN (POISON!)\n");
-    }
-    else
-    {
-        fprintf (log_file, "%lg\n", list->data[0].val);
-    }
+    fprintf (log_file, "POISON\n");
 
     fprintf (log_file, "\tnext = %u\n", list->data[0].next);
 
-    fprintf (log_file, "\tprev = %u\n\n", list->data[0].prev);
+    fprintf (log_file, "\tprev = %u\n", list->data[0].prev);
 }
 
 void print_list_nodes (List_t* list, FILE* log_file)
 {
     for (size_t i = 1; i < list->capacity + 1; i++)
     {
-        if (isnan(list->data[i].val))
+        fprintf (log_file, "\n");
+
+        if (list->data[i].prev == -1)
         {
             fprintf (log_file, "\t [%u]\n", i);
 
             fprintf (log_file, "\tval = ");
 
-            fprintf (log_file, "NAN (POISON!)\n");
+            fprintf (log_file, "POISON\n");
         }
         else
         {
@@ -1094,14 +973,106 @@ void print_list_nodes (List_t* list, FILE* log_file)
             fprintf (log_file, "%lg\n", list->data[i].val);
         }
 
-        fprintf (log_file, "\tnext = %u\n", list->data[i].next);
+        fprintf (log_file, "\tnext = %d\n", list->data[i].next);
 
-        fprintf (log_file, "\tprev = %u\n", list->data[i].prev);
-
-        fprintf (log_file, "\n");
+        fprintf (log_file, "\tprev = %d\n", list->data[i].prev);
     }
 
     fprintf (log_file, "\t}\n");
 }
 
+void create_txt_file_for_graphviz (List_t* list)
+{
+    static size_t num_of_call = 0;
+    num_of_call++;
+
+    static FILE* graphviz_file = nullptr;
+
+    if (num_of_call == 1)
+    {
+        graphviz_file = fopen ("graphviz_file.txt", "w");
+    }
+
+    fprintf (graphviz_file, "digraph PL\n");
+
+    fprintf (graphviz_file, "{\nrankdir=HR;\n");
+
+    fprintf (graphviz_file, "0 [style=\"filled\", fillcolor = \"red\", shape=record,label=\" <next> 0 | { POISON | 0} | <prev> 0\" ];\n");
+
+    print_nodes (list, graphviz_file);
+
+    print_links (list, graphviz_file);
+
+    print_ptrs (list, graphviz_file);
+
+    fprintf (graphviz_file, "}");
+}
+
+void print_nodes (List_t* list, FILE* graphviz_file)
+{
+    for (size_t i = 1; i <= list->capacity; i++)
+    {
+        if (list->data[i].prev == -1)
+        {
+            fprintf (graphviz_file, "%u [style=\"filled\", fillcolor = \"yellow\", shape=record,label=\" <next> %d | { POISON | %u} | <prev> %d\" ];\n", i, list->data[i].next, /*list->data[i].val, */i, list->data[i].prev);
+        }
+        else
+        {
+            fprintf (graphviz_file, "%u [style=\"filled\", fillcolor = \"green\", shape=record,label=\" <next> %d | { %lg | %u} | <prev> %d\" ];\n", i, list->data[i].next, list->data[i].val, i, list->data[i].prev);
+        }
+    }
+}
+
+void print_links (List_t* list, FILE* graphviz_file)
+{
+    fprintf (graphviz_file, "{\nedge[color=white]\n");
+
+    for (size_t i = 0; i < list->capacity; i++)
+    {
+        fprintf (graphviz_file, "%u->", i);
+    }
+
+    fprintf (graphviz_file, "%u;\n", list->capacity);
+
+    fprintf (graphviz_file, "}\n");
+
+    for (size_t i = 1; i <= list->capacity; i++)
+    {
+        if (list->data[i].next > 0)
+        {
+            fprintf (graphviz_file, "%u:<next> -> %u:<next>[color=\"blue\",constraint=false];\n", i, list->data[i].next);
+        }
+
+        if (list->data[i].prev > 0)
+        {
+            fprintf (graphviz_file, "%u:<prev> -> %u:<prev>[color=\"red\",constraint=false];\n", i, list->data[i].prev);
+        }
+    }
+}
+
+void print_ptrs (List_t* list, FILE* graphviz_file)
+{
+    char s[5];
+
+    #define print_ptr(param)                                                         \
+                                                                                     \
+    if (list->param > 0)                                                             \
+    {                                                                                \
+        strcpy (s, #param);                                                          \
+        strcpy (s, strupr(s));                                                       \
+        fprintf (graphviz_file, "%s [style=\"filled\", fillcolor = \"purple\"];", s);\
+        fprintf (graphviz_file, "%s -> %u\n", /*strupr(s)*/s, list->param);          \
+    }
+
+    print_ptr (head)
+
+    print_ptr (tail)
+
+    print_ptr (free)
+
+    #undef print_ptr
+}
+
 #undef check_out
+
+#undef POISON
