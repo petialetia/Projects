@@ -1,147 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <math.h>
-#include <windows.h>
-
-#define get_name(var) #var
-
-#define check_out(list)                     \
-    list->status = is_list_corrupted (list);\
-    if (list->status)                       \
-    {                                       \
-        list_dump (list);                   \
-        assert (0);                         \
-    }
-
-#define POISON NAN
-
-typedef double Elem_t;
-
-/*#define POISON 0
-
-typedef int Elem_t;*/
-
-const size_t MIN_CAPACITY = 10;
-
-const size_t MAX_CAPACITY = 10000000;
-
-enum list_status
-{
-    NoError,
-
-    #define DEF_CMD(name, condition, error_description)\
-    name,
-
-    #include "Errors.hpp"
-
-    #undef DEF_CMD
-
-    IncorrectListNode,
-
-    IncorrectEmptyNode
-};
-
-struct list_node
-{
-    Elem_t val  = POISON;
-    int next = 0;
-    int prev = 0;
-};
-
-struct List_t
-{
-    size_t      size                    = 0;
-    size_t      capacity                = 0;
-    list_node*  data                    = nullptr;
-    char*       name_of_list            = nullptr;
-
-    list_status status                  = NoError;
-    size_t      index_of_incorrect_node = 0;
-    bool        mod                     = 0;
-
-    size_t      head                    = 0;
-    size_t      tail                    = 0;
-    size_t      free                    = 0;
-};
-
-void Construct (List_t* list, int start_capacity = MIN_CAPACITY);
-
-bool can_list_be_constructed (List_t* list, int start_capacity);
-
-bool can_ptr_be_used (const void* ptr);
-
-void spill_poison (List_t* list, size_t start_position);
-
-void Destroy (List_t* list);
-
-void insertion (List_t* list, size_t left, size_t right, Elem_t val);
-
-void InsertBack (List_t* list, Elem_t val);
-
-void InsertFront (List_t* list, Elem_t val);
-
-void Erase (List_t* list, size_t index);
-
-void erasing (List_t* list, size_t index);
-
-void EraseFront (List_t* list);
-
-void EraseBack (List_t* list);
-
-void InsertBefore (List_t* list, size_t index, Elem_t val);
-
-void InsertAfter (List_t* list, size_t index, Elem_t val);
-
-bool is_index_correct (List_t* list, size_t index);
-
-size_t FindIndex (List_t* list, size_t num);
-
-size_t finding_index (List_t* list, size_t num);
-
-Elem_t GetVal (List_t* list, size_t num);
-
-void ChangeMod (List_t* list);
-
-void sort_list (List_t* list);
-
-void move_list_nodes (List_t* list, Elem_t* vals_buffer);
-
-void move_empty_nodes (List_t* list);
-
-bool is_list_looped (List_t* list);
-
-bool are_empty_nodes_looped (List_t* list);
-
-size_t find_incorrect_list_node (List_t* list);
-
-size_t find_incorrect_node_in_unsorted_list (List_t* list);
-
-size_t find_incorrect_empty_node (List_t* list);
-
-list_status is_list_corrupted (List_t* list);
-
-void list_dump (List_t* list);
-
-void error_descriptor (List_t* list, FILE* log_file);
-
-void print_info_about_list (List_t* list, FILE* log_file);
-
-void print_params_of_list (List_t* list, FILE* log_file);
-
-void print_zero_node (List_t* list, FILE* log_file);
-
-void print_list_nodes (List_t* list, FILE* log_file);
-
-void create_txt_file_for_graphviz (List_t* list);
-
-void print_nodes (List_t* list, FILE* graphviz_file);
-
-void print_links (List_t* list, FILE* graphviz_file);
-
-void print_ptrs (List_t* list, FILE* graphviz_file);
-
-
+#include "Header.hpp"
 //-----------------------------------------------------------------------------
 
 
@@ -149,37 +6,7 @@ main ()
 {
     List_t list;
 
-    Construct (&list);
-
-    InsertBack (&list, 29);
-
-    InsertBefore (&list, 1, 210);
-
-    InsertAfter (&list, 1, 20);
-
-    InsertAfter (&list, 1, 120);
-
-    InsertBefore (&list, 1, 310);
-
-    InsertFront (&list, 2222);
-
-    Erase (&list, 1);
-
-    Erase (&list, 2);
-
-    InsertBefore (&list, 3, 230);
-
-    InsertFront (&list, 200);
-
-    list_dump (&list);
-
-    ChangeMod (&list);
-
-    Destroy (&list);
-
-    Construct (&list);
-
-    Destroy (&list);
+    test_list (&list);
 }
 
 
@@ -287,7 +114,7 @@ void Destroy (List_t* list)
     memset (list, 0, sizeof (List_t));
 }
 
-void insertion (List_t* list, size_t left, size_t right, Elem_t val)
+size_t insertion (List_t* list, size_t left, size_t right, Elem_t val)
 {
     size_t new_node_index = list->free;
 
@@ -320,18 +147,18 @@ void insertion (List_t* list, size_t left, size_t right, Elem_t val)
     }
 
     list->size++;
+
+    return new_node_index;
 }
 
-void InsertBack (List_t* list, Elem_t val)
+size_t InsertBack (List_t* list, Elem_t val)
 {
     check_out (list)
 
-    insertion (list, list->tail, 0, val);
-
-    check_out (list);
+    return insertion (list, list->tail, 0, val);
 }
 
-void InsertFront (List_t* list, Elem_t val)
+size_t InsertFront (List_t* list, Elem_t val)
 {
     check_out (list)
 
@@ -340,12 +167,12 @@ void InsertFront (List_t* list, Elem_t val)
         list->mod = 1;
     }
 
-    insertion (list, 0, list->head, val);
-
     check_out (list);
+
+    return insertion (list, 0, list->head, val);
 }
 
-void Erase (List_t* list, size_t index)
+Elem_t Erase (List_t* list, size_t index)
 {
     check_out (list);
 
@@ -356,7 +183,8 @@ void Erase (List_t* list, size_t index)
             list->mod = 1;
         }
 
-        erasing (list, index);
+        check_out (list);
+        return erasing (list, index);
     }
     else
     {
@@ -364,9 +192,10 @@ void Erase (List_t* list, size_t index)
     }
 
     check_out (list);
+    return POISON;
 }
 
-void erasing (List_t* list, size_t index)
+Elem_t erasing (List_t* list, size_t index)
 {
     if (list->data[index].next != 0)
     {
@@ -389,12 +218,16 @@ void erasing (List_t* list, size_t index)
 
     list->free = index;
     list->data[index].prev = -1;
+
+    Elem_t erased_val = list->data[index].val;
     list->data[index].val = POISON;
 
     list->size--;
+
+    return erased_val;
 }
 
-void EraseFront (List_t* list)
+Elem_t EraseFront (List_t* list)
 {
     check_out (list);
 
@@ -405,7 +238,8 @@ void EraseFront (List_t* list)
             list->mod = 1;
         }
 
-        erasing (list, list->head);
+        check_out (list);
+        return erasing (list, list->head);
     }
     else
     {
@@ -413,15 +247,17 @@ void EraseFront (List_t* list)
     }
 
     check_out (list);
+    return POISON;
 }
 
-void EraseBack (List_t* list)
+Elem_t EraseBack (List_t* list)
 {
     check_out (list);
 
     if (list->size > 0)
     {
-        erasing (list, list->tail);
+        check_out (list);
+        return erasing (list, list->tail);
     }
     else
     {
@@ -429,9 +265,10 @@ void EraseBack (List_t* list)
     }
 
     check_out (list);
+    return POISON;
 }
 
-void InsertBefore (List_t* list, size_t index, Elem_t val)
+size_t InsertBefore (List_t* list, size_t index, Elem_t val)
 {
     check_out (list);
 
@@ -442,17 +279,18 @@ void InsertBefore (List_t* list, size_t index, Elem_t val)
             list->mod = 1;
         }
 
-        insertion (list, list->data[index].prev, index, val);
+        check_out (list);
+        return insertion (list, list->data[index].prev, index, val);
     }
     else
     {
         printf ("Invalid index is given to InsertBefore\n");
+        check_out (list);
+        return 0;
     }
-
-    check_out (list);
 }
 
-void InsertAfter (List_t* list, size_t index, Elem_t val)
+size_t InsertAfter (List_t* list, size_t index, Elem_t val)
 {
     check_out (list);
 
@@ -463,14 +301,15 @@ void InsertAfter (List_t* list, size_t index, Elem_t val)
             list->mod = 1;
         }
 
-        insertion (list, index, list->data[index].next, val);
+        check_out (list);
+        return insertion (list, index, list->data[index].next, val);
     }
     else
     {
         printf ("Invalid index is given to InsertAfter\n");
+        check_out (list);
+        return 0;
     }
-
-    check_out (list);
 }
 
 bool is_index_correct (List_t* list, size_t index)
@@ -549,17 +388,6 @@ Elem_t GetVal (List_t* list, size_t num)
         return POISON;
     }
 
-    if (list->mod != 0)
-    {
-        size_t index = list->head;
-
-        for (size_t i = 1; i < num; i++)
-        {
-            index = list->data[index].next;
-        }
-        check_out (list);
-        return list->data[index].val;
-    }
     check_out (list);
     return list->data[num].val;
 }
@@ -652,6 +480,10 @@ void move_empty_nodes (List_t* list)
     list->data[list->capacity].prev = -1;
 }
 
+
+//-----------------------------------------------------------------------------
+
+
 bool is_list_looped (List_t* list)
 {
     if (list->size == 0)
@@ -694,8 +526,6 @@ bool is_list_looped (List_t* list)
     ptr2 = list->tail;
 
     checking_for_loop (prev);
-
-    #undef cheking_for_loop_in_list
 
     return 0;
 }
@@ -829,15 +659,19 @@ list_status is_list_corrupted (List_t* list)
 
 void list_dump (List_t* list)
 {
-    static size_t num_of_call = 0;
-    num_of_call++;
-
     static FILE* log_file = nullptr;
 
-    if (num_of_call == 1)
-    {
-        log_file = fopen ("LogFile.txt", "w");
-    }
+    #define open_file(param, name)     \
+                                       \
+        static size_t num_of_call = 0; \
+        num_of_call++;                 \
+                                       \
+        if (num_of_call == 1)          \
+        {                              \
+            param = fopen (#name, "w");\
+        }
+
+    open_file (log_file, LogFile.txt)
 
     fprintf (log_file, "List_t (");
 
@@ -853,10 +687,12 @@ void list_dump (List_t* list)
     }
     else
     {
-        print_info_about_list (list, log_file);
+        log_print_info_about_list (list, log_file);
     }
 
-    create_txt_file_for_graphviz (list);
+    create_txt_file_for_graphviz_phys (list);
+
+    create_txt_file_for_graphviz_logic (list);
 }
 
 void error_descriptor (List_t* list, FILE* log_file)
@@ -884,7 +720,7 @@ void error_descriptor (List_t* list, FILE* log_file)
     }
 }
 
-void print_info_about_list (List_t* list, FILE* log_file)
+void log_print_info_about_list (List_t* list, FILE* log_file)
 {
     if ((list->status == NoAccessPtr))
     {
@@ -892,7 +728,7 @@ void print_info_about_list (List_t* list, FILE* log_file)
     }
     else
     {
-        print_params_of_list (list, log_file);
+        log_print_params_of_list (list, log_file);
 
         if ((list->status == DataEqualsNullptr) || (list->data == nullptr))
         {
@@ -900,16 +736,16 @@ void print_info_about_list (List_t* list, FILE* log_file)
         }
         else
         {
-            print_zero_node (list, log_file);
+            log_print_zero_node (list, log_file);
 
-            print_list_nodes (list, log_file);
+            log_print_list_nodes (list, log_file);
         }
 
         fprintf (log_file, "}\n");
     }
 }
 
-void print_params_of_list (List_t* list, FILE* log_file)
+void log_print_params_of_list (List_t* list, FILE* log_file)
 {
     if (list->name_of_list != nullptr)
     {
@@ -937,7 +773,7 @@ void print_params_of_list (List_t* list, FILE* log_file)
     fprintf (log_file, "\t{\n");
 }
 
-void print_zero_node (List_t* list, FILE* log_file)
+void log_print_zero_node (List_t* list, FILE* log_file)
 {
     fprintf (log_file, "\t!!![0]!!!\n");
 
@@ -950,7 +786,7 @@ void print_zero_node (List_t* list, FILE* log_file)
     fprintf (log_file, "\tprev = %u\n", list->data[0].prev);
 }
 
-void print_list_nodes (List_t* list, FILE* log_file)
+void log_print_list_nodes (List_t* list, FILE* log_file)
 {
     for (size_t i = 1; i < list->capacity + 1; i++)
     {
@@ -981,34 +817,76 @@ void print_list_nodes (List_t* list, FILE* log_file)
     fprintf (log_file, "\t}\n");
 }
 
-void create_txt_file_for_graphviz (List_t* list)
+
+//-----------------------------------------------------------------------------
+
+
+void create_txt_file_for_graphviz_phys (List_t* list)
 {
-    static size_t num_of_call = 0;
-    num_of_call++;
-
-    static FILE* graphviz_file = nullptr;
-
-    if (num_of_call == 1)
+    if (list->capacity <= 100)
     {
-        graphviz_file = fopen ("graphviz_file.txt", "w");
-    }
+        static FILE* graphviz_file = nullptr;
 
+        open_file (graphviz_file, graphviz_file_phys.txt)
+
+        graph_print_beginning (list, graphviz_file);
+
+        graph_print_zero_node (list, graphviz_file);
+
+        graph_print_nodes_phys (list, graphviz_file);
+
+        graph_print_links_phys (list, graphviz_file);
+
+        graph_print_ptrs_phys (list, graphviz_file);
+
+        fprintf (graphviz_file, "}");
+    }
+}
+
+void create_txt_file_for_graphviz_logic (List_t* list)
+{
+    if (list->capacity <= 100)
+    {
+        static FILE* graphviz_file = nullptr;
+
+        open_file (graphviz_file, graphviz_file_logic.txt)
+
+        graph_print_beginning (list, graphviz_file);
+
+        if (list->size > 0)
+        {
+            graph_print_nodes_logic (list, graphviz_file);
+
+            graph_print_links_logic (list, graphviz_file);
+
+            graph_print_head_logic (list, graphviz_file);
+
+            graph_print_tail_logic (list, graphviz_file);
+        }
+        else
+        {
+            fprintf (graphviz_file, "\"List is empty\" [style=\"filled\", fillcolor = \"red\",shape=\"rectangle\"];\n");
+        }
+
+        fprintf (graphviz_file, "}");
+    }
+}
+
+#undef open_file
+
+void graph_print_beginning (List_t* list, FILE* graphviz_file)
+{
     fprintf (graphviz_file, "digraph PL\n");
 
     fprintf (graphviz_file, "{\nrankdir=HR;\n");
-
-    fprintf (graphviz_file, "0 [style=\"filled\", fillcolor = \"red\", shape=record,label=\" <next> 0 | { POISON | 0} | <prev> 0\" ];\n");
-
-    print_nodes (list, graphviz_file);
-
-    print_links (list, graphviz_file);
-
-    print_ptrs (list, graphviz_file);
-
-    fprintf (graphviz_file, "}");
 }
 
-void print_nodes (List_t* list, FILE* graphviz_file)
+void graph_print_zero_node (List_t* list, FILE* graphviz_file)
+{
+    fprintf (graphviz_file, "0 [style=\"filled\", fillcolor = \"red\", shape=record,label=\" <next> 0 | { POISON | 0} | <prev> 0\" ];\n");
+}
+
+void graph_print_nodes_phys (List_t* list, FILE* graphviz_file)
 {
     for (size_t i = 1; i <= list->capacity; i++)
     {
@@ -1023,7 +901,16 @@ void print_nodes (List_t* list, FILE* graphviz_file)
     }
 }
 
-void print_links (List_t* list, FILE* graphviz_file)
+void graph_print_nodes_logic (List_t* list, FILE* graphviz_file)
+{
+    for (size_t i = 1, num = list->head; i <= list->size; i++)
+    {
+        fprintf (graphviz_file, "%u [style=\"filled\", fillcolor = \"green\", shape=record,label=\" <next> %d | { %lg | %u} | <prev> %d\" ];\n", i, list->data[num].next, list->data[num].val, num, list->data[num].prev);
+        num = list->data[num].next;
+    }
+}
+
+void graph_print_links_phys (List_t* list, FILE* graphviz_file)
 {
     fprintf (graphviz_file, "{\nedge[color=white]\n");
 
@@ -1050,7 +937,34 @@ void print_links (List_t* list, FILE* graphviz_file)
     }
 }
 
-void print_ptrs (List_t* list, FILE* graphviz_file)
+void graph_print_links_logic (List_t* list, FILE* graphviz_file)
+{
+    if (list->size > 1)
+    {
+        fprintf (graphviz_file, "{\nedge[color=white]\n");
+
+        for (size_t i = 1; i < list->size; i++)
+        {
+            fprintf (graphviz_file, "%u->", i);
+        }
+
+        fprintf (graphviz_file, "%u;\n", list->size);
+
+        fprintf (graphviz_file, "}\n");
+
+        fprintf (graphviz_file, "%u:<next> -> %u:<next>[color=\"blue\",constraint=false];\n", 1, 2);
+
+        for (size_t i = 2, size_t; i < list->size; i++)
+        {
+            fprintf (graphviz_file, "%u:<next> -> %u:<next>[color=\"blue\",constraint=false];\n", i, i + 1);
+            fprintf (graphviz_file, "%u:<prev> -> %u:<prev>[color=\"red\",constraint=false];\n", i, i - 1);
+        }
+
+        fprintf (graphviz_file, "%u:<prev> -> %u:<prev>[color=\"red\",constraint=false];\n", list->size, list->size - 1);
+    }
+}
+
+void graph_print_ptrs_phys (List_t* list, FILE* graphviz_file)
 {
     char s[5];
 
@@ -1061,7 +975,7 @@ void print_ptrs (List_t* list, FILE* graphviz_file)
         strcpy (s, #param);                                                          \
         strcpy (s, strupr(s));                                                       \
         fprintf (graphviz_file, "%s [style=\"filled\", fillcolor = \"purple\"];", s);\
-        fprintf (graphviz_file, "%s -> %u\n", /*strupr(s)*/s, list->param);          \
+        fprintf (graphviz_file, "%s -> %u\n", s, list->param);                       \
     }
 
     print_ptr (head)
@@ -1073,6 +987,85 @@ void print_ptrs (List_t* list, FILE* graphviz_file)
     #undef print_ptr
 }
 
-#undef check_out
+void graph_print_head_logic (List_t* list, FILE* graphviz_file)
+{
+    fprintf (graphviz_file, "HEAD [style=\"filled\", fillcolor = \"purple\"];");
+    fprintf (graphviz_file, "HEAD -> 1\n");
+}
 
-#undef POISON
+void graph_print_tail_logic (List_t* list, FILE* graphviz_file)
+{
+    fprintf (graphviz_file, "TAIL [style=\"filled\", fillcolor = \"purple\"];");
+    fprintf (graphviz_file, "TAIL -> %u\n", list->size);
+}
+
+
+//-----------------------------------------------------------------------------
+
+
+void test_list (List_t* list)
+{
+    Construct (list);
+
+    empty_test (list);
+    insert_test (list);
+    erase_test (list);
+    change_mod_test (list);
+
+    list_dump (list);
+
+    Destroy (list);
+}
+
+void empty_test (List_t* list)
+{
+}
+
+void insert_test (List_t* list)
+{
+    for (size_t i = 0; i < 5; i++)
+    {
+        InsertFront (list, 20);
+        InsertBack (list, 30);
+    }
+
+    size_t index_for_test = FindIndex (list, 6);
+
+    for (size_t i = 0; i < 5; i++)
+    {
+        InsertAfter (list, index_for_test, 1);
+        InsertBefore (list, index_for_test, 2);
+    }
+}
+
+void erase_test (List_t* list)
+{
+    for (size_t i = 0; i < 10; i++)
+    {
+        InsertFront (list, i);
+        InsertBack (list, i);
+    }
+
+    for (size_t i = 0; i < 2; i++)
+    {
+        EraseBack (list);
+        EraseFront (list);
+    }
+
+    size_t index_for_test = FindIndex (list, 10);
+
+    Erase (list, index_for_test);
+}
+
+void change_mod_test (List_t* list)
+{
+    for (size_t i = 0; i < 10; i++)
+    {
+        InsertBack (list, i);
+        InsertFront (list, i);
+    }
+
+    ChangeMod (list);
+}
+
+#undef check_out
