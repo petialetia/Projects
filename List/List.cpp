@@ -38,21 +38,9 @@
 
 main ()
 {
-    List_t list;
+    //List_t list;
 
-    test_list (&list);
-
-    //Construct (&list, 10);
-
-    //Construct (&list, 100);
-
-    //Construct (&list, 100);
-
-    //Erase (&list, 1);
-
-    //Destroy (&list);
-
-    //list_dump (&list);
+    //test_list (&list);
 }
 
 

@@ -24,6 +24,8 @@ const size_t MAX_CAPACITY = 10000000;
 
 const size_t SIZE_OF_NAME_OF_PTR = 5;
 
+#ifdef SUPERPROTECT
+
 enum list_status
 {
     NoError,
@@ -39,6 +41,8 @@ enum list_status
 
     IncorrectEmptyNode
 };
+
+#endif
 
 struct list_node
 {
@@ -125,7 +129,11 @@ size_t find_incorrect_node_in_unsorted_list (List_t* list);
 
 size_t find_incorrect_empty_node (List_t* list);
 
+#ifdef SUPERPROTECT
+
 list_status is_list_corrupted (List_t* list);
+
+#endif
 
 void list_dump (List_t* list);
 
