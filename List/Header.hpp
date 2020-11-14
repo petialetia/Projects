@@ -4,15 +4,7 @@
 #include <math.h>
 #include <windows.h>
 
-#define get_name(var) #var
-
-#define check_out(list)                     \
-    list->status = is_list_corrupted (list);\
-    if (list->status)                       \
-    {                                       \
-        list_dump (list);                   \
-        assert (0);                         \
-    }
+#define SUPERPROTECT
 
 typedef double Elem_t;
 
@@ -22,9 +14,15 @@ const Elem_t POISON = NAN;
 
 const Elem_t POISON = 0;*/
 
+size_t NUM_OF_PRINT_IN_LOG_FILE = 0;
+
+FILE* LOG_FILE = nullptr;
+
 const size_t MIN_CAPACITY = 100;
 
 const size_t MAX_CAPACITY = 10000000;
+
+const size_t SIZE_OF_NAME_OF_PTR = 5;
 
 enum list_status
 {
@@ -54,11 +52,15 @@ struct List_t
     size_t      size                    = 0;
     size_t      capacity                = 0;
     list_node*  data                    = nullptr;
-    char*       name_of_list            = nullptr;
+    bool        mod                     = 0;
 
+#ifdef SUPERPROTECT
+
+    char*       name_of_list            = nullptr;
     list_status status                  = NoError;
     size_t      index_of_incorrect_node = 0;
-    bool        mod                     = 0;
+
+#endif
 
     size_t      head                    = 0;
     size_t      tail                    = 0;
@@ -177,3 +179,4 @@ void change_mod_test (List_t* list);
 
 void create_txt_file_for_graphviz_phys (List_t* list);
 
+#undef SUPERPROTECT
