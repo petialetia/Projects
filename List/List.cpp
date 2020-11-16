@@ -14,19 +14,6 @@
         assert (0);                         \
     }
 
-/*#define print_warning(warning)                \
-                                              \
-    printf (#warning"\n");                    \
-                                              \
-    NUM_OF_PRINT_IN_LOG_FILE++;               \
-                                              \
-    if (NUM_OF_PRINT_IN_LOG_FILE == 1)        \
-    {                                         \
-        LOG_FILE = fopen ("LogFile.txt", "w");\
-    }                                         \
-                                              \
-    fprintf (LOG_FILE, #warning"\n");*/
-
 #else
 #define get_name(var)
 #define check_up(list)
@@ -543,8 +530,6 @@ void move_empty_nodes (List_t* list)
     list->data[list->capacity].val = POISON;
     list->data[list->capacity].prev = -1;
 }
-
-#undef print_warning
 
 //-----------------------------------------------------------------------------
 
