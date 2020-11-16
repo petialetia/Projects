@@ -17,7 +17,6 @@
 #else
 #define get_name(var)
 #define check_up(list)
-#define print_warning(warning)
 #endif
 
 //-----------------------------------------------------------------------------
@@ -34,7 +33,7 @@ main ()
 //-----------------------------------------------------------------------------
 
 
-#ifdef SUPERPROTECT
+
 
 void Construct (List_t* list, int start_capacity)
 {
@@ -42,7 +41,11 @@ void Construct (List_t* list, int start_capacity)
     {
         list->capacity = start_capacity;
 
+        #ifdef SUPERPROTECT
+
         list->name_of_list = get_name(list);
+
+        #endif
 
         list->free = 1;
 
@@ -57,29 +60,7 @@ void Construct (List_t* list, int start_capacity)
     return;
 }
 
-#else
-
-void Construct (List_t* list, int start_capacity)
-{
-    assert (list != nullptr);
-
-    list->capacity = start_capacity;
-
-    list->free = 1;
-
-    list->data = (list_node*) calloc (start_capacity + 1, sizeof (list_node));
-
-    list->data[0].val = POISON;
-
-    spill_poison (list, list->size+1);
-    check_up (list);
-}
-
-#endif
-
 #undef get_name
-
-#ifdef SUPERPROTECT
 
 bool can_list_be_constructed (List_t* list, int start_capacity)
 {
@@ -103,11 +84,25 @@ bool can_list_be_constructed (List_t* list, int start_capacity)
         print_warning ("You're trying to construct list with too small capacity");
         return 0;
     }
-    if ((list->size                    != 0)       || (list->capacity     != 0)       ||
-        (list->data                    != nullptr) || (list->name_of_list != nullptr) ||
-        (list->status                  != NoError) || (list->mod          != 0)       ||
-        (list->index_of_incorrect_node != 0)       || (list->head         != 0)       ||
-        (list->tail                    != 0)       || (list->free         != 0))
+
+    #ifdef SUPERPROTECT
+
+    if ((list->size                    != 0)       || (list->capacity != 0)       ||
+        (list->data                    != nullptr) || (list->mod      != 0)       ||
+        (list->name_of_list            != nullptr) || (list->status   != NoError) ||
+        (list->index_of_incorrect_node != 0)       || (list->head     != 0)       ||
+        (list->tail                    != 0)       || (list->free     != 0))
+
+    #else
+
+    if ((list->size != 0)       || (list->capacity != 0) ||
+        (list->data != nullptr) || (list->mod      != 0) ||
+        (list->head != 0)       || (list->tail     != 0) ||
+        (list->free != 0))
+
+    #endif
+
+
     {
         print_warning ("You're trying to construct list, but there are some data you didn't delete");
         return 0;
@@ -149,7 +144,7 @@ bool can_ptr_be_used (const void* ptr)
     return (mbi.Protect & read_rights);
 }
 
-#endif
+
 
 void spill_poison (List_t* list, size_t start_position)
 {
@@ -533,6 +528,8 @@ void move_empty_nodes (List_t* list)
 
 //-----------------------------------------------------------------------------
 
+#ifdef SUPERPROTECT
+
 #define checking_for_loop(direction)                               \
                                                                    \
     for (;;)                                                       \
@@ -557,8 +554,6 @@ void move_empty_nodes (List_t* list)
             }                                                      \
         }                                                          \
     }
-
-#ifdef SUPERPROTECT
 
 bool is_list_looped (List_t* list)
 {
@@ -1088,6 +1083,7 @@ void graph_print_tail_logic (List_t* list, FILE* graphviz_file)
     fprintf (graphviz_file, "TAIL -> %u\n", list->size);
 }
 
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -1188,8 +1184,6 @@ void change_mod_test (List_t* list)
 
     Destroy (list);
 }
-
-#endif
 
 #undef ckeck_vals_test
 
