@@ -14,9 +14,9 @@
         assert (0);                         \
     }
 
-#define print_warning(warning)                \
+/*#define print_warning(warning)                \
                                               \
-    printf ("%s\n", #warning);                \
+    printf (#warning"\n");                    \
                                               \
     NUM_OF_PRINT_IN_LOG_FILE++;               \
                                               \
@@ -25,7 +25,7 @@
         LOG_FILE = fopen ("LogFile.txt", "w");\
     }                                         \
                                               \
-    fprintf (LOG_FILE, "%s\n", #warning);
+    fprintf (LOG_FILE, #warning"\n");*/
 
 #else
 #define get_name(var)
@@ -38,9 +38,9 @@
 
 main ()
 {
-    //List_t list;
+    List_t list;
 
-    //test_list (&list);
+    test_list (&list);
 }
 
 
@@ -98,22 +98,22 @@ bool can_list_be_constructed (List_t* list, int start_capacity)
 {
     if (list == nullptr)
     {
-        print_warning (Your pointer equals nullptr) //printf ("Your pointer equals nullptr\n");
+        print_warning ("Your pointer equals nullptr");
         return 0;
     }
     if (!can_ptr_be_used(list))
     {
-        print_warning (Your pointer can not be read) //printf ("Your pointer can not be read\n");
+        print_warning ("Your pointer can not be read");
         return 0;
     }
     if (start_capacity > MAX_CAPACITY)
     {
-        print_warning (You are trying to construct list with too big start capacity) //printf ("You're trying to construct list with too big start capacity\n");
+        print_warning ("You're trying to construct list with too big start capacity");
         return 0;
     }
     if (start_capacity < MIN_CAPACITY)
     {
-        print_warning (You are trying to construct list with too small capacity) //printf ("You're trying to construct list with too small capacity\n");
+        print_warning ("You're trying to construct list with too small capacity");
         return 0;
     }
     if ((list->size                    != 0)       || (list->capacity     != 0)       ||
@@ -122,11 +122,25 @@ bool can_list_be_constructed (List_t* list, int start_capacity)
         (list->index_of_incorrect_node != 0)       || (list->head         != 0)       ||
         (list->tail                    != 0)       || (list->free         != 0))
     {
-        print_warning (You are trying to construct list but there are some data you did not delete) //printf ("You're trying to construct list, but there are some data you didn't delete\n");
+        print_warning ("You're trying to construct list, but there are some data you didn't delete");
         return 0;
     }
 
     return 1;
+}
+
+void print_warning (char* warning)
+{
+    printf ("%s\n", warning);
+
+    NUM_OF_PRINT_IN_LOG_FILE++;
+
+    if (NUM_OF_PRINT_IN_LOG_FILE == 1)
+    {
+        LOG_FILE = fopen ("LogFile.txt", "w");
+    }
+
+    fprintf (LOG_FILE, "%s\n", warning);
 }
 
 bool can_ptr_be_used (const void* ptr)
@@ -238,7 +252,7 @@ Elem_t Erase (List_t* list, size_t index)
     }
     else
     {
-        print_warning (Invalid index is given to Erase) //printf ("Invalid index is given to Erase\n");
+        print_warning ("Invalid index is given to Erase");
     }
 
     check_up (list);
@@ -285,7 +299,7 @@ Elem_t EraseFront (List_t* list)
     }
     else
     {
-        print_warning (Empty list is given to EraseFront) //printf ("Empty list is given to EraseFront\n");
+        print_warning ("Empty list is given to EraseFront");
     }
 
     check_up (list);
@@ -303,7 +317,7 @@ Elem_t EraseBack (List_t* list)
     }
     else
     {
-        print_warning (Empty list is given to EraseBack) //printf ("Empty list is given to EraseBack\n");
+        print_warning ("Empty list is given to EraseBack");
     }
 
     check_up (list);
@@ -326,7 +340,7 @@ size_t InsertBefore (List_t* list, size_t index, Elem_t val)
     }
     else
     {
-        print_warning (Invalid index is given to InsertBefore) //printf ("Invalid index is given to InsertBefore\n");
+        print_warning ("Invalid index is given to InsertBefore");
         check_up (list);
         return 0;
     }
@@ -348,7 +362,7 @@ size_t InsertAfter (List_t* list, size_t index, Elem_t val)
     }
     else
     {
-        print_warning (Invalid index is given to InsertAfter) //printf ("Invalid index is given to InsertAfter\n");
+        print_warning ("Invalid index is given to InsertAfter");
         check_up (list);
         return 0;
     }
@@ -379,14 +393,14 @@ size_t FindIndex (List_t* list, size_t num)
 
     if (num == 0)
     {
-        print_warning (Number of system zero node is given to FindIndex) //printf ("Number of system zero node is given to FindIndex\n");
+        print_warning ("Number of system zero node is given to FindIndex");
         check_up (list);
         return 0;
     }
 
     if (num > list->size)
     {
-        print_warning (Number of empty or nonexistent node is given to FindIndex) //printf ("Number of empty or nonexistent node is given to FindIndex\n");
+        print_warning ("Number of nonexistent or empty node is given to FindIndex");
         check_up (list);
         return 0;
     }
@@ -422,14 +436,21 @@ Elem_t GetVal (List_t* list, size_t num)
 
     if (num == 0)
     {
-        print_warning (Number of system zero node is given to GetVal) //printf ("Number of system zero node is given to GetVal\n");
+        print_warning ("Number of system zero node is given to GetVal");
         check_up (list);
         return POISON;
     }
 
     if (num > list->capacity)
     {
-        print_warning (Number of nonexistent node is given to GetVal) //printf ("Number of nonexistent node is given to GetVal\n");
+        print_warning ("Number of nonexistent node is given to GetVal");
+        check_up (list);
+        return POISON;
+    }
+
+    if (list->data[num].prev == -1)
+    {
+        print_warning ("Number of empty node is given to GetVal");
         check_up (list);
         return POISON;
     }
@@ -452,7 +473,7 @@ void ChangeMod (List_t* list)
         if (list->size == 0)
         {
             list->mod = 0;
-            print_warning (Empty list is given to ChangeMod) //printf ("Empty list is given to ChangeMod\n");
+            print_warning ("Empty list is given to ChangeMod");
             check_up (list);
             return;
         }

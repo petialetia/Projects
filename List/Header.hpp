@@ -75,6 +75,8 @@ void Construct (List_t* list, int start_capacity = MIN_CAPACITY);
 
 bool can_list_be_constructed (List_t* list, int start_capacity);
 
+void print_warning (char* str);
+
 bool can_ptr_be_used (const void* ptr);
 
 void spill_poison (List_t* list, size_t start_position);
