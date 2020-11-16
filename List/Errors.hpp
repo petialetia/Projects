@@ -12,11 +12,11 @@ DEF_CMD (ZeroNodeCorrupted, /*(list->data[0].val != POISON) ||*/ (list->data[0].
 
 DEF_CMD (IncorrectHeadPtr, (list->head > list->capacity), "Head pointer is incorrect")
 
-DEF_CMD (IncorrectHeadNote, (list->head != 0) && ((list->data[list->head].prev != 0) || (list->data[list->head].val == POISON)), "Head node is incorrect")
+DEF_CMD (IncorrectHeadNote, (list->head != 0) && ((list->data[list->head].prev != 0)/* || (list->data[list->head].val == POISON)*/), "Head node is incorrect")
 
 DEF_CMD (IncorrectTailPtr, (list->tail > list->capacity), "Tail pointer is incorrect")
 
-DEF_CMD (IncorrectTailNote, (list->tail != 0) && ((list->data[list->tail].next != 0) || (list->data[list->tail].val == POISON)), "Tail node is incorrect")
+DEF_CMD (IncorrectTailNote, (list->tail != 0) && ((list->data[list->tail].next != 0)/* || (list->data[list->tail].val == POISON)*/), "Tail node is incorrect")
 
 DEF_CMD (ConflictingHeadAndTail, (list->size == 1) && ((list->head == 0) || (list->tail != list->head)) ||
                                  (list->size > 1)  && (list->head == list->tail), "Conflicting head and tail")
