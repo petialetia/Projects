@@ -8,6 +8,14 @@
 
 #define WINDOWS
 
+//system ("dot -Tpng graphviz_file_logic.txt -o graphviz_file_logic.png");
+
+//system ("dot -Tpng graphviz_file_phys.txt -o graphviz_file_phys.png");
+
+//system ("start graphviz_file_logic.png");
+
+//system ("start graphviz_file_phys.png");
+
 typedef double Elem_t;
 
 const Elem_t POISON = NAN;
@@ -20,7 +28,7 @@ size_t NUM_OF_PRINT_IN_LOG_FILE = 0;
 
 FILE* LOG_FILE = nullptr;
 
-const size_t PREFERABLE_START_CAPACITY = 100;
+const size_t PREFERABLE_START_CAPACITY = 60;
 
 const size_t MAX_CAPACITY              = 10000000;
 
@@ -185,6 +193,8 @@ void log_print_list_nodes (List_t* list, FILE* log_file);
 
 void create_txt_file_for_graphviz_logic (List_t* list);
 
+void create_txt_file_for_graphviz_phys (List_t* list);
+
 void graph_print_beginning (List_t* list, FILE* graphviz_file);
 
 void graph_print_zero_node (List_t* list, FILE* graphviz_file);
@@ -216,7 +226,5 @@ void insert_test (List_t* list);
 void erase_test (List_t* list);
 
 void change_mod_test (List_t* list);
-
-void create_txt_file_for_graphviz_phys (List_t* list);
 
 #undef SUPERPROTECT
