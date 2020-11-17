@@ -1004,7 +1004,7 @@ void graph_print_nodes_phys (List_t* list, FILE* graphviz_file)
         else
         {
             fprintf (graphviz_file,
-            "%u [style=\"filled\", fillcolor = \"green\", shape=record,label=\" <next> next: %d | { %lg | index: %u} | <prev> prev: %d\" ];\n",
+            "%u [style=\"filled\", fillcolor = \"#98FB98\", shape=record,label=\" <next> next: %d | { %lg | index: %u} | <prev> prev: %d\" ];\n",
             i, list->data[i].next, list->data[i].val, i, list->data[i].prev);
         }
     }
@@ -1018,7 +1018,7 @@ void graph_print_nodes_logic (List_t* list, FILE* graphviz_file)
     for (size_t i = 1, num = list->head; i <= list->size; i++)
     {
         fprintf (graphviz_file,
-        "%u [style=\"filled\", fillcolor = \"green\", shape=record,label=\" <next> next: %d | { %lg | index: %u} | <prev> prev: %d\" ];\n",
+        "%u [style=\"filled\", fillcolor = \"#98FB98\", shape=record,label=\" <next> next: %d | { %lg | index: %u} | <prev> prev: %d\" ];\n",
         i, list->data[num].next, list->data[num].val, num, list->data[num].prev);
 
         num = list->data[num].next;
