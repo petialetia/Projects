@@ -2,22 +2,26 @@
 
 #define SUPERPROTECT
 
+#define WINDOWS
+
 #ifdef SUPERPROTECT
 
 #define get_name(var) #var
 
-#define check_up(list)                      \
-    list->status = is_list_corrupted (list);\
-    if (list->status)                       \
-    {                                       \
-        list_dump (list);                   \
-        assert (0);                         \
+#define check_up(list)                                \
+    list->status = is_list_corrupted (list);          \
+    if (list->status)                                 \
+    {                                                 \
+        list_dump (list);                             \
+        printf ("Error found on line %u\n", __LINE__);\
+        abort ();                                     \
     }
 
 #else
 #define get_name(var)
 #define check_up(list)
 #endif
+
 
 //-----------------------------------------------------------------------------
 
@@ -33,7 +37,7 @@ main ()
 //-----------------------------------------------------------------------------
 
 
-
+#ifdef SUPERPROTECT
 
 void Construct (List_t* list, int start_capacity)
 {
@@ -41,11 +45,7 @@ void Construct (List_t* list, int start_capacity)
     {
         list->capacity = start_capacity;
 
-        #ifdef SUPERPROTECT
-
         list->name_of_list = get_name(list);
-
-        #endif
 
         list->free = 1;
 
@@ -60,7 +60,27 @@ void Construct (List_t* list, int start_capacity)
     return;
 }
 
+#else
+
+void Construct (List_t* list, int start_capacity)
+{
+    list->capacity = start_capacity;
+
+    list->free = 1;
+
+    list->data = (list_node*) calloc (start_capacity + 1, sizeof (list_node));
+
+    list->data[0].val = POISON;
+
+    spill_poison (list, list->size+1);
+    check_up (list);
+}
+
+#endif
+
 #undef get_name
+
+#ifdef SUPERPROTECT
 
 bool can_list_be_constructed (List_t* list, int start_capacity)
 {
@@ -69,40 +89,24 @@ bool can_list_be_constructed (List_t* list, int start_capacity)
         print_warning ("Your pointer equals nullptr");
         return 0;
     }
+    #ifdef WINDOWS
     if (!can_ptr_be_used(list))
     {
         print_warning ("Your pointer can not be read");
         return 0;
     }
+    #endif
     if (start_capacity > MAX_CAPACITY)
     {
         print_warning ("You're trying to construct list with too big start capacity");
         return 0;
     }
-    if (start_capacity < MIN_CAPACITY)
-    {
-        print_warning ("You're trying to construct list with too small capacity");
-        return 0;
-    }
 
-    #ifdef SUPERPROTECT
-
-    if ((list->size                    != 0)       || (list->capacity != 0)       ||
-        (list->data                    != nullptr) || (list->mod      != 0)       ||
-        (list->name_of_list            != nullptr) || (list->status   != NoError) ||
-        (list->index_of_incorrect_node != 0)       || (list->head     != 0)       ||
+    if ((list->size                    != 0)       || (list->capacity != 0)            ||
+        (list->data                    != nullptr) || (list->mod      != LIST_ORDERED) ||
+        (list->name_of_list            != nullptr) || (list->status   != NoError)      ||
+        (list->index_of_incorrect_node != 0)       || (list->head     != 0)            ||
         (list->tail                    != 0)       || (list->free     != 0))
-
-    #else
-
-    if ((list->size != 0)       || (list->capacity != 0) ||
-        (list->data != nullptr) || (list->mod      != 0) ||
-        (list->head != 0)       || (list->tail     != 0) ||
-        (list->free != 0))
-
-    #endif
-
-
     {
         print_warning ("You're trying to construct list, but there are some data you didn't delete");
         return 0;
@@ -125,6 +129,10 @@ void print_warning (char* warning)
     fprintf (LOG_FILE, "%s\n", warning);
 }
 
+#endif
+
+#ifdef WINDOWS
+
 bool can_ptr_be_used (const void* ptr)
 {
     MEMORY_BASIC_INFORMATION mbi;
@@ -144,6 +152,8 @@ bool can_ptr_be_used (const void* ptr)
     return (mbi.Protect & read_rights);
 }
 
+
+#endif
 
 
 void spill_poison (List_t* list, size_t start_position)
@@ -208,15 +218,15 @@ size_t InsertFront (List_t* list, Elem_t val)
 {
     check_up (list)
 
-    if ((list->head != 0) && (list->mod == 0))
+    if ((list->head != 0) && (list->mod == LIST_ORDERED))
     {
-        list->mod = 1;
+        list->mod = LIST_NOT_ORDERED;
     }
-
-    check_up (list);
 
     return insertion (list, 0, list->head, val);
 }
+
+#ifdef SUPERPROTECT
 
 Elem_t Erase (List_t* list, size_t index)
 {
@@ -224,12 +234,11 @@ Elem_t Erase (List_t* list, size_t index)
 
     if (is_index_correct (list, index))
     {
-        if ((list->tail != index) && (list->mod == 0))
+        if ((list->tail != index) && (list->mod == LIST_ORDERED))
         {
-            list->mod = 1;
+            list->mod = LIST_NOT_ORDERED;
         }
 
-        check_up (list);
         return erasing (list, index);
     }
     else
@@ -237,9 +246,24 @@ Elem_t Erase (List_t* list, size_t index)
         print_warning ("Invalid index is given to Erase");
     }
 
-    check_up (list);
     return POISON;
 }
+
+#else
+
+Elem_t Erase (List_t* list, size_t index)
+{
+    check_up (list);
+
+    if ((list->tail != index) && (list->mod == LIST_ORDERED))
+    {
+        list->mod = LIST_NOT_ORDERED;
+    }
+
+    return erasing (list, index);
+}
+
+#endif
 
 Elem_t erasing (List_t* list, size_t index)
 {
@@ -265,18 +289,19 @@ Elem_t erasing (List_t* list, size_t index)
     return erased_val;
 }
 
+#ifdef SUPERPROTECT
+
 Elem_t EraseFront (List_t* list)
 {
     check_up (list);
 
     if (list->size > 0)
     {
-        if ((list->mod == 0) && (list->size > 1))
+        if ((list->mod == LIST_ORDERED) && (list->size > 1))
         {
-            list->mod = 1;
+            list->mod = LIST_NOT_ORDERED;
         }
 
-        check_up (list);
         return erasing (list, list->head);
     }
     else
@@ -284,9 +309,26 @@ Elem_t EraseFront (List_t* list)
         print_warning ("Empty list is given to EraseFront");
     }
 
-    check_up (list);
     return POISON;
 }
+
+#else
+
+Elem_t EraseFront (List_t* list)
+{
+    check_up (list);
+
+    if ((list->mod == LIST_ORDERED) && (list->size > 1))
+    {
+        list->mod = LIST_NOT_ORDERED;
+    }
+
+    return erasing (list, list->head);
+}
+
+#endif
+
+#ifdef SUPERPROTECT
 
 Elem_t EraseBack (List_t* list)
 {
@@ -294,7 +336,6 @@ Elem_t EraseBack (List_t* list)
 
     if (list->size > 0)
     {
-        check_up (list);
         return erasing (list, list->tail);
     }
     else
@@ -302,9 +343,21 @@ Elem_t EraseBack (List_t* list)
         print_warning ("Empty list is given to EraseBack");
     }
 
-    check_up (list);
     return POISON;
 }
+
+#else
+
+Elem_t EraseBack (List_t* list)
+{
+    check_up (list);
+
+    return erasing (list, list->tail);
+}
+
+#endif
+
+#ifdef SUPERPROTECT
 
 size_t InsertBefore (List_t* list, size_t index, Elem_t val)
 {
@@ -312,21 +365,38 @@ size_t InsertBefore (List_t* list, size_t index, Elem_t val)
 
     if (is_index_correct (list, index))
     {
-        if (list->mod == 0)
+        if (list->mod == LIST_ORDERED)
         {
-            list->mod = 1;
+            list->mod = LIST_NOT_ORDERED;
         }
 
-        check_up (list);
         return insertion (list, list->data[index].prev, index, val);
     }
     else
     {
         print_warning ("Invalid index is given to InsertBefore");
-        check_up (list);
-        return 0;
     }
+
+    return POISON;
 }
+
+#else
+
+size_t InsertBefore (List_t* list, size_t index, Elem_t val)
+{
+    check_up (list);
+
+    if (list->mod == LIST_ORDERED)
+    {
+        list->mod = LIST_NOT_ORDERED;
+    }
+
+    return insertion (list, list->data[index].prev, index, val);
+}
+
+#endif
+
+#ifdef SUPERPROTECT
 
 size_t InsertAfter (List_t* list, size_t index, Elem_t val)
 {
@@ -334,70 +404,91 @@ size_t InsertAfter (List_t* list, size_t index, Elem_t val)
 
     if (is_index_correct (list, index))
     {
-        if ((index != list->tail) && (list->mod == 0))
+        if ((index != list->tail) && (list->mod == LIST_ORDERED))
         {
-            list->mod = 1;
+            list->mod = LIST_NOT_ORDERED;
         }
 
-        check_up (list);
         return insertion (list, index, list->data[index].next, val);
     }
     else
     {
         print_warning ("Invalid index is given to InsertAfter");
-        check_up (list);
-        return 0;
     }
+
+    return POISON;
 }
+
+#else
+
+size_t InsertAfter (List_t* list, size_t index, Elem_t val)
+{
+    check_up (list);
+
+    if ((index != list->tail) && (list->mod == LIST_ORDERED))
+    {
+        list->mod = LIST_NOT_ORDERED;
+    }
+
+    return insertion (list, index, list->data[index].next, val);
+}
+
+#endif
+
+#ifdef SUPERPROTECT
 
 bool is_index_correct (List_t* list, size_t index)
 {
     assert (list != nullptr);
 
-    if ((index == 0) || (index > list->capacity))
-    {
-        return false;
-    }
+    if ((index == 0) || (index > list->capacity)) return false;
     else
     {
-        if (list->data[index].prev == -1)
-        {
-            return false;
-        }
+        if (list->data[index].prev == -1) return false;
     }
 
     return true;
 }
 
+#endif
+
+#ifdef SUPERPROTECT
+
 size_t FindIndex (List_t* list, size_t num)
 {
     check_up (list);
 
-    if (num == 0)
+    if (is_num_correct (list, num))
     {
-        print_warning ("Number of system zero node is given to FindIndex");
-        check_up (list);
-        return 0;
+        if (list->mod != LIST_ORDERED)
+        {
+            size_t index = list->head;
+
+            for (size_t i = 1; i < num; i++)
+            {
+                index = list->data[index].next;
+            }
+
+            return index;
+        }
+
+        return num;
+    }
+    else
+    {
+        print_warning ("Invalid num is given to FindIndex");
     }
 
-    if (num > list->size)
-    {
-        print_warning ("Number of nonexistent or empty node is given to FindIndex");
-        check_up (list);
-        return 0;
-    }
-
-    check_up (list);
-
-    return finding_index (list, num);
-
+    return POISON;
 }
 
-size_t finding_index (List_t* list, size_t num)
-{
-    assert (list != nullptr);
+#else
 
-    if (list->mod != 0)
+size_t FindIndex (List_t* list, size_t num)
+{
+    check_up (list);
+
+    if (list->mod != LIST_ORDERED)
     {
         size_t index = list->head;
 
@@ -412,64 +503,98 @@ size_t finding_index (List_t* list, size_t num)
     return num;
 }
 
-Elem_t GetVal (List_t* list, size_t num)
+#endif
+
+#ifdef SUPERPROTECT
+
+bool is_num_correct (List_t* list, size_t num)
+{
+    if ((num == 0) || (num > list->size)) return false;
+
+    return true;
+}
+
+#endif
+
+#ifdef SUPERPROTECT
+
+Elem_t GetVal (List_t* list, size_t index)
 {
     check_up (list);
 
-    if (num == 0)
+    if (is_index_correct (list, index))
     {
-        print_warning ("Number of system zero node is given to GetVal");
-        check_up (list);
-        return POISON;
+        return list->data[index].val;
+    }
+    else
+    {
+        print_warning ("Invalid index is given to GetVal");
     }
 
-    if (num > list->capacity)
-    {
-        print_warning ("Number of nonexistent node is given to GetVal");
-        check_up (list);
-        return POISON;
-    }
-
-    if (list->data[num].prev == -1)
-    {
-        print_warning ("Number of empty node is given to GetVal");
-        check_up (list);
-        return POISON;
-    }
-
-    check_up (list);
-    return list->data[num].val;
+    return POISON;
 }
+
+#else
+
+Elem_t GetVal (List_t* list, size_t index)
+{
+    check_up (list);
+
+    return list->data[index].val;
+}
+
+#endif
+
+#ifdef SUPERPROTECT
 
 void ChangeMod (List_t* list)
 {
     check_up (list);
 
-    if (list->mod == 0)
+    if (list->mod == LIST_ORDERED)
     {
-        check_up (list);
         return;
     }
     else
     {
         if (list->size == 0)
         {
-            list->mod = 0;
+            list->mod = LIST_ORDERED;
             print_warning ("Empty list is given to ChangeMod");
-            check_up (list);
             return;
         }
         else
         {
-            sort_list (list);
-            list->mod = 0;
+            put_nodes_in_order (list);
+            list->mod = LIST_ORDERED;
         }
     }
 
     check_up (list);
 }
 
-void sort_list (List_t* list)
+#else
+
+void ChangeMod (List_t* list)
+{
+    check_up (list);
+
+    if (list->mod == LIST_ORDERED)
+    {
+        return;
+    }
+    else
+    {
+        put_nodes_in_order (list);
+        list->mod = LIST_ORDERED;
+    }
+
+    check_up (list);
+}
+
+#endif
+
+void put_nodes_in_order (List_t* list)
 {
     assert (list != nullptr);
 
@@ -601,7 +726,7 @@ size_t find_incorrect_list_node (List_t* list)
 {
     assert (list != nullptr);
 
-    if (list->mod == 0)
+    if (list->mod == LIST_ORDERED)
     {
         for (size_t i = 1; i < list->size; i++)
         {
@@ -768,12 +893,14 @@ void error_descriptor (List_t* list, FILE* log_file)
     }
 }
 
+#ifdef WINDOWS
+
 void log_print_info_about_list (List_t* list, FILE* log_file)
 {
     assert (list != nullptr);
     assert (log_file != nullptr);
 
-    if ((list->status == NoAccessPtr))
+    if (list->status == NoAccessPtr)
     {
         fprintf (log_file, "\nPointer on list might be invalid, variables are lost\n");
     }
@@ -795,6 +922,31 @@ void log_print_info_about_list (List_t* list, FILE* log_file)
         fprintf (log_file, "}\n");
     }
 }
+
+#else
+
+void log_print_info_about_list (List_t* list, FILE* log_file)
+{
+    assert (list != nullptr);
+    assert (log_file != nullptr);
+
+    log_print_params_of_list (list, log_file);
+
+    if ((list->status == DataEqualsNullptr) || (list->data == nullptr))
+    {
+        fprintf (log_file, "\tData equals nullptr, elements are lost\n\t}\n");
+    }
+    else
+    {
+        log_print_zero_node (list, log_file);
+
+        log_print_list_nodes (list, log_file);
+    }
+
+    fprintf (log_file, "}\n");
+}
+
+#endif
 
 void log_print_params_of_list (List_t* list, FILE* log_file)
 {

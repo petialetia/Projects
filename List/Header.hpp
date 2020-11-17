@@ -6,6 +6,8 @@
 
 #define SUPERPROTECT
 
+#define WINDOWS
+
 typedef double Elem_t;
 
 const Elem_t POISON = NAN;
@@ -18,11 +20,15 @@ size_t NUM_OF_PRINT_IN_LOG_FILE = 0;
 
 FILE* LOG_FILE = nullptr;
 
-const size_t MIN_CAPACITY = 100;
+const size_t PREFERABLE_START_CAPACITY = 100;
 
-const size_t MAX_CAPACITY = 10000000;
+const size_t MAX_CAPACITY              = 10000000;
 
-const size_t SIZE_OF_NAME_OF_PTR = 5;
+const size_t SIZE_OF_NAME_OF_PTR       = 5;
+
+const bool   LIST_ORDERED              = 0;
+
+const bool   LIST_NOT_ORDERED          = 1;
 
 #ifdef SUPERPROTECT
 
@@ -71,13 +77,21 @@ struct List_t
     size_t      free                    = 0;
 };
 
-void Construct (List_t* list, int start_capacity = MIN_CAPACITY);
+void Construct (List_t* list, int start_capacity = PREFERABLE_START_CAPACITY);
+
+#ifdef SUPERPROTECT
 
 bool can_list_be_constructed (List_t* list, int start_capacity);
 
 void print_warning (char* str);
 
+#endif
+
+#ifdef WINDOWS
+
 bool can_ptr_be_used (const void* ptr);
+
+#endif
 
 void spill_poison (List_t* list, size_t start_position);
 
@@ -101,17 +115,25 @@ size_t InsertBefore (List_t* list, size_t index, Elem_t val);
 
 size_t InsertAfter (List_t* list, size_t index, Elem_t val);
 
+#ifdef SUPERPROTECT
+
 bool is_index_correct (List_t* list, size_t index);
+
+#endif
 
 size_t FindIndex (List_t* list, size_t num);
 
-size_t finding_index (List_t* list, size_t num);
+#ifdef SUPERPROTECT
+
+bool is_num_correct (List_t* list, size_t num);
+
+#endif
 
 Elem_t GetVal (List_t* list, size_t num);
 
 void ChangeMod (List_t* list);
 
-void sort_list (List_t* list);
+void put_nodes_in_order (List_t* list);
 
 void move_list_nodes (List_t* list, Elem_t* vals_buffer);
 

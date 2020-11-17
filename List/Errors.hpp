@@ -1,10 +1,14 @@
 DEF_CMD (ListPtrEqualsNullptr, list == nullptr, "Pointer on list equals nullptr")
 
+#ifdef WINDOWS
+
 DEF_CMD (NoAccessPtr, !can_ptr_be_used(list), "No access to variables on pointer")
+
+#endif
 
 DEF_CMD (DataEqualsNullptr, list->data == nullptr, "Pointer on array equals nullptr")
 
-DEF_CMD (IncorrectCapacity, list->capacity < MIN_CAPACITY || list->capacity > MAX_CAPACITY, "Incorrect capacity in list")
+DEF_CMD (IncorrectCapacity, /*list->capacity < MIN_CAPACITY ||*/ list->capacity > MAX_CAPACITY, "Incorrect capacity in list")
 
 DEF_CMD (SizeBiggerThanCapacity, list->size > list->capacity, "Size is bigger than capacity")
 
