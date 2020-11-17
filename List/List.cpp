@@ -111,7 +111,6 @@ bool can_list_be_constructed (List_t* list, int start_capacity)
         print_warning ("You're trying to construct list, but there are some data you didn't delete");
         return 0;
     }
-
     return 1;
 }
 
@@ -121,10 +120,7 @@ void print_warning (char* warning)
 
     NUM_OF_PRINT_IN_LOG_FILE++;
 
-    if (NUM_OF_PRINT_IN_LOG_FILE == 1)
-    {
-        LOG_FILE = fopen ("LogFile.txt", "w");
-    }
+    if (NUM_OF_PRINT_IN_LOG_FILE == 1) LOG_FILE = fopen ("LogFile.txt", "w");
 
     fprintf (LOG_FILE, "%s\n", warning);
 }
@@ -137,15 +133,9 @@ bool can_ptr_be_used (const void* ptr)
 {
     MEMORY_BASIC_INFORMATION mbi;
 
-    if (!VirtualQuery (ptr, &mbi, sizeof (mbi)))
-    {
-        return false;
-    }
+    if (!VirtualQuery (ptr, &mbi, sizeof (mbi))) return false;
 
-    if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS))
-    {
-        return false;
-    }
+    if (mbi.Protect & (PAGE_GUARD | PAGE_NOACCESS)) return false;
 
     DWORD read_rights = PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY;
 
@@ -207,6 +197,11 @@ size_t insertion (List_t* list, size_t left, size_t right, Elem_t val)
     return new_node_index;
 }
 
+void check_will_list_stay_ordered (List_t* list, bool condition)
+{
+    if (condition) list->mod = LIST_NOT_ORDERED;
+}
+
 size_t InsertBack (List_t* list, Elem_t val)
 {
     check_up (list)
@@ -218,10 +213,7 @@ size_t InsertFront (List_t* list, Elem_t val)
 {
     check_up (list)
 
-    if ((list->head != 0) && (list->mod == LIST_ORDERED))
-    {
-        list->mod = LIST_NOT_ORDERED;
-    }
+    check_will_list_stay_ordered (list, (list->head != 0) && (list->mod == LIST_ORDERED));
 
     return insertion (list, 0, list->head, val);
 }
@@ -234,17 +226,11 @@ Elem_t Erase (List_t* list, size_t index)
 
     if (is_index_correct (list, index))
     {
-        if ((list->tail != index) && (list->mod == LIST_ORDERED))
-        {
-            list->mod = LIST_NOT_ORDERED;
-        }
+        check_will_list_stay_ordered (list, (list->tail != index) && (list->mod == LIST_ORDERED));
 
         return erasing (list, index);
     }
-    else
-    {
-        print_warning ("Invalid index is given to Erase");
-    }
+    else print_warning ("Invalid index is given to Erase");
 
     return POISON;
 }
@@ -255,10 +241,7 @@ Elem_t Erase (List_t* list, size_t index)
 {
     check_up (list);
 
-    if ((list->tail != index) && (list->mod == LIST_ORDERED))
-    {
-        list->mod = LIST_NOT_ORDERED;
-    }
+    check_will_list_stay_ordered (list, (list->tail != index) && (list->mod == LIST_ORDERED));
 
     return erasing (list, index);
 }
@@ -297,17 +280,12 @@ Elem_t EraseFront (List_t* list)
 
     if (list->size > 0)
     {
-        if ((list->mod == LIST_ORDERED) && (list->size > 1))
-        {
-            list->mod = LIST_NOT_ORDERED;
-        }
+        check_will_list_stay_ordered (list, (list->mod == LIST_ORDERED) && (list->size > 1));
 
         return erasing (list, list->head);
     }
-    else
-    {
-        print_warning ("Empty list is given to EraseFront");
-    }
+
+    else print_warning ("Empty list is given to EraseFront");
 
     return POISON;
 }
@@ -318,10 +296,7 @@ Elem_t EraseFront (List_t* list)
 {
     check_up (list);
 
-    if ((list->mod == LIST_ORDERED) && (list->size > 1))
-    {
-        list->mod = LIST_NOT_ORDERED;
-    }
+    check_will_list_stay_ordered (list, (list->mod == LIST_ORDERED) && (list->size > 1));
 
     return erasing (list, list->head);
 }
@@ -334,14 +309,8 @@ Elem_t EraseBack (List_t* list)
 {
     check_up (list);
 
-    if (list->size > 0)
-    {
-        return erasing (list, list->tail);
-    }
-    else
-    {
-        print_warning ("Empty list is given to EraseBack");
-    }
+    if   (list->size > 0) return erasing (list, list->tail);
+    else print_warning ("Empty list is given to EraseBack");
 
     return POISON;
 }
@@ -359,22 +328,19 @@ Elem_t EraseBack (List_t* list)
 
 #ifdef SUPERPROTECT
 
-size_t InsertBefore (List_t* list, size_t index, Elem_t val)
+size_t insert_in_any_place (List_t* list, size_t index, Elem_t val, bool condition_of_disordering, bool direction)
 {
-    check_up (list);
-
     if (is_index_correct (list, index))
     {
-        if (list->mod == LIST_ORDERED)
-        {
-            list->mod = LIST_NOT_ORDERED;
-        }
+        check_will_list_stay_ordered (list, condition_of_disordering);
 
-        return insertion (list, list->data[index].prev, index, val);
+        if   (direction == AFTER) return insertion (list, index, list->data[index].next, val);
+        else return insertion (list, list->data[index].prev, index, val);
     }
     else
     {
-        print_warning ("Invalid index is given to InsertBefore");
+        if   (direction == AFTER) print_warning ("Invalid index is given to InsertAfter");
+        else print_warning ("Invalid index is given to InsertBefore");
     }
 
     return POISON;
@@ -382,58 +348,29 @@ size_t InsertBefore (List_t* list, size_t index, Elem_t val)
 
 #else
 
+size_t insert_in_any_place (List_t* list, size_t index, Elem_t val, bool condition_of_disordering, bool direction)
+{
+    check_will_list_stay_ordered (list, condition_of_disordering);
+
+    if   (direction == AFTER) return insertion (list, index, list->data[index].next, val);
+    else return insertion (list, list->data[index].prev, index, val);
+}
+
+#endif
+
 size_t InsertBefore (List_t* list, size_t index, Elem_t val)
 {
     check_up (list);
 
-    if (list->mod == LIST_ORDERED)
-    {
-        list->mod = LIST_NOT_ORDERED;
-    }
-
-    return insertion (list, list->data[index].prev, index, val);
+    return insert_in_any_place (list, index, val, list->mod == LIST_ORDERED, BEFORE);
 }
-
-#endif
-
-#ifdef SUPERPROTECT
 
 size_t InsertAfter (List_t* list, size_t index, Elem_t val)
 {
     check_up (list);
 
-    if (is_index_correct (list, index))
-    {
-        if ((index != list->tail) && (list->mod == LIST_ORDERED))
-        {
-            list->mod = LIST_NOT_ORDERED;
-        }
-
-        return insertion (list, index, list->data[index].next, val);
-    }
-    else
-    {
-        print_warning ("Invalid index is given to InsertAfter");
-    }
-
-    return POISON;
+    return insert_in_any_place (list, index, val, (index != list->tail) && (list->mod == LIST_ORDERED), AFTER);
 }
-
-#else
-
-size_t InsertAfter (List_t* list, size_t index, Elem_t val)
-{
-    check_up (list);
-
-    if ((index != list->tail) && (list->mod == LIST_ORDERED))
-    {
-        list->mod = LIST_NOT_ORDERED;
-    }
-
-    return insertion (list, index, list->data[index].next, val);
-}
-
-#endif
 
 #ifdef SUPERPROTECT
 
@@ -474,10 +411,7 @@ size_t FindIndex (List_t* list, size_t num)
 
         return num;
     }
-    else
-    {
-        print_warning ("Invalid num is given to FindIndex");
-    }
+    else print_warning ("Invalid num is given to FindIndex");
 
     return POISON;
 }
@@ -522,14 +456,8 @@ Elem_t GetVal (List_t* list, size_t index)
 {
     check_up (list);
 
-    if (is_index_correct (list, index))
-    {
-        return list->data[index].val;
-    }
-    else
-    {
-        print_warning ("Invalid index is given to GetVal");
-    }
+    if   (is_index_correct (list, index)) return list->data[index].val;
+    else print_warning ("Invalid index is given to GetVal");
 
     return POISON;
 }
@@ -551,10 +479,7 @@ void ChangeMod (List_t* list)
 {
     check_up (list);
 
-    if (list->mod == LIST_ORDERED)
-    {
-        return;
-    }
+    if   (list->mod == LIST_ORDERED) return;
     else
     {
         if (list->size == 0)
@@ -579,10 +504,7 @@ void ChangeMod (List_t* list)
 {
     check_up (list);
 
-    if (list->mod == LIST_ORDERED)
-    {
-        return;
-    }
+    if   (list->mod == LIST_ORDERED) return;
     else
     {
         put_nodes_in_order (list);
@@ -684,10 +606,7 @@ bool is_list_looped (List_t* list)
 {
     assert (list != nullptr);
 
-    if (list->size == 0)
-    {
-        return 0;
-    }
+    if (list->size == 0) return 0;
 
     size_t ptr1 = list->head;
     size_t ptr2 = list->head;
@@ -706,10 +625,7 @@ bool are_empty_nodes_looped (List_t* list)
 {
     assert (list != nullptr);
 
-    if (list->size == list->capacity)
-    {
-        return 0;
-    }
+    if (list->size == list->capacity) return 0;
 
     size_t ptr1 = list->free;
     size_t ptr2 = list->free;
@@ -730,21 +646,12 @@ size_t find_incorrect_list_node (List_t* list)
     {
         for (size_t i = 1; i < list->size; i++)
         {
-            if ((list->data[i].next != (i + 1)) || (list->data[i].prev != i - 1))
-            {
-                return i;
-            }
+            if ((list->data[i].next != (i + 1)) || (list->data[i].prev != i - 1)) return i;
         }
 
-        if (list->data[list->size].prev != list->size -1)  //list->size == list->tail
-        {
-            return list->size;
-        }
+        if (list->data[list->size].prev != list->size -1) return list->size; //list->size == list->tail
     }
-    else
-    {
-        return find_incorrect_node_in_unsorted_list (list);
-    }
+    else return find_incorrect_node_in_unsorted_list (list);
 
     return 0;
 }
@@ -770,10 +677,7 @@ size_t find_incorrect_node_in_unsorted_list (List_t* list)
 
     }
 
-    if (list->data[current_node_index].prev != previous_next) //current_node_index == list->tail
-    {
-        return current_node_index;
-    }
+    if (list->data[current_node_index].prev != previous_next) return current_node_index; //current_node_index == list->tail
 
     return 0;
 }
@@ -822,17 +726,11 @@ list_status is_list_corrupted (List_t* list)
 
     list->index_of_incorrect_node = find_incorrect_list_node (list);
 
-    if (list->index_of_incorrect_node > 0)
-    {
-        return IncorrectListNode;
-    }
+    if (list->index_of_incorrect_node > 0) return IncorrectListNode;
 
     list->index_of_incorrect_node = find_incorrect_empty_node (list);
 
-    if (list->index_of_incorrect_node > 0)
-    {
-        return IncorrectEmptyNode;
-    }
+    if (list->index_of_incorrect_node > 0) return IncorrectEmptyNode;
 
     return NoError;
 }
@@ -843,10 +741,7 @@ void list_dump (List_t* list)
 
     NUM_OF_PRINT_IN_LOG_FILE++;
 
-    if (NUM_OF_PRINT_IN_LOG_FILE == 1)
-    {
-        LOG_FILE = fopen ("LogFile.txt", "w");\
-    }
+    if (NUM_OF_PRINT_IN_LOG_FILE == 1) LOG_FILE = fopen ("LogFile.txt", "w");
 
     fprintf (LOG_FILE, "\n\n\n\n\n");
 
@@ -900,10 +795,7 @@ void log_print_info_about_list (List_t* list, FILE* log_file)
     assert (list != nullptr);
     assert (log_file != nullptr);
 
-    if (list->status == NoAccessPtr)
-    {
-        fprintf (log_file, "\nPointer on list might be invalid, variables are lost\n");
-    }
+    if   (list->status == NoAccessPtr) fprintf (log_file, "\nPointer on list might be invalid, variables are lost\n");
     else
     {
         log_print_params_of_list (list, log_file);
@@ -1068,10 +960,7 @@ void create_txt_file_for_graphviz_logic (List_t* list)
 
             graph_print_tail_logic (list, graphviz_file);
         }
-        else
-        {
-            fprintf (graphviz_file, "\"List is empty\" [style=\"filled\", fillcolor = \"red\",shape=\"rectangle\"];\n");
-        }
+        else fprintf (graphviz_file, "\"List is empty\" [style=\"filled\", fillcolor = \"red\",shape=\"rectangle\"];\n");
 
         fprintf (graphviz_file, "}");
 
@@ -1105,13 +994,19 @@ void graph_print_nodes_phys (List_t* list, FILE* graphviz_file)
 
     for (size_t i = 1; i <= list->capacity; i++)
     {
-        if   (list->data[i].prev == -1) fprintf (graphviz_file,
-             "%u [style=\"filled\", fillcolor = \"yellow\", shape=record,label=\" <next> next: %d | { POISON | index: %u} | <prev> prev: %d\" ];\n",
-             i, list->data[i].next, i, list->data[i].prev);
+        if (list->data[i].prev == -1)
+        {
+            fprintf (graphviz_file,
+            "%u [style=\"filled\", fillcolor = \"yellow\", shape=record,label=\" <next> next: %d | { POISON | index: %u} | <prev> prev: %d\" ];\n",
+            i, list->data[i].next, i, list->data[i].prev);
+        }
 
-        else fprintf (graphviz_file,
-                     "%u [style=\"filled\", fillcolor = \"green\", shape=record,label=\" <next> next: %d | { %lg | index: %u} | <prev> prev: %d\" ];\n",
-                     i, list->data[i].next, list->data[i].val, i, list->data[i].prev);
+        else
+        {
+            fprintf (graphviz_file,
+            "%u [style=\"filled\", fillcolor = \"green\", shape=record,label=\" <next> next: %d | { %lg | index: %u} | <prev> prev: %d\" ];\n",
+            i, list->data[i].next, list->data[i].val, i, list->data[i].prev);
+        }
     }
 }
 

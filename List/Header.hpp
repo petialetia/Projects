@@ -30,6 +30,10 @@ const bool   LIST_ORDERED              = 0;
 
 const bool   LIST_NOT_ORDERED          = 1;
 
+const bool   AFTER                     = 1;
+
+const bool   BEFORE                    = 0;
+
 #ifdef SUPERPROTECT
 
 enum list_status
@@ -99,6 +103,8 @@ void Destroy (List_t* list);
 
 size_t insertion (List_t* list, size_t left, size_t right, Elem_t val);
 
+void check_will_list_stay_ordered (List_t* list, bool condition);
+
 size_t InsertBack (List_t* list, Elem_t val);
 
 size_t InsertFront (List_t* list, Elem_t val);
@@ -110,6 +116,8 @@ Elem_t erasing (List_t* list, size_t index);
 Elem_t EraseFront (List_t* list);
 
 Elem_t EraseBack (List_t* list);
+
+size_t insert_in_any_place (List_t* list, size_t index, Elem_t val, bool condition_of_disordering, bool direction);
 
 size_t InsertBefore (List_t* list, size_t index, Elem_t val);
 
