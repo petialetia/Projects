@@ -324,11 +324,11 @@ void DrawTree (tree* akinator_tree)
 
     fprintf (graphviz_file, "}\n");
 
+    fclose (graphviz_file);
+
     system ("dot -Tpng GraphvizFile.txt -o Graph.png");
 
     system ("start Graph.png");
-
-    fclose (graphviz_file);
 }
 
 void print_nodes_description (FILE* graphviz_file, tree_node* current_node)
