@@ -1,5 +1,10 @@
 //#define SUPERPROTECT
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <math.h>
+#include <windows.h>
 
 #ifdef SUPERPROTECT
 #define get_name(var) #var

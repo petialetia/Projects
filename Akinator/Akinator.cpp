@@ -1,109 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <math.h>
-#include <windows.h>
-//#include "C:\Users\petialetia\Desktop\TX\txlib.h"
-
-#include "Stack.cpp"
-
-const size_t MAX_LENGTH_OF_KEY = 100;
-
-const size_t START_CAPACITY = 10;
-
-const size_t INCREASE_PARAMETR = 10;
-
-const size_t MAX_LENGTH_OF_REPLY = 100;
-
-struct tree_node
-{
-    char*      key         = nullptr;
-    tree_node* left_child  = nullptr;
-    tree_node* right_child = nullptr;
-    tree_node* parent      = nullptr;
-};
-
-struct tree
-{
-    tree_node* root             = nullptr;
-    char*      new_nodes_buffer = nullptr;
-    size_t     num_of_new_nodes = 0;
-    size_t     buffer_capacity  = 0;
-};
-
-struct text
-{
-    size_t file_length      = 0;
-    char* pointer_on_buffer = nullptr;
-};
-
-struct keys
-{
-    size_t in  = 0;
-};
-
-tree* create_tree_with_base (int argC, char* argV[], text* akinator_base);
-
-size_t get_arg_val (int argC, char* argV[], char* key);
-
-size_t find_length_of_file (FILE* input);
-
-void copy_file_in_buffer (FILE* input, char* pointer_on_buffer, size_t* file_length);
-
-void fill_tree (text* akinator_base, tree* acinator_tree);
-
-void construct_tree (tree* akinator_tree);
-
-void print_greeting ();
-
-void help_print ();
-
-void StartProgramm (tree* akinator_tree);
-
-void DrawTree (tree* akinator_tree);
-
-void print_nodes_description (FILE* graphviz_file, tree_node* current_node);
-
-void GameMod (tree* akinator_tree);
-
-void print_answer (tree_node* current_node, tree* akinator_tree);
-
-void add_new_key (tree_node* current_node, tree* akinator_tree);
-
-void extend_buffer_of_new_nodes (tree* akinator_tree);
-
-void ask_for_difference (tree_node* current_node, char* ptr_on_answer, char* ptr_on_sign_of_differentiation);
-
-void add_new_nodes (tree_node* current_node, char* ptr_on_answer, char* ptr_on_sign_of_differentiation, tree* akinator_tree);
-
-void CreatNewBase (tree* akinator_tree);
-
-void print_descendant (FILE* data_base_file, tree_node* current_node);
-
-void PrintDefinition (tree* akinator_tree);
-
-void printing_description (tree_node* answer, Stack_t* PathStack, tree* akinator_tree);
-
-tree_node* print_sign (bool prev_answer, tree_node* current_node, char* to_be);
-
-void print_separator (bool prev_answer, Stack_t* PathStack);
-
-void print_standart_description (tree_node* answer, Stack_t* PathStack, tree_node* current_node);
-
-void CompareKeys (tree* akinator_tree);
-
-void ask_for_words (char* key1, char* key2);
-
-tree_node* print_similarity (tree_node* current_node, tree_node* answer1, tree_node* answer2, Stack_t* PathStack1, Stack_t* PathStack2);
-
-tree_node* find_node_by_key (char* key, tree_node* current_node, Stack_t* path_stack);
-
-void fill_path_stack (tree_node* current_node, Stack_t* path_stack);
-
-void DestroyTree (tree* akinator_tree);
-
-void destroy_nodes (tree_node* current_node);
+#include "Akinator.hpp"
 
 main (int argC, char* argV[])
 {
@@ -126,13 +21,17 @@ main (int argC, char* argV[])
 
 tree* create_tree_with_base (int argC, char* argV[], text* akinator_base)
 {
+    assert (argC != 0); assert (argV != nullptr); assert (akinator_base != nullptr);
+
     keys akinator_keys = {};
 
     akinator_keys.in = get_arg_val (argC, argV, "in");
 
-    FILE* input = (akinator_keys.in != 0) ? (fopen (argV[akinator_keys.in], "r")) : (fopen ("DataBase.txt", "r"));
+    FILE* input = (akinator_keys.in != 0) ? (fopen (argV[akinator_keys.in], "r")) : (fopen (STANDARD_DATA_BASE, "r"));
 
     akinator_base->file_length = find_length_of_file (input);
+
+    assert (akinator_base->file_length != 0);
 
     akinator_base->pointer_on_buffer = (char*) calloc (akinator_base->file_length + 1, sizeof(char));
 
@@ -192,66 +91,80 @@ void copy_file_in_buffer (FILE* input, char* pointer_on_buffer, size_t* file_len
     *file_length = size+1;
 }
 
-/*#define create_child(direction)                                                     \
-{                                                                                   \
-    current_node->##direction##_child = (tree_node*) calloc (1, sizeof (tree_node));\
-    current_node->##direction##_child->parent = current_node;                       \
-    current_node = current_node->##direction##_child;                               \
-}*/
-
-#define process_cases                                                                          \
-    switch (*pointer)                                                                          \
-    {                                                                                          \
-        case '"' : pointer++;                                                                  \
-                   current_node->key = pointer;                                                \
-                   pointer = strchr (pointer, '"');                                            \
-                   *pointer = '\0';                                                            \
-                   break;                                                                      \
-                                                                                               \
-        case '{' : if (current_node->right_child == nullptr)                                   \
-                   {                                                                           \
-                       current_node->right_child = (tree_node*) calloc (1, sizeof (tree_node));\
-                       current_node->right_child->parent = current_node;                       \
-                       current_node = current_node->right_child;                               \
-                       /*create_child (right)*/                                                \
-                   }                                                                           \
-                   else                                                                        \
-                   {                                                                           \
-                       current_node->left_child = (tree_node*) calloc (1, sizeof (tree_node)); \
-                       current_node->left_child->parent = current_node;                        \
-                       current_node = current_node->left_child;                                \
-                       /*create_child (left)*/                                                 \
-                   }                                                                           \
-                   break;                                                                      \
-                                                                                               \
-        case '}' : current_node = current_node->parent;                                        \
-                   break;                                                                      \
-                                                                                               \
-        case '\0': return;                                                                     \
-                                                                                               \
-        default  : break;                                                                      \
-    }
-
 void fill_tree (text* akinator_base, tree* akinator_tree)
 {
+    assert (akinator_base != nullptr);
+    assert (akinator_tree != nullptr);
+
     tree_node* current_node = akinator_tree->root;
 
     char* pointer = akinator_base->pointer_on_buffer;
 
     while ((current_node != akinator_tree->root) || (akinator_tree->root->left_child == nullptr))
     {
-        process_cases
+        switch (*pointer)
+        {
+            case '"' : pointer = case_add_key (pointer, current_node);
+                       break;
 
+            case '{' : current_node = case_move_to_child (current_node);
+                       break;
+
+            case '}' : current_node = current_node->parent;
+                       break;
+
+            case '\0': return;
+
+            default  : break;
+        }
         pointer++;
     }
 }
 
-#undef process_cases
+char* case_add_key (char* pointer, tree_node* current_node)
+{
+    assert (pointer != nullptr);
+
+    pointer++;
+    current_node->key = pointer;
+    pointer = strchr (pointer, '"');
+    *pointer = '\0';
+    return pointer;
+}
+
+/*#define create_child(direction)                                                     \
+{                                                                                   \
+    current_node->##direction = (tree_node*) calloc (1, sizeof (tree_node));\
+    current_node->##direction->parent = current_node;                       \
+    current_node = current_node->##direction;                               \
+}*/
+
+tree_node* case_move_to_child (tree_node* current_node)
+{
+    assert (current_node != nullptr);
+
+    if (current_node->right_child == nullptr)
+    {
+        current_node->right_child = (tree_node*) calloc (1, sizeof (tree_node));
+        current_node->right_child->parent = current_node;
+        current_node = current_node->right_child;
+        //create_child (right_son)
+    }
+    else
+    {
+        current_node->left_child = (tree_node*) calloc (1, sizeof (tree_node));
+        current_node->left_child->parent = current_node;
+        current_node = current_node->left_child;
+        //create_child (left_son)
+    }
+}
 
 #undef create_child
 
 void construct_tree (tree* akinator_tree)
 {
+    assert (akinator_tree != nullptr);
+
     akinator_tree->new_nodes_buffer = (char*) calloc (START_CAPACITY, (MAX_LENGTH_OF_KEY + 1) * sizeof (char));
 
     akinator_tree->buffer_capacity = START_CAPACITY;
@@ -261,6 +174,7 @@ void print_greeting ()
 {
     printf ("\n\n");
     printf ("Hello, mortal.\nYou're here today for me to show you my infinite abilities!\n\n");
+    system ("espeak Hello");
 }
 
 void help_print ()
@@ -315,7 +229,7 @@ void StartProgramm (tree* akinator_tree)
 
 void DrawTree (tree* akinator_tree)
 {
-    FILE* graphviz_file = fopen ("GraphvizFile.txt", "w");
+    FILE* graphviz_file = fopen (STANDART_GRAPHVIZ_FILE, "w");
 
     fprintf (graphviz_file, "digraph PL\n");
     fprintf (graphviz_file, "{\nrankdir=HR;\n");
@@ -333,6 +247,9 @@ void DrawTree (tree* akinator_tree)
 
 void print_nodes_description (FILE* graphviz_file, tree_node* current_node)
 {
+    assert (graphviz_file != nullptr);
+    assert (current_node  != nullptr);
+
     if (current_node->right_child != nullptr)
     {
         fprintf (graphviz_file, "\"%p\" [style=\"filled\", fillcolor = \"yellow\", shape=\"rectangle\", label=\"%s\"];\n", current_node, current_node->key);
@@ -363,6 +280,12 @@ void print_nodes_description (FILE* graphviz_file, tree_node* current_node)
 
 void GameMod (tree* akinator_tree)
 {
+    assert (akinator_tree != nullptr);
+
+    printf ("\nThink up word\n");
+
+    system ("espeak Think_up_word");
+
     tree_node* current_node = akinator_tree->root;
 
     char reply[MAX_LENGTH_OF_REPLY] = {};
@@ -389,6 +312,9 @@ void GameMod (tree* akinator_tree)
 
 void print_answer (tree_node* current_node, tree* akinator_tree)
 {
+    assert (akinator_tree != nullptr);
+    assert (current_node  != nullptr);
+
     char reply[MAX_LENGTH_OF_REPLY] = {};
 
     printf ("\nI think I know what it is. It's \"%s\".\nIsn't it?\n(y/n)\n\n", current_node->key);
@@ -410,6 +336,9 @@ void print_answer (tree_node* current_node, tree* akinator_tree)
 
 void add_new_key (tree_node* current_node, tree* akinator_tree)
 {
+    assert (akinator_tree != nullptr);
+    assert (current_node  != nullptr);
+
     if (akinator_tree->num_of_new_nodes == akinator_tree->buffer_capacity)
     {
         extend_buffer_of_new_nodes (akinator_tree);
@@ -442,6 +371,10 @@ void extend_buffer_of_new_nodes (tree* akinator_tree)
 
 void ask_for_difference (tree_node* current_node, char* ptr_on_answer, char* ptr_on_sign_of_differentiation)
 {
+    assert (current_node                   != nullptr);
+    assert (ptr_on_answer                  != nullptr);
+    assert (ptr_on_sign_of_differentiation != nullptr);
+
     printf ("\nWhat the difference between \"%s\" and \"%s\"\n\"%s\" is ...\n(write sign of differentiation)\n\n", current_node->key, ptr_on_answer, ptr_on_answer);
 
     scanf ("%s", ptr_on_sign_of_differentiation);
@@ -487,12 +420,14 @@ void add_new_nodes (tree_node* current_node, char* ptr_on_answer, char* ptr_on_s
 
 void CreatNewBase (tree* akinator_tree)
 {
+    assert (akinator_tree != nullptr);
+
     if (akinator_tree->num_of_new_nodes == 0)
     {
         return;
     }
 
-    FILE* data_base_file = fopen ("DataBase.txt", "w");
+    FILE* data_base_file = fopen (STANDARD_DATA_BASE, "w");
 
     print_descendant (data_base_file, akinator_tree->root);
 
@@ -501,7 +436,8 @@ void CreatNewBase (tree* akinator_tree)
 
 void print_descendant (FILE* data_base_file, tree_node* current_node)
 {
-    assert (current_node != nullptr);
+    assert (current_node   != nullptr);
+    assert (data_base_file != nullptr);
 
     fprintf (data_base_file, "\"%s\"\n", current_node->key);
 
@@ -523,9 +459,11 @@ void print_descendant (FILE* data_base_file, tree_node* current_node)
 
 void PrintDefinition (tree* akinator_tree)
 {
-    Stack_t* PathStack = (Stack_t*) calloc (1, sizeof (Stack_t));
+    assert (akinator_tree != nullptr);
 
-    Construct (PathStack);
+    Stack_t* path_stack = (Stack_t*) calloc (1, sizeof (Stack_t));
+
+    Construct (path_stack);
 
     char key[MAX_LENGTH_OF_KEY + 1] = {};
 
@@ -533,19 +471,20 @@ void PrintDefinition (tree* akinator_tree)
 
     scanf ("%s", key);
 
-    //key = strlwr (key);
+    char* strlwr_key = strlwr (key);
 
-    tree_node* answer = find_node_by_key (key, akinator_tree->root, PathStack);
+    tree_node* answer = find_node_by_key (strlwr_key, akinator_tree->root, path_stack);
 
-    printing_description (answer, PathStack, akinator_tree);
+    printing_description (answer, path_stack, akinator_tree);
 
-    Destroy (PathStack);
-
-    free (PathStack);
+    Destroy (path_stack);
+    free (path_stack);
 }
 
-void printing_description (tree_node* answer, Stack_t* PathStack, tree* akinator_tree)
+void printing_description (tree_node* answer, Stack_t* path_stack, tree* akinator_tree)
 {
+    assert (path_stack != nullptr);
+
     if (answer == nullptr)
     {
         printf ("\nI don't know what it is, you can play the game and add this word\n");
@@ -558,25 +497,28 @@ void printing_description (tree_node* answer, Stack_t* PathStack, tree* akinator
         return;
     }
 
-    print_standart_description (answer, PathStack, akinator_tree->root);
+    print_standart_description (answer, path_stack, akinator_tree->root);
 }
 
-void print_standart_description (tree_node* answer, Stack_t* PathStack, tree_node* current_node)
+void print_standart_description (tree_node* answer, Stack_t* path_stack, tree_node* current_node)
 {
+    assert (answer    != nullptr);
+    assert (path_stack != nullptr);
+
     printf ("\n\"%s\"", answer->key);
 
     bool prev_answer = 0;
 
-    while (PathStack->size != 1)
+    while (path_stack->size != 1)
     {
-        prev_answer = Pop(PathStack);
+        prev_answer = Pop (path_stack);
 
         current_node = print_sign (prev_answer, current_node, "is");
 
-        print_separator (prev_answer, PathStack);
+        print_separator (prev_answer, path_stack);
     }
 
-    prev_answer = Pop(PathStack);
+    prev_answer = Pop (path_stack);
 
     if (prev_answer == 1)
     {
@@ -590,6 +532,9 @@ void print_standart_description (tree_node* answer, Stack_t* PathStack, tree_nod
 
 tree_node* print_sign (bool prev_answer, tree_node* current_node, char* to_be)
 {
+    assert (current_node != nullptr);
+    assert (to_be        != nullptr);
+
     if (prev_answer == 1)
     {
         printf (" %s \"%s\"", to_be, current_node->key);
@@ -602,41 +547,41 @@ tree_node* print_sign (bool prev_answer, tree_node* current_node, char* to_be)
     }
 }
 
-void print_separator (bool prev_answer, Stack_t* PathStack)
+void print_separator (bool prev_answer, Stack_t* path_stack)
 {
+    assert (path_stack != nullptr);
+
     printf (",");
 
-    if (prev_answer != Top(PathStack))
+    if (prev_answer != Top (path_stack))
     {
         printf (" but");
     }
 }
 
-#define process_special_cases                                                                     \
+#define process_special_cases(answer1, answer2, root)                                             \
 {                                                                                                 \
     if (answer1 == nullptr)                                                                       \
     {                                                                                             \
         printf ("\nI don't know what \"%s\" is, you can play the game and add this word\n", key1);\
-        StartProgramm (akinator_tree);                                                            \
         return;                                                                                   \
     }                                                                                             \
                                                                                                   \
     if (answer2 == nullptr)                                                                       \
     {                                                                                             \
         printf ("\nI don't know what \"%s\" is, you can play the game and add this word\n", key2);\
-        StartProgramm (akinator_tree);                                                            \
         return;                                                                                   \
     }                                                                                             \
                                                                                                   \
-    if ((answer1 == akinator_tree->root) || (answer2 == akinator_tree->root))                     \
+    if ((answer1 == root) || (answer2 == root))                                                   \
     {                                                                                             \
-        printing_description (answer1, PathStack1, akinator_tree);                                \
-        printing_description (answer2, PathStack2, akinator_tree);                                \
+        printing_description (answer1, path_stack1, akinator_tree);                               \
+        printing_description (answer2, path_stack2, akinator_tree);                               \
         return;                                                                                   \
     }                                                                                             \
 }
 
-#define check_for_similarity                                        \
+#define check_for_similarity(key1, key2)                            \
                                                                     \
     if (strcmp (key1, key2) == 0)                                   \
     {                                                               \
@@ -645,46 +590,54 @@ void print_separator (bool prev_answer, Stack_t* PathStack)
         return;                                                     \
     }
 
-#define finish_description(num)                                                \
-                                                                               \
-    if (PathStack##num->size != 0)                                             \
-    {                                                                          \
-        print_standart_description (answer##num, PathStack##num, current_node);\
-    }                                                                          \
+#define finish_description(num)                                                 \
+                                                                                \
+    if (path_stack##num->size != 0)                                             \
+    {                                                                           \
+        print_standart_description (answer##num, path_stack##num, current_node);\
+    }                                                                           \
 
 void CompareKeys (tree* akinator_tree)
 {
-    Stack_t* PathStack1 = (Stack_t*) calloc (1, sizeof (Stack_t));
-    Construct (PathStack1);
+    Stack_t* path_stack1 = (Stack_t*) calloc (1, sizeof (Stack_t));
+    Construct (path_stack1);
 
-    Stack_t* PathStack2 = (Stack_t*) calloc (1, sizeof (Stack_t));
-    Construct (PathStack2);
+    Stack_t* path_stack2 = (Stack_t*) calloc (1, sizeof (Stack_t));
+    Construct (path_stack2);
 
     char key1[MAX_LENGTH_OF_KEY + 1] = {};
     char key2[MAX_LENGTH_OF_KEY + 1] = {};
 
     ask_for_words (key1, key2);
 
-    check_for_similarity
+    char* strlwr_key1 = strlwr (key1);
+    char* strlwr_key2 = strlwr (key2);
 
-    tree_node* answer1 = find_node_by_key (key1, akinator_tree->root, PathStack1);
-    tree_node* answer2 = find_node_by_key (key2, akinator_tree->root, PathStack2);
+    check_for_similarity (strlwr_key1, strlwr_key2)
 
-    process_special_cases
+    tree_node* answer1 = find_node_by_key (strlwr_key1, akinator_tree->root, path_stack1);
+    tree_node* answer2 = find_node_by_key (strlwr_key2, akinator_tree->root, path_stack2);
 
-    tree_node* current_node = print_similarity (akinator_tree->root, answer1, answer2, PathStack1, PathStack2);
+    process_special_cases (answer1, answer2, akinator_tree->root)
+
+    tree_node* current_node = print_similarity (akinator_tree->root, answer1, answer2, path_stack1, path_stack2);
 
     finish_description (1)
     finish_description (2)
 
-    Destroy (PathStack1);
-    Destroy (PathStack2);
-    free (PathStack1);
-    free (PathStack2);
+    Destroy (path_stack1);
+    Destroy (path_stack2);
+    free (path_stack1);
+    free (path_stack2);
 }
 
 void ask_for_words (char* key1, char* key2)
 {
+    assert (key1 != nullptr);
+    assert (key2 != nullptr);
+
+    printf ("\nI'll show you likenesses and differences of 2 things\n");
+
     printf ("\nWhat is the first word?\n(enter word)\n\n");
 
     scanf ("%s", key1);
@@ -694,32 +647,32 @@ void ask_for_words (char* key1, char* key2)
     scanf ("%s", key2);
 }
 
-tree_node* print_similarity (tree_node* current_node, tree_node* answer1, tree_node* answer2, Stack_t* PathStack1, Stack_t* PathStack2)
+tree_node* print_similarity (tree_node* current_node, tree_node* answer1, tree_node* answer2, Stack_t* path_stack1, Stack_t* path_stack2)
 {
     bool prev_answer1, prev_answer2 = 0;
 
-    if (Top (PathStack1) == Top (PathStack2))
+    if (Top (path_stack1) == Top (path_stack2))
     {
         printf ("\n\"%s\" and \"%s\" both", answer1->key, answer2->key);
 
         while (true)
         {
-            prev_answer1 = Pop(PathStack1);
-            prev_answer2 = Pop (PathStack2);
+            prev_answer1 = Pop (path_stack1);
+            prev_answer2 = Pop (path_stack2);
 
             current_node = print_sign (prev_answer1, current_node, "are");
 
-            if ((PathStack1->size == 0) || (PathStack2->size == 0))
+            if ((path_stack1->size == 0) || (path_stack2->size == 0))
             {
                 break;
             }
 
-            if (Top (PathStack1) != Top (PathStack2))
+            if (Top (path_stack1) != Top (path_stack2))
             {
                 break;
             }
 
-            print_separator (prev_answer1, PathStack1);
+            print_separator (prev_answer1, path_stack1);
         }
         printf ("\n\nHowever:\n");
     }
@@ -734,6 +687,10 @@ tree_node* print_similarity (tree_node* current_node, tree_node* answer1, tree_n
 
 tree_node* find_node_by_key (char* key, tree_node* current_node, Stack_t* path_stack)
 {
+    assert (key          != nullptr);
+    assert (path_stack   != nullptr);
+    assert (current_node != nullptr);
+
     if (strcmp (key, strlwr(current_node->key)) != 0)
     {
         if (current_node->right_child != nullptr)
@@ -789,6 +746,8 @@ void fill_path_stack (tree_node* current_node, Stack_t* path_stack)
 
 void DestroyTree (tree* akinator_tree)
 {
+    assert (akinator_tree != nullptr);
+
     destroy_nodes (akinator_tree->root);
 
     free (akinator_tree->new_nodes_buffer);
@@ -796,6 +755,8 @@ void DestroyTree (tree* akinator_tree)
 
 void destroy_nodes (tree_node* current_node)
 {
+    assert (current_node != nullptr);
+
     if (current_node->right_child != nullptr)
     {
         destroy_nodes (current_node->left_child);

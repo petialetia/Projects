@@ -28,7 +28,7 @@
 }
 }
 {
-"Petr Lubar"
+"Petr"
 }
 }
 }
@@ -47,7 +47,13 @@
 }
 }
 {
+"russian"
+{
+"Freeman"
+}
+{
 "Drakula"
+}
 }
 }
 {
@@ -58,7 +64,13 @@
 "Oil"
 }
 {
+"white"
+{
+"Milk"
+}
+{
 "Water"
+}
 }
 }
 {
@@ -72,7 +84,13 @@
 "laptop"
 }
 {
+"dish"
+{
+"Cup"
+}
+{
 "Stone"
+}
 }
 }
 }
