@@ -39,11 +39,11 @@ void DivByZero (dependencies* dep);
 
 int main ()
 {
-    char string[] = " ( cos ( 1 ) ^ ( 3 - 1 ) + sin ( 1 ) ^ 2 ) * ( ( 35 + 5 ^ 2 ) * 2 ) / 2 * 5";
+    char string[] = "tan (1.570796)";
 
     double val = GetG (string);
 
-    printf ("%lg\n", val);
+    if (!isnan(val)) printf ("%lg\n", val);
 
     return NULL;
 }
@@ -285,7 +285,7 @@ bool Require (dependencies* dep, char symbol)
 
 void SyntaxError (dependencies* dep)
 {
-    printf ("Error is found\n");
+    printf ("Error is found\n\n");
 
     printf ("%s\n", dep->string);
     for (size_t i = 0; i < dep->position; i ++)
@@ -303,5 +303,5 @@ bool IsZero (double val)
 void DivByZero (dependencies* dep)
 {
     SyntaxError (dep);
-    printf ("DIVISION BY 0\n");
+    printf ("\nDIVISION BY 0\n");
 }
