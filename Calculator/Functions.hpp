@@ -14,7 +14,7 @@ DEF_FUNCTION (tan, 3,
     val = cos (val);
     if (IsZero (val))
     {
-        DivByZero (dep);
+        InvalidArgument (dep);
         return NAN;
     }
     val = sin (_old_val_)/val;

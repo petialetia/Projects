@@ -37,9 +37,11 @@ bool IsZero (double val);
 
 void DivByZero (dependencies* dep);
 
+void InvalidArgument (dependencies* dep);
+
 int main ()
 {
-    char string[] = "tan (1.570796)";
+    char string[] = "tan (1.570796)    + 2";
 
     double val = GetG (string);
 
@@ -149,14 +151,6 @@ double GetPWR (dependencies* dep)
     return val;
 }
 
-#define DEF_FUNCTION(name, num, equivalent)\
-                                           \
-if (func_num == num)                       \
-{                                          \
-    equivalent                             \
-    return val;                            \
-}
-
 double GetP (dependencies* dep)
 {
     double val = NAN;
@@ -171,11 +165,19 @@ double GetP (dependencies* dep)
         val = GetB (dep);
         if (isnan (val)) return NAN;
 
-        SkipSpaces (dep);
+        #define DEF_FUNCTION(name, num, equivalent)\
+                                                   \
+        if (func_num == num)                       \
+        {                                          \
+            equivalent                             \
+            return val;                            \
+        }
 
         #include "Functions.hpp"
 
         #undef DEF_FUNCTION
+
+        SkipSpaces (dep);
     }
 
     if (dep->string[dep->position] == '(')
@@ -304,4 +306,10 @@ void DivByZero (dependencies* dep)
 {
     SyntaxError (dep);
     printf ("\nDIVISION BY 0\n");
+}
+
+void InvalidArgument (dependencies* dep)
+{
+    SyntaxError (dep);
+    printf ("\nInvalid argument\n");
 }
