@@ -27,6 +27,8 @@ double GetB (dependencies* dep);
 
 double GetN (dependencies* dep);
 
+void SkipSpaces (dependencies* dep);
+
 bool Require (dependencies* dep, char symbol);
 
 void SyntaxError (dependencies* dep);
@@ -37,7 +39,7 @@ void DivByZero (dependencies* dep);
 
 int main ()
 {
-    char string[] = "(cos(1)^(3-1)+sin(1)^2)*((35+5^2)*2)/2*5";
+    char string[] = " ( cos ( 1 ) ^ ( 3 - 1 ) + sin ( 1 ) ^ 2 ) * ( ( 35 + 5 ^ 2 ) * 2 ) / 2 * 5";
 
     double val = GetG (string);
 
@@ -52,12 +54,16 @@ double GetG (const char* string)
 
     dep.string = string;
 
+    SkipSpaces (&dep);
+
     double val = GetE (&dep);
 
     if (isnan (val))
     {
         return NAN;
     }
+
+    SkipSpaces (&dep);
 
     if (Require (&dep, '\0')) return NAN;
 
@@ -68,6 +74,8 @@ double GetE (dependencies* dep)
 {
     double val = GetT (dep);
 
+    SkipSpaces (dep);
+
     if (isnan (val)) return NAN;
 
     while ((dep->string[dep->position] == '+') || (dep->string[dep->position] == '-'))
@@ -75,8 +83,8 @@ double GetE (dependencies* dep)
         char op = dep->string[dep->position];
         dep->position++;
 
+        SkipSpaces (dep);
         double val2 = GetT (dep);
-
         if (isnan (val2)) return NAN;
 
         if (op == '+') val += val2;
@@ -90,6 +98,8 @@ double GetT (dependencies* dep)
 {
     double val = GetPWR (dep);
 
+    SkipSpaces (dep);
+
     if (isnan (val)) return NAN;
 
     while ((dep->string[dep->position] == '*') || (dep->string[dep->position] == '/'))
@@ -97,8 +107,8 @@ double GetT (dependencies* dep)
         char op = dep->string[dep->position];
         dep->position++;
 
+        SkipSpaces (dep);
         double val2 = GetPWR (dep);
-
         if (isnan (val2)) return NAN;
 
         if (op == '/')
@@ -120,12 +130,15 @@ double GetPWR (dependencies* dep)
 {
     double val = GetP (dep);
 
+    SkipSpaces (dep);
+
     if (isnan (val)) return NAN;
 
     while (dep->string[dep->position] == '^')
     {
         dep->position++;
 
+        SkipSpaces (dep);
         double val2 = GetP (dep);
 
         if (isnan (val2)) return NAN;
@@ -136,6 +149,14 @@ double GetPWR (dependencies* dep)
     return val;
 }
 
+#define DEF_FUNCTION(name, num, equivalent)\
+                                           \
+if (func_num == num)                       \
+{                                          \
+    equivalent                             \
+    return val;                            \
+}
+
 double GetP (dependencies* dep)
 {
     double val = NAN;
@@ -143,20 +164,14 @@ double GetP (dependencies* dep)
     if (islower (dep->string[dep->position]))
     {
         char func_num = GetF(dep);
-
         if (func_num == 0) return NAN;
 
-        val = GetB (dep);
+        SkipSpaces (dep);
 
+        val = GetB (dep);
         if (isnan (val)) return NAN;
 
-        #define DEF_FUNCTION(name, num, equivalent)\
-                                                   \
-        if (func_num == num)                       \
-        {                                          \
-            equivalent                             \
-            return val;                            \
-        }
+        SkipSpaces (dep);
 
         #include "Functions.hpp"
 
@@ -167,12 +182,15 @@ double GetP (dependencies* dep)
     {
         val = GetB (dep);
         if (isnan (val)) return NAN;
-    }
 
+        SkipSpaces (dep);
+    }
     else
     {
         val = GetN (dep);
         if (isnan (val)) return NAN;
+
+        SkipSpaces (dep);
     }
 
     return val;
@@ -207,8 +225,12 @@ double GetB (dependencies* dep)
     if (Require (dep, '(')) return NAN;
     dep->position++;
 
+    SkipSpaces (dep);
+
     double val = GetE (dep);
     if (isnan (val)) return NAN;
+
+    SkipSpaces (dep);
 
     if (Require (dep, ')')) return NAN;
     dep->position++;
@@ -233,6 +255,21 @@ double GetN (dependencies* dep)
     dep->position += end_ptr - (dep->string + dep->position);
 
     return val;
+}
+
+void SkipSpaces (dependencies* dep)
+{
+    if (dep->string[dep->position] == ' ')
+    {
+        for (size_t i = 1;; i++)
+        {
+            if (dep->string[dep->position + i] != ' ')
+            {
+                dep->position += i;
+                break;
+            }
+        }
+    }
 }
 
 bool Require (dependencies* dep, char symbol)
