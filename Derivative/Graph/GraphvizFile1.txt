@@ -1,0 +1,13 @@
+digraph PL
+{
+rankdir=HR;
+"0000000000161540" [style="filled", fillcolor="yellow", shape="parallelogram", label="+"];
+"0000000000161480" [style="filled", fillcolor="yellow", shape="parallelogram", label="tan"];
+"00000000001614B0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000161480" -> "00000000001614B0"
+"0000000000161540" -> "0000000000161480"
+"00000000001614E0" [style="filled", fillcolor="yellow", shape="parallelogram", label="ln"];
+"0000000000161510" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000001614E0" -> "0000000000161510"
+"0000000000161540" -> "00000000001614E0"
+}

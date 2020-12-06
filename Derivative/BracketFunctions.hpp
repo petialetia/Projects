@@ -1,0 +1,9 @@
+DEF_FUNCTION (SIN, sin, 6)
+
+DEF_FUNCTION (COS, cos, 7)
+
+DEF_FUNCTION (TAN, tan, 8)
+
+DEF_FUNCTION (CTG, ctg, 9)
+
+DEF_FUNCTION (LN, ln, 10)
