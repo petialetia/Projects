@@ -6,7 +6,7 @@ int main (int argC, char* argV[])
 
     ProcessInput (argC, argV, &functions, STANDART_INPUT_FILE);
 
-    tree* tree = GetG (functions.pointer_on_buffer);
+    tree* tree = GetGeneral (functions.pointer_on_buffer);
 
     DrawTree (tree->root, 1);
 
@@ -31,29 +31,7 @@ int main (int argC, char* argV[])
     return 0;
 }
 
-#define dL CalculateDerivative (original_node->left_child)
-
-#define dR CalculateDerivative (original_node->right_child)
-
-#define cR CopySubtree (original_node->right_child)
-
-#define cL CopySubtree (original_node->left_child)
-
-#define ADD(left_child, right_child) ConstructTreeNode (FUNC, OP_ADD, left_child, right_child)
-
-#define SUB(left_child, right_child) ConstructTreeNode (FUNC, OP_SUB, left_child, right_child)
-
-#define MUL(left_child, right_child) ConstructTreeNode (FUNC, OP_MUL, left_child, right_child)
-
-#define DIV(left_child, right_child) ConstructTreeNode (FUNC, OP_DIV, left_child, right_child)
-
-#define POW(left_child, right_child) ConstructTreeNode (FUNC, OP_POW, left_child, right_child)
-
-#define SIN(left_child, right_child) ConstructTreeNode (FUNC, OP_SIN, left_child, right_child)
-
-#define COS(left_child, right_child) ConstructTreeNode (FUNC, OP_COS, left_child, right_child)
-
-#define CONST_CHILD(val) ConstructTreeNode (CONST, val)
+#include "DSL.hpp"
 
 tree_node* CalculateDerivative (tree_node* original_node)
 {
@@ -61,10 +39,10 @@ tree_node* CalculateDerivative (tree_node* original_node)
 
     switch (original_node->node_type)
     {
-        case CONST: return ConstructTreeNode (CONST, 0.0);
+        case CONST: return CreateTreeNode (CONST, 0.0);
 
-        case VAR:   if (original_node->key.num == 'x' - 'a') return ConstructTreeNode (CONST, 1.0);
-                    return ConstructTreeNode (CONST, 0.0);
+        case VAR:   if (original_node->key.num == 'x' - 'a') return CreateTreeNode (CONST, 1.0);
+                    return CreateTreeNode (CONST, 0.0);
 
         case FUNC:  return CalculateDerivativeOfFunctions (original_node);
 
@@ -107,29 +85,7 @@ tree_node* CalculateDerivativeOfFunctions (tree_node* original_node)
     return nullptr;
 }
 
-#undef dL
-
-#undef dR
-
-#undef cR
-
-#undef cL
-
-#undef ADD
-
-#undef SUB
-
-#undef MUL
-
-#undef DIV
-
-#undef POW
-
-#undef SIN
-
-#undef COS
-
-#undef CONST_CHILD
+#include "UnDSL.hpp"
 
 #define check_for_const(operator)                                                           \
                                                                                             \
@@ -173,21 +129,21 @@ if ((*node)->left_child->node_type == CONST)               \
 ckeck_for_neutral_elem (neutral_elem, left,  right)     \
 ckeck_for_neutral_elem (neutral_elem, right, left)
 
-#define ckeck_for_neutral_elem(neutral_elem, direction, opposite_direction)                                            \
-                                                                                                                       \
+#define ckeck_for_neutral_elem(neutral_elem, direction, opposite_direction)                                           \
+                                                                                                                      \
 if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direction##_child->key.val - neutral_elem)))\
-{                                                                                                                      \
-    if ((*node)->parent == nullptr)                                                                                    \
-    {                                                                                                                  \
-        free ((*node)->direction##_child);                                                                             \
-                                                                                                                       \
-        tree_node* old_node = *node;                                                                                   \
-                                                                                                                       \
-        *node = (*node)->opposite_direction##_child;                                                                   \
-                                                                                                                       \
-        free (old_node);                                                                                               \
-        return;                                                                                                        \
-    }                                                                                                                  \
+{                                                                                                                     \
+    if ((*node)->parent == nullptr)                                                                                   \
+    {                                                                                                                 \
+        free ((*node)->direction##_child);                                                                            \
+                                                                                                                      \
+        tree_node* old_node = *node;                                                                                  \
+                                                                                                                      \
+        *node = (*node)->opposite_direction##_child;                                                                  \
+                                                                                                                      \
+        free (old_node);                                                                                              \
+        return;                                                                                                       \
+    }                                                                                                                 \
 }
 
 #define ckeck_for_definite_elem_commutative(definite_elem, result)\
@@ -196,18 +152,18 @@ ckeck_for_definite_elem (definite_elem, result, left,  right)     \
 ckeck_for_definite_elem (definite_elem, result, right, left)
 
 
-#define ckeck_for_definite_elem(definite_elem, result, direction, opposite_direction)                                   \
-                                                                                                                        \
+#define ckeck_for_definite_elem(definite_elem, result, direction, opposite_direction)                                  \
+                                                                                                                       \
 if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direction##_child->key.val) - definite_elem))\
-{                                                                                                                       \
-    (*node)->node_type = CONST;                                                                                         \
-    (*node)->key.val   = result;                                                                                        \
-    free ((*node)->direction##_child);                                                                                  \
-    DestroySubtree ((*node)->opposite_direction##_child);                                                               \
-    (*node)->direction##_child = nullptr;                                                                               \
-    (*node)->opposite_direction##_child = nullptr;                                                                      \
-    return;                                                                                                             \
-}                                                                                                                       \
+{                                                                                                                      \
+    (*node)->node_type = CONST;                                                                                        \
+    (*node)->key.val   = result;                                                                                       \
+    free ((*node)->direction##_child);                                                                                 \
+    DestroySubtree ((*node)->opposite_direction##_child);                                                              \
+    (*node)->direction##_child = nullptr;                                                                              \
+    (*node)->opposite_direction##_child = nullptr;                                                                     \
+    return;                                                                                                            \
+}                                                                                                                      \
 
 void Simplify (tree_node** node)
 {

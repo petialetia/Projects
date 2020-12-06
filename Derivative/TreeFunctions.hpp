@@ -55,13 +55,13 @@ struct tree
     tree_node* root = nullptr;
 };
 
-tree* ConstructTree ();
+tree* NewTree ();
 
-tree_node* ConstructTreeNode (char node_type, double key,
-                              tree_node* ptr_on_left_child = nullptr, tree_node* ptr_on_right_child = nullptr, tree_node* ptr_on_parent = nullptr);
+tree_node* CreateTreeNode (char node_type, double key,
+                           tree_node* ptr_on_left_child = nullptr, tree_node* ptr_on_right_child = nullptr, tree_node* ptr_on_parent = nullptr);
 
-tree_node* ConstructTreeNode (char node_type, char key,
-                              tree_node* ptr_on_left_child = nullptr, tree_node* ptr_on_right_child = nullptr, tree_node* ptr_on_parent = nullptr);
+tree_node* CreateTreeNode (char node_type, char key,
+                           tree_node* ptr_on_left_child = nullptr, tree_node* ptr_on_right_child = nullptr, tree_node* ptr_on_parent = nullptr);
 
 tree_node* CopySubtree (tree_node* node);
 
@@ -89,21 +89,21 @@ struct dependencies
     size_t            position  = 0;
 };
 
-tree* GetG (const char* string);
+tree* GetGeneral (const char* string);
 
-tree_node* GetE (dependencies* dep);
+tree_node* GetExpression (dependencies* dep);
 
-tree_node* GetT (dependencies* dep);
+tree_node* GetTerm (dependencies* dep);
 
-tree_node* GetPWR (dependencies* dep);
+tree_node* GetPower (dependencies* dep);
 
-tree_node* GetP (dependencies* dep);
+tree_node* GetPrimary (dependencies* dep);
 
-tree_node* GetF (dependencies* dep);
+tree_node* GetFunction (dependencies* dep);
 
-tree_node* GetB (dependencies* dep);
+tree_node* GetBrackets (dependencies* dep);
 
-tree_node* GetN (dependencies* dep);
+tree_node* GetNumber (dependencies* dep);
 
 void SkipSpaces (dependencies* dep);
 

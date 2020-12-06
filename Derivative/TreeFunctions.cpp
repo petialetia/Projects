@@ -1,13 +1,13 @@
 #include "TreeFunctions.hpp"
 
-tree* ConstructTree ()
+tree* NewTree ()
 {
     tree* ptr_on_tree = (tree*) calloc (1, sizeof (tree));
 
     return ptr_on_tree;
 }
 
-tree_node* ConstructTreeNode (char node_type, double key, tree_node* ptr_on_left_child, tree_node* ptr_on_right_child, tree_node* ptr_on_parent)
+tree_node* CreateTreeNode (char node_type, double key, tree_node* ptr_on_left_child, tree_node* ptr_on_right_child, tree_node* ptr_on_parent)
 {
     tree_node* ptr_on_tree_node = (tree_node*) calloc (1, sizeof (tree_node));
 
@@ -24,7 +24,7 @@ tree_node* ConstructTreeNode (char node_type, double key, tree_node* ptr_on_left
     return ptr_on_tree_node;
 }
 
-tree_node* ConstructTreeNode (char node_type, char key, tree_node* ptr_on_left_child, tree_node* ptr_on_right_child, tree_node* ptr_on_parent)
+tree_node* CreateTreeNode (char node_type, char key, tree_node* ptr_on_left_child, tree_node* ptr_on_right_child, tree_node* ptr_on_parent)
 {
     tree_node* ptr_on_tree_node = (tree_node*) calloc (1, sizeof (tree_node));
 
@@ -43,7 +43,7 @@ tree_node* ConstructTreeNode (char node_type, char key, tree_node* ptr_on_left_c
 
 tree_node* CopySubtree (tree_node* node)
 {
-    if (node != nullptr) return ConstructTreeNode (node->node_type, node->key.val, CopySubtree (node->left_child), CopySubtree (node->right_child), node->parent);
+    if (node != nullptr) return CreateTreeNode (node->node_type, node->key.val, CopySubtree (node->left_child), CopySubtree (node->right_child), node->parent);
 
     return nullptr;
 }
@@ -159,7 +159,7 @@ void DestroySubtree (tree_node* current_node)
 //-----------------------------------------------------------------------------
 
 
-tree* GetG (const char* string)
+tree* GetGeneral (const char* string)
 {
     assert (string != nullptr);
 
@@ -169,9 +169,9 @@ tree* GetG (const char* string)
 
     SkipSpaces (&dep);
 
-    tree* tree = ConstructTree ();
+    tree* tree = NewTree ();
 
-    tree->root = GetE (&dep);
+    tree->root = GetExpression (&dep);
 
     if (tree->root == nullptr) return nullptr;
 
@@ -186,11 +186,11 @@ tree* GetG (const char* string)
     return tree;
 }
 
-tree_node* GetE (dependencies* dep)
+tree_node* GetExpression (dependencies* dep)
 {
     assert (dep != nullptr);
 
-    tree_node* ptr = GetT (dep);
+    tree_node* ptr = GetTerm (dep);
 
     SkipSpaces (dep);
 
@@ -202,21 +202,21 @@ tree_node* GetE (dependencies* dep)
         dep->position++;
 
         SkipSpaces (dep);
-        tree_node* ptr2 = GetT (dep);
+        tree_node* ptr2 = GetTerm (dep);
         if (ptr2 == nullptr) return nullptr;
 
-        if (op == '+') ptr = ConstructTreeNode (FUNC, OP_ADD, ptr, ptr2);
-        else           ptr = ConstructTreeNode (FUNC, OP_SUB, ptr, ptr2);
+        if (op == '+') ptr = CreateTreeNode (FUNC, OP_ADD, ptr, ptr2);
+        else           ptr = CreateTreeNode (FUNC, OP_SUB, ptr, ptr2);
     }
 
     return ptr;
 }
 
-tree_node* GetT (dependencies* dep)
+tree_node* GetTerm (dependencies* dep)
 {
     assert (dep != nullptr);
 
-    tree_node* ptr = GetPWR (dep);
+    tree_node* ptr = GetPower (dep);
 
     SkipSpaces (dep);
 
@@ -228,21 +228,21 @@ tree_node* GetT (dependencies* dep)
         dep->position++;
 
         SkipSpaces (dep);
-        tree_node* ptr2 = GetPWR (dep);
+        tree_node* ptr2 = GetPower (dep);
         if (ptr2 == nullptr) return nullptr;
 
-        if (op == '/') ptr = ConstructTreeNode (FUNC, OP_DIV, ptr, ptr2);
-        else           ptr = ConstructTreeNode (FUNC, OP_MUL, ptr, ptr2);
+        if (op == '/') ptr = CreateTreeNode (FUNC, OP_DIV, ptr, ptr2);
+        else           ptr = CreateTreeNode (FUNC, OP_MUL, ptr, ptr2);
     }
 
     return ptr;
 }
 
-tree_node* GetPWR (dependencies* dep)
+tree_node* GetPower (dependencies* dep)
 {
     assert (dep != nullptr);
 
-    tree_node* ptr = GetP (dep);
+    tree_node* ptr = GetPrimary (dep);
 
     SkipSpaces (dep);
 
@@ -253,16 +253,16 @@ tree_node* GetPWR (dependencies* dep)
         dep->position++;
 
         SkipSpaces (dep);
-        tree_node* ptr2 = GetP (dep);
+        tree_node* ptr2 = GetPrimary (dep);
         if (ptr2 == nullptr) return nullptr;
 
-        ptr = ConstructTreeNode (FUNC, OP_POW, ptr, ptr2);
+        ptr = CreateTreeNode (FUNC, OP_POW, ptr, ptr2);
     }
 
     return ptr;
 }
 
-tree_node* GetP (dependencies* dep)
+tree_node* GetPrimary (dependencies* dep)
 {
     assert (dep != nullptr);
 
@@ -270,7 +270,7 @@ tree_node* GetP (dependencies* dep)
 
     if (islower (dep->string[dep->position]))
     {
-        ptr = GetF(dep);
+        ptr = GetFunction(dep);
 
         SkipSpaces (dep);
 
@@ -287,7 +287,7 @@ tree_node* GetP (dependencies* dep)
         }
         else
         {
-            ptr->left_child = GetB (dep);
+            ptr->left_child = GetBrackets (dep);
         }
 
         SkipSpaces (dep);
@@ -296,14 +296,14 @@ tree_node* GetP (dependencies* dep)
 
     if (dep->string[dep->position] == '(')
     {
-        ptr = GetB (dep);
+        ptr = GetBrackets (dep);
         if (ptr == nullptr) return nullptr;
 
         SkipSpaces (dep);
     }
     else
     {
-        ptr = GetN (dep);
+        ptr = GetNumber (dep);
         if (ptr == nullptr) return nullptr;
 
         SkipSpaces (dep);
@@ -312,7 +312,7 @@ tree_node* GetP (dependencies* dep)
     return ptr;
 }
 
-tree_node* GetF (dependencies* dep)
+tree_node* GetFunction (dependencies* dep)
 {
     assert (dep != nullptr);
 
@@ -332,7 +332,7 @@ tree_node* GetF (dependencies* dep)
     if (strncmp (#symbol, dep->string + dep->position, length) == 0)\
     {                                                               \
         dep->position += length;                                    \
-        return ConstructTreeNode (FUNC, OP_##name);                 \
+        return CreateTreeNode (FUNC, OP_##name);                    \
     }
 
     #include "Functions.hpp"
@@ -341,14 +341,14 @@ tree_node* GetF (dependencies* dep)
 
     //Only for single-letter variables
 
-    tree_node* ptr = ConstructTreeNode (VAR,(char) (dep->string[dep->position] - 'a'));
+    tree_node* ptr = CreateTreeNode (VAR,(char) (dep->string[dep->position] - 'a'));
 
     dep->position++;
 
     return ptr;
 }
 
-tree_node* GetB (dependencies* dep)
+tree_node* GetBrackets (dependencies* dep)
 {
     assert (dep != nullptr);
 
@@ -357,7 +357,7 @@ tree_node* GetB (dependencies* dep)
 
     SkipSpaces (dep);
 
-    tree_node* ptr = GetE (dep);
+    tree_node* ptr = GetExpression (dep);
     if (ptr == nullptr) return nullptr;
 
     SkipSpaces (dep);
@@ -373,7 +373,7 @@ tree_node* GetB (dependencies* dep)
     return ptr;
 }
 
-tree_node* GetN (dependencies* dep)
+tree_node* GetNumber (dependencies* dep)
 {
     assert (dep != nullptr);
 
@@ -391,7 +391,7 @@ tree_node* GetN (dependencies* dep)
 
     dep->position += end_ptr - (dep->string + dep->position);
 
-    return ConstructTreeNode (CONST, val);
+    return CreateTreeNode (CONST, val);
 }
 
 void SkipSpaces (dependencies* dep)
