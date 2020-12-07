@@ -458,6 +458,8 @@ void ConvertPow (FILE* tex_file, tree_node* current_node)
 
     fprintf (tex_file, "^");
 
+    fprintf (tex_file, "{");
+
     if (current_node->right_child->node_type == FUNC)
     {
         fprintf (tex_file, "(");
@@ -465,6 +467,8 @@ void ConvertPow (FILE* tex_file, tree_node* current_node)
         fprintf (tex_file, ")");
     }
     else ConvertTreeNode (tex_file, current_node->right_child);
+
+    fprintf (tex_file, "}");
 }
 
 #undef mul_convert_check_for_priority
