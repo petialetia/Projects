@@ -1,13 +1,15 @@
 digraph PL
 {
 rankdir=HR;
-"00000000007B15E0" [style="filled", fillcolor="yellow", shape="parallelogram", label="+"];
-"00000000007B1520" [style="filled", fillcolor="yellow", shape="parallelogram", label="tan"];
-"00000000007B1550" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
-"00000000007B1520" -> "00000000007B1550"
-"00000000007B15E0" -> "00000000007B1520"
-"00000000007B1580" [style="filled", fillcolor="yellow", shape="parallelogram", label="ln"];
-"00000000007B15B0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
-"00000000007B1580" -> "00000000007B15B0"
-"00000000007B15E0" -> "00000000007B1580"
+"00000000007F1570" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"00000000007F1480" [style="filled", fillcolor="yellow", shape="parallelogram", label="sin"];
+"00000000007F14B0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F1480" -> "00000000007F14B0"
+"00000000007F1570" -> "00000000007F1480"
+"00000000007F1540" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"00000000007F14E0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F1540" -> "00000000007F14E0"
+"00000000007F1510" [style="filled", fillcolor="#98FB98", label="2"];
+"00000000007F1540" -> "00000000007F1510"
+"00000000007F1570" -> "00000000007F1540"
 }

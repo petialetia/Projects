@@ -20,4 +20,10 @@
 
 #define COS(left_child, right_child) CreateTreeNode (FUNC, OP_COS, left_child, right_child)
 
+#define TAN(left_child, right_child) CreateTreeNode (FUNC, OP_TAN, left_child, right_child)
+
+#define CTG(left_child, right_child) CreateTreeNode (FUNC, OP_CTG, left_child, right_child)
+
+#define LN(left_child, right_child) CreateTreeNode (FUNC, OP_LN, left_child, right_child)
+
 #define CONST_CHILD(val) CreateTreeNode (CONST, val)

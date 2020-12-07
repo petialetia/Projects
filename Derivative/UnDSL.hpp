@@ -20,4 +20,10 @@
 
 #undef COS
 
+#undef TAN
+
+#undef CTG
+
+#undef LN
+
 #undef CONST_CHILD

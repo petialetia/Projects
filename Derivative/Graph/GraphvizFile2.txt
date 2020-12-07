@@ -1,31 +1,67 @@
 digraph PL
 {
 rankdir=HR;
-"00000000007B5AC0" [style="filled", fillcolor="yellow", shape="parallelogram", label="+"];
-"00000000007B5A60" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
-"00000000007B5B80" [style="filled", fillcolor="yellow", shape="parallelogram", label="/"];
-"00000000007B5C70" [style="filled", fillcolor="#98FB98", label="1"];
-"00000000007B5B80" -> "00000000007B5C70"
-"00000000007B5BE0" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
-"00000000007B1790" [style="filled", fillcolor="yellow", shape="parallelogram", label="cos"];
-"00000000007B1760" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
-"00000000007B1790" -> "00000000007B1760"
-"00000000007B5BE0" -> "00000000007B1790"
-"00000000007B1730" [style="filled", fillcolor="#98FB98", label="2"];
-"00000000007B5BE0" -> "00000000007B1730"
-"00000000007B5B80" -> "00000000007B5BE0"
-"00000000007B5A60" -> "00000000007B5B80"
-"00000000007B1700" [style="filled", fillcolor="#98FB98", label="1"];
-"00000000007B5A60" -> "00000000007B1700"
-"00000000007B5AC0" -> "00000000007B5A60"
-"00000000007B16D0" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
-"00000000007B16A0" [style="filled", fillcolor="yellow", shape="parallelogram", label="/"];
-"00000000007B1670" [style="filled", fillcolor="#98FB98", label="1"];
-"00000000007B16A0" -> "00000000007B1670"
-"00000000007B1640" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
-"00000000007B16A0" -> "00000000007B1640"
-"00000000007B16D0" -> "00000000007B16A0"
-"00000000007B1610" [style="filled", fillcolor="#98FB98", label="1"];
-"00000000007B16D0" -> "00000000007B1610"
-"00000000007B5AC0" -> "00000000007B16D0"
+"00000000007F63D0" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"00000000007F6190" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"00000000007F6820" [style="filled", fillcolor="yellow", shape="parallelogram", label="sin"];
+"00000000007F61F0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F6820" -> "00000000007F61F0"
+"00000000007F6190" -> "00000000007F6820"
+"00000000007F67C0" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"00000000007F6790" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F67C0" -> "00000000007F6790"
+"00000000007F17D0" [style="filled", fillcolor="#98FB98", label="2"];
+"00000000007F67C0" -> "00000000007F17D0"
+"00000000007F6190" -> "00000000007F67C0"
+"00000000007F63D0" -> "00000000007F6190"
+"00000000007F1A70" [style="filled", fillcolor="yellow", shape="parallelogram", label="+"];
+"00000000007F17A0" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"00000000007F1A10" [style="filled", fillcolor="yellow", shape="parallelogram", label="ln"];
+"00000000007F1770" [style="filled", fillcolor="yellow", shape="parallelogram", label="sin"];
+"00000000007F19B0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F1770" -> "00000000007F19B0"
+"00000000007F1A10" -> "00000000007F1770"
+"00000000007F17A0" -> "00000000007F1A10"
+"00000000007F1740" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"00000000007F1980" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"00000000007F1890" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"00000000007F1950" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F1890" -> "00000000007F1950"
+"00000000007F18F0" [style="filled", fillcolor="yellow", shape="parallelogram", label="-"];
+"00000000007F1860" [style="filled", fillcolor="#98FB98", label="2"];
+"00000000007F18F0" -> "00000000007F1860"
+"00000000007F1830" [style="filled", fillcolor="#98FB98", label="1"];
+"00000000007F18F0" -> "00000000007F1830"
+"00000000007F1890" -> "00000000007F18F0"
+"00000000007F1980" -> "00000000007F1890"
+"00000000007F1800" [style="filled", fillcolor="#98FB98", label="2"];
+"00000000007F1980" -> "00000000007F1800"
+"00000000007F1740" -> "00000000007F1980"
+"00000000007F1AA0" [style="filled", fillcolor="#98FB98", label="1"];
+"00000000007F1740" -> "00000000007F1AA0"
+"00000000007F17A0" -> "00000000007F1740"
+"00000000007F1A70" -> "00000000007F17A0"
+"00000000007F18C0" [style="filled", fillcolor="yellow", shape="parallelogram", label="/"];
+"00000000007F1A40" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"00000000007F1920" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"00000000007F19E0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F1920" -> "00000000007F19E0"
+"00000000007F16C0" [style="filled", fillcolor="#98FB98", label="2"];
+"00000000007F1920" -> "00000000007F16C0"
+"00000000007F1A40" -> "00000000007F1920"
+"00000000007F1690" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"00000000007F1660" [style="filled", fillcolor="yellow", shape="parallelogram", label="cos"];
+"00000000007F1630" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F1660" -> "00000000007F1630"
+"00000000007F1690" -> "00000000007F1660"
+"00000000007F1600" [style="filled", fillcolor="#98FB98", label="1"];
+"00000000007F1690" -> "00000000007F1600"
+"00000000007F1A40" -> "00000000007F1690"
+"00000000007F18C0" -> "00000000007F1A40"
+"00000000007F15D0" [style="filled", fillcolor="yellow", shape="parallelogram", label="sin"];
+"00000000007F15A0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"00000000007F15D0" -> "00000000007F15A0"
+"00000000007F18C0" -> "00000000007F15D0"
+"00000000007F1A70" -> "00000000007F18C0"
+"00000000007F63D0" -> "00000000007F1A70"
 }

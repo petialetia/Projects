@@ -8,6 +8,22 @@ int main (int argC, char* argV[])
 
     tree* tree = GetGeneral (functions.pointer_on_buffer);
 
+    if (tree == nullptr)
+    {
+        free (functions.pointer_on_buffer);
+
+        return 0;
+    }
+
+    ProcessFunction (tree);
+
+    free (functions.pointer_on_buffer);
+
+    return 0;
+}
+
+void ProcessFunction (tree* tree)
+{
     DrawTree (tree->root, 1);
 
     tree_node* derivative = CalculateDerivative (tree->root);
@@ -20,15 +36,11 @@ int main (int argC, char* argV[])
 
     CreateLatexFile (derivative);
 
-    free (functions.pointer_on_buffer);
-
     DestroyTree (tree);
 
     DestroySubtree (derivative);
 
     system ("start tex.pdf");
-
-    return 0;
 }
 
 #include "DSL.hpp"
@@ -67,7 +79,7 @@ tree_node* CalculateDerivativeOfFunctions (tree_node* original_node)
 
         case OP_DIV: return DIV (SUB (MUL (dL, cR), MUL (cL, dR)), POW (cR, CONST_CHILD (2.0)));
 
-        case OP_POW: return MUL (MUL (POW (cL, SUB (cR, CONST_CHILD (1.0))), cR), dL);
+        case OP_POW: return CalculateDerivativePow (original_node);
 
         case OP_SIN: return MUL (COS (cL, nullptr), dL);
 
@@ -83,6 +95,31 @@ tree_node* CalculateDerivativeOfFunctions (tree_node* original_node)
         break;
     }
     return nullptr;
+}
+
+tree_node* CalculateDerivativePow (tree_node* original_node)
+{
+    if (IsThereX (original_node->right_child))
+    {
+        if (IsThereX (original_node->left_child)) return MUL (POW (cL, cR), ADD (MUL (LN (cL, nullptr), dR), DIV (MUL (cR, dL), cL)));
+        else                                      return MUL (POW (cL, cR), MUL (dR, LN (cL, nullptr)));
+    }
+    else
+    {
+        if (IsThereX (original_node->left_child)) return MUL (MUL (POW (cL, SUB (cR, CONST_CHILD (1.0))), cR), dL);
+        else                                      return CONST_CHILD (0.0);
+    }
+}
+
+bool IsThereX (tree_node* current_node)
+{
+    if (current_node == nullptr) return 0;
+
+    if ((current_node->node_type == VAR) && (current_node->key.num == 'x' - 'a')) return 1;
+    if (IsThereX (current_node->left_child))  return 1;
+    if (IsThereX (current_node->right_child)) return 1;
+
+    return 0;
 }
 
 #include "UnDSL.hpp"
@@ -154,7 +191,7 @@ ckeck_for_definite_elem (definite_elem, result, right, left)
 
 #define ckeck_for_definite_elem(definite_elem, result, direction, opposite_direction)                                  \
                                                                                                                        \
-if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direction##_child->key.val) - definite_elem))\
+if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direction##_child->key.val - definite_elem)))\
 {                                                                                                                      \
     (*node)->node_type = CONST;                                                                                        \
     (*node)->key.val   = result;                                                                                       \
@@ -310,7 +347,7 @@ void CreateLatexFile (tree_node* root)
 
 void ConvertTreeNode (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
     switch (current_node->node_type)
@@ -329,7 +366,7 @@ void ConvertTreeNode (FILE* tex_file, tree_node* current_node)
     }
 }
 
-#define mul_convert_check_for_priority(direction)                                                                              \
+#define convert_check_for_priority(direction)                                                                                  \
                                                                                                                                \
 if ((current_node->direction##_child->node_type == FUNC) && (current_node->direction##_child->key.num < current_node->key.num))\
 {                                                                                                                              \
@@ -339,10 +376,30 @@ if ((current_node->direction##_child->node_type == FUNC) && (current_node->direc
 }                                                                                                                              \
 else ConvertTreeNode (tex_file, current_node->direction##_child);
 
+#define convert_mul_check_for_const(direction, opposite_direction)           \
+                                                                             \
+if (current_node->direction##_child->node_type == CONST)                     \
+{                                                                            \
+    if (current_node->direction##_child->key.val > 0)                        \
+    {                                                                        \
+        ConvertTreeNode (tex_file, current_node->direction##_child);         \
+        ConvertTreeNode (tex_file, current_node->opposite_direction##_child);\
+    }                                                                        \
+    else                                                                     \
+    {                                                                        \
+        fprintf (tex_file, "(");                                             \
+        ConvertTreeNode (tex_file, current_node->direction##_child);         \
+        fprintf (tex_file, ")");                                             \
+        fprintf (tex_file, "*");                                             \
+        ConvertTreeNode (tex_file, current_node->opposite_direction##_child);\
+    }                                                                        \
+    return;                                                                  \
+}
+
 
 void ConvertFunc (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
     switch (current_node->key.num)
@@ -381,7 +438,7 @@ void ConvertFunc (FILE* tex_file, tree_node* current_node)
 
 void ConvertAdd (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
     ConvertTreeNode (tex_file, current_node->left_child);
@@ -391,7 +448,7 @@ void ConvertAdd (FILE* tex_file, tree_node* current_node)
 
 void ConvertSub (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
     ConvertTreeNode (tex_file, current_node->left_child);
@@ -401,39 +458,20 @@ void ConvertSub (FILE* tex_file, tree_node* current_node)
 
 void ConvertMul (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
-    if ((current_node->left_child->node_type == CONST) && (current_node->right_child->node_type == CONST))
-    {
-        ConvertTreeNode (tex_file, current_node->left_child);
-        fprintf (tex_file, "*");
-        ConvertTreeNode (tex_file, current_node->right_child);
-        return;
-    }
+    convert_mul_check_for_const (left,  right)
+    convert_mul_check_for_const (right, left )
 
-    if ((current_node->left_child->node_type == VAR) && (current_node->right_child->node_type == VAR))
-    {
-        ConvertTreeNode (tex_file, current_node->left_child);
-        fprintf (tex_file, "*");
-        ConvertTreeNode (tex_file, current_node->right_child);
-        return;
-    }
-
-    if ((current_node->right_child->node_type == CONST) && (current_node->left_child->node_type == VAR))
-    {
-        ConvertTreeNode (tex_file, current_node->right_child);
-        ConvertTreeNode (tex_file, current_node->left_child);
-        return;
-    }
-
-    mul_convert_check_for_priority (left)
-    mul_convert_check_for_priority (right)
+    convert_check_for_priority (left)
+    fprintf (tex_file, "*");
+    convert_check_for_priority (right)
 }
 
 void ConvertDiv (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
     fprintf (tex_file, "\\frac{");
@@ -445,30 +483,20 @@ void ConvertDiv (FILE* tex_file, tree_node* current_node)
 
 void ConvertPow (FILE* tex_file, tree_node* current_node)
 {
-    assert (tex_file != nullptr);
+    assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
-    if (current_node->left_child->node_type == FUNC)
-    {
-        fprintf (tex_file, "(");
-        ConvertTreeNode (tex_file, current_node->left_child);
-        fprintf (tex_file, ")");
-    }
-    else ConvertTreeNode (tex_file, current_node->left_child);
+    convert_check_for_priority (left)
 
     fprintf (tex_file, "^");
 
     fprintf (tex_file, "{");
 
-    if (current_node->right_child->node_type == FUNC)
-    {
-        fprintf (tex_file, "(");
-        ConvertTreeNode (tex_file, current_node->right_child);
-        fprintf (tex_file, ")");
-    }
-    else ConvertTreeNode (tex_file, current_node->right_child);
+    convert_check_for_priority (right)
 
     fprintf (tex_file, "}");
 }
 
-#undef mul_convert_check_for_priority
+#undef convert_check_for_priority
+
+#undef convert_mul_check_for_const

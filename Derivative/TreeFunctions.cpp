@@ -131,6 +131,8 @@ const char* FinNameOfFunc (char key)
 
 void DestroyTree (tree* tree)
 {
+    assert (tree != nullptr);
+
     DestroySubtree (tree->root);
 }
 
@@ -192,9 +194,9 @@ tree_node* GetExpression (dependencies* dep)
 
     tree_node* ptr = GetTerm (dep);
 
-    SkipSpaces (dep);
-
     if (ptr == nullptr) return nullptr;
+
+    SkipSpaces (dep);
 
     while ((dep->string[dep->position] == '+') || (dep->string[dep->position] == '-'))
     {
@@ -218,9 +220,9 @@ tree_node* GetTerm (dependencies* dep)
 
     tree_node* ptr = GetPower (dep);
 
-    SkipSpaces (dep);
-
     if (ptr == nullptr) return nullptr;
+
+    SkipSpaces (dep);
 
     while ((dep->string[dep->position] == '*') || (dep->string[dep->position] == '/'))
     {
@@ -244,9 +246,9 @@ tree_node* GetPower (dependencies* dep)
 
     tree_node* ptr = GetPrimary (dep);
 
-    SkipSpaces (dep);
-
     if (ptr == nullptr) return nullptr;
+
+    SkipSpaces (dep);
 
     while (dep->string[dep->position] == '^')
     {
@@ -271,6 +273,7 @@ tree_node* GetPrimary (dependencies* dep)
     if (islower (dep->string[dep->position]))
     {
         ptr = GetFunction(dep);
+        if (ptr == nullptr) return nullptr;
 
         SkipSpaces (dep);
 
@@ -288,6 +291,7 @@ tree_node* GetPrimary (dependencies* dep)
         else
         {
             ptr->left_child = GetBrackets (dep);
+            if (ptr->left_child == nullptr) return nullptr;
         }
 
         SkipSpaces (dep);

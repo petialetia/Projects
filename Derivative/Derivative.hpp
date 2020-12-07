@@ -6,9 +6,15 @@ const char* const  STANDART_INPUT_FILE = "Function.txt";
 
 const double PSEUDO_NULL = 1E-6;
 
+void ProcessFunction (tree* tree);
+
 tree_node* CalculateDerivative (tree_node* original_node);
 
 tree_node* CalculateDerivativeOfFunctions (tree_node* original_node);
+
+tree_node* CalculateDerivativePow (tree_node* original_node);
+
+bool IsThereX (tree_node* current_node);
 
 void Simplify (tree_node** node);
 
