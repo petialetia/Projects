@@ -26,4 +26,14 @@
 
 #define LN(left_child, right_child) CreateTreeNode (FUNC, OP_LN, left_child, right_child)
 
+#define EXP(left_child, right_child) CreateTreeNode (FUNC, OP_EXP, left_child, right_child)
+
+#define SH(left_child, right_child) CreateTreeNode (FUNC, OP_SH, left_child, right_child)
+
+#define CH(left_child, right_child) CreateTreeNode (FUNC, OP_CH, left_child, right_child)
+
+#define TH(left_child, right_child) CreateTreeNode (FUNC, OP_TH, left_child, right_child)
+
+#define CTH(left_child, right_child) CreateTreeNode (FUNC, OP_CTH, left_child, right_child)
+
 #define CONST_CHILD(val) CreateTreeNode (CONST, val)

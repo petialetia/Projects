@@ -26,4 +26,14 @@
 
 #undef LN
 
+#undef EXP
+
+#undef SH
+
+#undef CH
+
+#undef TH
+
+#undef CTH
+
 #undef CONST_CHILD

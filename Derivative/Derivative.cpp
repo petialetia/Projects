@@ -91,6 +91,16 @@ tree_node* CalculateDerivativeOfFunctions (tree_node* original_node)
 
         case OP_LN:  return MUL (DIV (CONST_CHILD (1.0), cL), dL);
 
+        case OP_EXP: return MUL (EXP (cL, nullptr), dL);
+
+        case OP_SH:  return MUL (CH (cL, nullptr), dL);
+
+        case OP_CH:  return MUL (SH (cL, nullptr), dL);
+
+        case OP_TH:  return MUL (DIV (CONST_CHILD (1.0), POW (CH (cL, nullptr), CONST_CHILD (2.0))), dL);
+
+        case OP_CTH: return MUL (MUL (CONST_CHILD (-1.0), DIV (CONST_CHILD (1.0), POW (SH (dL, nullptr), CONST_CHILD (2.0)))), dL);
+
         default:     printf ("Undefined function is written in node\n");
         break;
     }
@@ -311,6 +321,26 @@ double ln (double val)
     return log (val);
 }
 
+double sh (double val)
+{
+    return sinh (val);
+}
+
+double ch (double val)
+{
+    return cosh (val);
+}
+
+double th (double val)
+{
+    return tanh (val);
+}
+
+double cth (double val)
+{
+    return ch (val)/sh (val);
+}
+
 #undef check_for_const
 
 #undef check_for_const_func
@@ -486,7 +516,13 @@ void ConvertPow (FILE* tex_file, tree_node* current_node)
     assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
-    convert_check_for_priority (left)
+    if (current_node->left_child->node_type == FUNC)
+    {
+        fprintf (tex_file, "(");                                                                                                   \
+        ConvertTreeNode (tex_file, current_node->left_child);                                                               \
+        fprintf (tex_file, ")");
+    }
+    else ConvertTreeNode (tex_file, current_node->left_child);
 
     fprintf (tex_file, "^");
 

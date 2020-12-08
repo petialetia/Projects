@@ -34,6 +34,14 @@ double ctg (double val);
 
 double ln (double val);
 
+double sh (double val);
+
+double ch (double val);
+
+double th (double val);
+
+double cth (double val);
+
 void CreateLatexFile (tree_node* root);
 
 void ConvertTreeNode (FILE* tex_file, tree_node* current_node);
