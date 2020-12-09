@@ -43,6 +43,11 @@ void ProcessFunction (tree* tree)
     system ("start tex.pdf");
 }
 
+char NumForX ()
+{
+    return 'x' - 'a';
+}
+
 #include "DSL.hpp"
 
 tree_node* CalculateDerivative (tree_node* original_node)
@@ -53,7 +58,7 @@ tree_node* CalculateDerivative (tree_node* original_node)
     {
         case CONST: return CreateTreeNode (CONST, 0.0);
 
-        case VAR:   if (original_node->key.num == 'x' - 'a') return CreateTreeNode (CONST, 1.0);
+        case VAR:   if (original_node->key.num == NumForX()) return CreateTreeNode (CONST, 1.0);
                     return CreateTreeNode (CONST, 0.0);
 
         case FUNC:  return CalculateDerivativeOfFunctions (original_node);
@@ -125,7 +130,7 @@ bool IsThereX (tree_node* current_node)
 {
     if (current_node == nullptr) return 0;
 
-    if ((current_node->node_type == VAR) && (current_node->key.num == 'x' - 'a')) return 1;
+    if ((current_node->node_type == VAR) && (current_node->key.num == NumForX ())) return 1;
     if (IsThereX (current_node->left_child))  return 1;
     if (IsThereX (current_node->right_child)) return 1;
 
@@ -134,7 +139,7 @@ bool IsThereX (tree_node* current_node)
 
 #include "UnDSL.hpp"
 
-#define check_for_const(operator)                                                           \
+#define CHECK_FOR_CONST(operator)                                                           \
                                                                                             \
 if (((*node)->right_child->node_type == CONST) && ((*node)->left_child->node_type == CONST))\
 {                                                                                           \
@@ -147,7 +152,7 @@ if (((*node)->right_child->node_type == CONST) && ((*node)->left_child->node_typ
     return;                                                                                 \
 }
 
-#define check_for_const_func(func)                                                          \
+#define CHECK_FOR_CONST_FUNC(func)                                                          \
                                                                                             \
 if (((*node)->right_child->node_type == CONST) && ((*node)->left_child->node_type == CONST))\
 {                                                                                           \
@@ -160,7 +165,7 @@ if (((*node)->right_child->node_type == CONST) && ((*node)->left_child->node_typ
     return;                                                                                 \
 }
 
-#define check_for_const_func_unary(func)                   \
+#define CHECK_FOR_CONST_FUNC_UNARY(func)                   \
                                                            \
 if ((*node)->left_child->node_type == CONST)               \
 {                                                          \
@@ -171,12 +176,12 @@ if ((*node)->left_child->node_type == CONST)               \
     return;                                                \
 }
 
-#define ckeck_for_neutral_elem_commutative(neutral_elem)\
+#define CHECK_FOR_NEUTRAL_ELEM_COMMUTATIVE(neutral_elem)\
                                                         \
-ckeck_for_neutral_elem (neutral_elem, left,  right)     \
-ckeck_for_neutral_elem (neutral_elem, right, left)
+CHECK_FOR_NEYTRAL_ELEM (neutral_elem, left,  right)     \
+CHECK_FOR_NEYTRAL_ELEM (neutral_elem, right, left)
 
-#define ckeck_for_neutral_elem(neutral_elem, direction, opposite_direction)                                           \
+#define CHECK_FOR_NEYTRAL_ELEM(neutral_elem, direction, opposite_direction)                                           \
                                                                                                                       \
 if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direction##_child->key.val - neutral_elem)))\
 {                                                                                                                     \
@@ -193,13 +198,13 @@ if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direct
     }                                                                                                                 \
 }
 
-#define ckeck_for_definite_elem_commutative(definite_elem, result)\
-                                                                  \
-ckeck_for_definite_elem (definite_elem, result, left,  right)     \
-ckeck_for_definite_elem (definite_elem, result, right, left)
+#define CHECK_FOR_DEFINITIVE_ELEM_COMMUTATIVE(definite_elem, result)\
+                                                                    \
+CHECK_FOR_DEFINITIVE_ELEM (definite_elem, result, left,  right)     \
+CHECK_FOR_DEFINITIVE_ELEM (definite_elem, result, right, left)
 
 
-#define ckeck_for_definite_elem(definite_elem, result, direction, opposite_direction)                                  \
+#define CHECK_FOR_DEFINITIVE_ELEM(definite_elem, result, direction, opposite_direction)                                \
                                                                                                                        \
 if (((*node)->direction##_child->node_type == CONST) && (IsZero ((*node)->direction##_child->key.val - definite_elem)))\
 {                                                                                                                      \
@@ -248,7 +253,7 @@ void SimplifyFunctions (tree_node** node)
 
         #define DEF_FUNCTION(name, symbol, num)            \
                                                            \
-        case OP_##name: check_for_const_func_unary (symbol)\
+        case OP_##name: CHECK_FOR_CONST_FUNC_UNARY (symbol)\
                         break;
 
         #include "BracketFunctions.hpp"
@@ -264,16 +269,16 @@ void SimplifyAdd (tree_node** node)
 {
     assert (node != nullptr);
 
-    check_for_const (+)
-    ckeck_for_neutral_elem_commutative (0)
+    CHECK_FOR_CONST (+)
+    CHECK_FOR_NEUTRAL_ELEM_COMMUTATIVE (0)
 }
 
 void SimplifySub (tree_node** node)
 {
     assert (node != nullptr);
 
-    check_for_const (-)
-    ckeck_for_neutral_elem (0, right, left)
+    CHECK_FOR_CONST (-)
+    CHECK_FOR_NEYTRAL_ELEM (0, right, left)
     if (((*node)->left_child->node_type == CONST) && (IsZero ((*node)->left_child->key.val)))
     {
         (*node)->key.num = OP_MUL;
@@ -286,29 +291,29 @@ void SimplifyMul (tree_node** node)
 {
     assert (node != nullptr);
 
-    check_for_const (*)
-    ckeck_for_neutral_elem_commutative  (1)
-    ckeck_for_definite_elem_commutative (0, 0)
+    CHECK_FOR_CONST (*)
+    CHECK_FOR_NEUTRAL_ELEM_COMMUTATIVE  (1)
+    CHECK_FOR_DEFINITIVE_ELEM_COMMUTATIVE (0, 0)
 }
 
 void SimplifyDiv (tree_node** node)
 {
     assert (node != nullptr);
 
-    check_for_const (/)
-    ckeck_for_neutral_elem  (1, right, left)
-    ckeck_for_definite_elem (0, 0, left, right)
+    CHECK_FOR_CONST (/)
+    CHECK_FOR_NEYTRAL_ELEM  (1, right, left)
+    CHECK_FOR_DEFINITIVE_ELEM (0, 0, left, right)
 }
 
 void SimplifyPow (tree_node** node)
 {
     assert (node != nullptr);
 
-    check_for_const_func (pow)
-    ckeck_for_neutral_elem  (1, right, left)
-    ckeck_for_definite_elem (1, 1, left, right)
-    ckeck_for_definite_elem (0, 0, left,  right)
-    ckeck_for_definite_elem (0, 1, right, left)
+    CHECK_FOR_CONST_FUNC (pow)
+    CHECK_FOR_NEYTRAL_ELEM  (1, right, left)
+    CHECK_FOR_DEFINITIVE_ELEM (1, 1, left, right)
+    CHECK_FOR_DEFINITIVE_ELEM (0, 0, left,  right)
+    CHECK_FOR_DEFINITIVE_ELEM (0, 1, right, left)
 }
 
 double ctg (double val)
@@ -341,19 +346,19 @@ double cth (double val)
     return ch (val)/sh (val);
 }
 
-#undef check_for_const
+#undef CHECK_FOR_CONST
 
-#undef check_for_const_func
+#undef CHECK_FOR_CONST_FUNC
 
-#undef check_for_const_func_unary
+#undef CHECK_FOR_CONST_FUNC_UNARY
 
-#undef ckeck_for_neutral_elem_commutative
+#undef CHECK_FOR_NEUTRAL_ELEM_COMMUTATIVE
 
-#undef ckeck_for_neutral_elem
+#undef CHECK_FOR_NEYTRAL_ELEM
 
-#undef ckeck_for_definite_elem_commutative
+#undef CHECK_FOR_DEFINITIVE_ELEM_COMMUTATIVE
 
-#undef ckeck_for_definite_elem
+#undef CHECK_FOR_DEFINITIVE_ELEM
 
 void CreateLatexFile (tree_node* root)
 {
@@ -396,7 +401,7 @@ void ConvertTreeNode (FILE* tex_file, tree_node* current_node)
     }
 }
 
-#define convert_check_for_priority(direction)                                                                                  \
+#define CONVERT_CHECK_FOR_PRIORITY(direction)                                                                                  \
                                                                                                                                \
 if ((current_node->direction##_child->node_type == FUNC) && (current_node->direction##_child->key.num < current_node->key.num))\
 {                                                                                                                              \
@@ -406,7 +411,7 @@ if ((current_node->direction##_child->node_type == FUNC) && (current_node->direc
 }                                                                                                                              \
 else ConvertTreeNode (tex_file, current_node->direction##_child);
 
-#define convert_mul_check_for_const(direction, opposite_direction)           \
+#define CONVERT_MUL_CHECK_FOR_CONST(direction, opposite_direction)           \
                                                                              \
 if (current_node->direction##_child->node_type == CONST)                     \
 {                                                                            \
@@ -491,12 +496,12 @@ void ConvertMul (FILE* tex_file, tree_node* current_node)
     assert (tex_file     != nullptr);
     assert (current_node != nullptr);
 
-    convert_mul_check_for_const (left,  right)
-    convert_mul_check_for_const (right, left )
+    CONVERT_MUL_CHECK_FOR_CONST (left,  right)
+    CONVERT_MUL_CHECK_FOR_CONST (right, left )
 
-    convert_check_for_priority (left)
+    CONVERT_CHECK_FOR_PRIORITY (left)
     fprintf (tex_file, "*");
-    convert_check_for_priority (right)
+    CONVERT_CHECK_FOR_PRIORITY (right)
 }
 
 void ConvertDiv (FILE* tex_file, tree_node* current_node)
@@ -528,11 +533,11 @@ void ConvertPow (FILE* tex_file, tree_node* current_node)
 
     fprintf (tex_file, "{");
 
-    convert_check_for_priority (right)
+    CONVERT_CHECK_FOR_PRIORITY (right)
 
     fprintf (tex_file, "}");
 }
 
-#undef convert_check_for_priority
+#undef CONVERT_CHECK_FOR_PRIORITY
 
-#undef convert_mul_check_for_const
+#undef CONVERT_MUL_CHECK_FOR_CONST

@@ -8,6 +8,8 @@ const double PSEUDO_NULL = 1E-6;
 
 void ProcessFunction (tree* tree);
 
+char NumForX ();
+
 tree_node* CalculateDerivative (tree_node* original_node);
 
 tree_node* CalculateDerivativeOfFunctions (tree_node* original_node);

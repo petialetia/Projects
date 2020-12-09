@@ -1,31 +1,41 @@
 digraph PL
 {
 rankdir=HR;
-"0000000000AC1860" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
-"0000000000AC1800" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
-"0000000000AC1770" [style="filled", fillcolor="#98FB98", label="-1"];
-"0000000000AC1800" -> "0000000000AC1770"
-"0000000000AC1890" [style="filled", fillcolor="yellow", shape="parallelogram", label="/"];
-"0000000000AC17D0" [style="filled", fillcolor="#98FB98", label="1"];
-"0000000000AC1890" -> "0000000000AC17D0"
-"0000000000AC17A0" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
-"0000000000AC19B0" [style="filled", fillcolor="yellow", shape="parallelogram", label="sh"];
-"0000000000AC1A70" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
-"0000000000AC19E0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
-"0000000000AC1A70" -> "0000000000AC19E0"
-"0000000000AC1980" [style="filled", fillcolor="#98FB98", label="2"];
-"0000000000AC1A70" -> "0000000000AC1980"
-"0000000000AC19B0" -> "0000000000AC1A70"
-"0000000000AC17A0" -> "0000000000AC19B0"
-"0000000000AC1920" [style="filled", fillcolor="#98FB98", label="2"];
-"0000000000AC17A0" -> "0000000000AC1920"
-"0000000000AC1890" -> "0000000000AC17A0"
-"0000000000AC1800" -> "0000000000AC1890"
-"0000000000AC1860" -> "0000000000AC1800"
-"0000000000AC1690" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
-"0000000000AC1630" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
-"0000000000AC1690" -> "0000000000AC1630"
-"0000000000AC1570" [style="filled", fillcolor="#98FB98", label="2"];
-"0000000000AC1690" -> "0000000000AC1570"
-"0000000000AC1860" -> "0000000000AC1690"
+"0000000000AD5D00" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"0000000000AD5DC0" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"0000000000AD5C70" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000AD5DC0" -> "0000000000AD5C70"
+"0000000000AD5AC0" [style="filled", fillcolor="yellow", shape="parallelogram", label="tan"];
+"0000000000AD5AF0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000AD5AC0" -> "0000000000AD5AF0"
+"0000000000AD5DC0" -> "0000000000AD5AC0"
+"0000000000AD5D00" -> "0000000000AD5DC0"
+"0000000000AD5C40" [style="filled", fillcolor="yellow", shape="parallelogram", label="+"];
+"0000000000AD5BE0" [style="filled", fillcolor="yellow", shape="parallelogram", label="*"];
+"0000000000AD5C10" [style="filled", fillcolor="yellow", shape="parallelogram", label="ln"];
+"0000000000AD5D90" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000AD5C10" -> "0000000000AD5D90"
+"0000000000AD5BE0" -> "0000000000AD5C10"
+"0000000000AD5B50" [style="filled", fillcolor="yellow", shape="parallelogram", label="/"];
+"0000000000AD5D30" [style="filled", fillcolor="#98FB98", label="1"];
+"0000000000AD5B50" -> "0000000000AD5D30"
+"0000000000AD5CA0" [style="filled", fillcolor="yellow", shape="parallelogram", label="^"];
+"0000000000AD17F0" [style="filled", fillcolor="yellow", shape="parallelogram", label="cos"];
+"0000000000AD17C0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000AD17F0" -> "0000000000AD17C0"
+"0000000000AD5CA0" -> "0000000000AD17F0"
+"0000000000AD1790" [style="filled", fillcolor="#98FB98", label="2"];
+"0000000000AD5CA0" -> "0000000000AD1790"
+"0000000000AD5B50" -> "0000000000AD5CA0"
+"0000000000AD5BE0" -> "0000000000AD5B50"
+"0000000000AD5C40" -> "0000000000AD5BE0"
+"0000000000AD1730" [style="filled", fillcolor="yellow", shape="parallelogram", label="/"];
+"0000000000AD16D0" [style="filled", fillcolor="yellow", shape="parallelogram", label="tan"];
+"0000000000AD16A0" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000AD16D0" -> "0000000000AD16A0"
+"0000000000AD1730" -> "0000000000AD16D0"
+"0000000000AD1640" [style="filled", fillcolor="#FFD6D4", shape="rectangle", label="x"];
+"0000000000AD1730" -> "0000000000AD1640"
+"0000000000AD5C40" -> "0000000000AD1730"
+"0000000000AD5D00" -> "0000000000AD5C40"
 }
