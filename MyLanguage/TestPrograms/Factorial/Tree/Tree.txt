@@ -1,0 +1,121 @@
+4 | factorial
+{
+7
+{
+0 | 1
+{
+5 | degree
+}
+}
+{
+7
+{
+0 | 0
+{
+5 | current_answer
+}
+{
+6 | 1
+}
+}
+{
+7
+{
+0 | 0
+{
+5 | current_degree
+}
+{
+6 | 1
+}
+}
+{
+7
+{
+0 | 2
+{
+5 | taking_factorial
+}
+}
+{
+7
+{
+0 | 3
+{
+5 | current_answer
+}
+}
+{
+0 | 5
+}
+}
+}
+}
+}
+}
+{
+4 | taking_factorial
+{
+7
+{
+3 | 0
+{
+2 | 1
+{
+5 | degree
+}
+{
+5 | current_degree
+}
+}
+{
+7
+{
+0 | 0
+{
+5 | current_degree
+}
+{
+1 | 0
+{
+5 | current_degree
+}
+{
+6 | 1
+}
+}
+}
+{
+7
+{
+0 | 0
+{
+5 | current_answer
+}
+{
+1 | 2
+{
+5 | current_degree
+}
+{
+5 | current_answer
+}
+}
+}
+{
+7
+{
+0 | 2
+{
+5 | taking_factorial
+}
+}
+}
+}
+}
+}
+{
+0 | 4
+}
+}
+}

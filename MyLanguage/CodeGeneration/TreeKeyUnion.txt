@@ -1,0 +1,11 @@
+TREE_KEY (char*,    name_ptr)
+
+TREE_KEY (enum SysFunc,   sys_func)
+
+TREE_KEY (enum MathOp,    math_op)
+
+TREE_KEY (enum Comparing, comparing)
+
+TREE_KEY (enum Condition, condition)
+
+TREE_KEY (double,         val)

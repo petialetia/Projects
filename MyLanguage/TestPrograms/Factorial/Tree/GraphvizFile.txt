@@ -1,0 +1,85 @@
+digraph PL
+{
+rankdir=HR;
+"0000000000A16D10" [style="filled", fillcolor="#FF7700", label="USER_FUNC | factorial"];
+"0000000000A16DA0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A16D40" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0000000000A16D70" [style="filled", fillcolor="#FF3030", label="VAR | degree"];
+"0000000000A16D40" -> "0000000000A16D70"
+"0000000000A16DA0" -> "0000000000A16D40"
+"0000000000A16E60" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A16DD0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | ="];
+"0000000000A16E00" [style="filled", fillcolor="#FF3030", label="VAR | current_answer"];
+"0000000000A16DD0" -> "0000000000A16E00"
+"0000000000A16E30" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A16DD0" -> "0000000000A16E30"
+"0000000000A16E60" -> "0000000000A16DD0"
+"0000000000A16F20" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A16E90" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | ="];
+"0000000000A16EC0" [style="filled", fillcolor="#FF3030", label="VAR | current_degree"];
+"0000000000A16E90" -> "0000000000A16EC0"
+"0000000000A16EF0" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A16E90" -> "0000000000A16EF0"
+"0000000000A16F20" -> "0000000000A16E90"
+"0000000000A11780" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A16F50" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A16F80" [style="filled", fillcolor="#FF3030", label="VAR | taking_factorial"];
+"0000000000A16F50" -> "0000000000A16F80"
+"0000000000A11780" -> "0000000000A16F50"
+"0000000000A117E0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A11A20" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A117B0" [style="filled", fillcolor="#FF3030", label="VAR | current_answer"];
+"0000000000A11A20" -> "0000000000A117B0"
+"0000000000A117E0" -> "0000000000A11A20"
+"0000000000A11990" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | hlt"];
+"0000000000A117E0" -> "0000000000A11990"
+"0000000000A11780" -> "0000000000A117E0"
+"0000000000A16F20" -> "0000000000A11780"
+"0000000000A16E60" -> "0000000000A16F20"
+"0000000000A16DA0" -> "0000000000A16E60"
+"0000000000A16D10" -> "0000000000A16DA0"
+"0000000000A11840" [style="filled", fillcolor="#FF7700", label="USER_FUNC | taking_factorial"];
+"0000000000A17B20" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A11810" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0000000000A11870" [style="filled", fillcolor="#EECFA1", label="COMPARING | <="];
+"0000000000A119C0" [style="filled", fillcolor="#FF3030", label="VAR | degree"];
+"0000000000A11870" -> "0000000000A119C0"
+"0000000000A118A0" [style="filled", fillcolor="#FF3030", label="VAR | current_degree"];
+"0000000000A11870" -> "0000000000A118A0"
+"0000000000A11810" -> "0000000000A11870"
+"0000000000A11960" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A118D0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | ="];
+"0000000000A11900" [style="filled", fillcolor="#FF3030", label="VAR | current_degree"];
+"0000000000A118D0" -> "0000000000A11900"
+"0000000000A11930" [style="filled", fillcolor="#FFFF00", label="MATH_OP | +"];
+"0000000000A119F0" [style="filled", fillcolor="#FF3030", label="VAR | current_degree"];
+"0000000000A11930" -> "0000000000A119F0"
+"0000000000A116F0" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A11930" -> "0000000000A116F0"
+"0000000000A118D0" -> "0000000000A11930"
+"0000000000A11960" -> "0000000000A118D0"
+"0000000000A17790" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A11A50" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | ="];
+"0000000000A11720" [style="filled", fillcolor="#FF3030", label="VAR | current_answer"];
+"0000000000A11A50" -> "0000000000A11720"
+"0000000000A17460" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A11750" [style="filled", fillcolor="#FF3030", label="VAR | current_degree"];
+"0000000000A17460" -> "0000000000A11750"
+"0000000000A177C0" [style="filled", fillcolor="#FF3030", label="VAR | current_answer"];
+"0000000000A17460" -> "0000000000A177C0"
+"0000000000A11A50" -> "0000000000A17460"
+"0000000000A17790" -> "0000000000A11A50"
+"0000000000A17850" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A177F0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A17820" [style="filled", fillcolor="#FF3030", label="VAR | taking_factorial"];
+"0000000000A177F0" -> "0000000000A17820"
+"0000000000A17850" -> "0000000000A177F0"
+"0000000000A17790" -> "0000000000A17850"
+"0000000000A11960" -> "0000000000A17790"
+"0000000000A11810" -> "0000000000A11960"
+"0000000000A17B20" -> "0000000000A11810"
+"0000000000A17880" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A17B20" -> "0000000000A17880"
+"0000000000A11840" -> "0000000000A17B20"
+"0000000000A16D10" -> "0000000000A11840"
+}

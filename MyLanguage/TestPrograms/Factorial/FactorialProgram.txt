@@ -1,0 +1,29 @@
+Guide how to build factorial:
+
+	Required degree.
+
+	current_answer = 1.
+
+	current_degree = 1.
+
+	See taking_factorial.
+
+	Write current_answer.
+
+End of instruction.
+
+Instruction of taking_factorial:
+
+	If (degree <= current_degree)
+
+		List of commands:
+
+		current_degree = current_degree + 1.
+
+		current_answer = current_degree * current_answer.
+
+		See taking_factorial.
+
+		End of commands.
+
+End of instruction.

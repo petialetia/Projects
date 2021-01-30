@@ -1,0 +1,73 @@
+Guide how to build quadratic_equation:
+
+	Required architector, bricks, cement.
+
+	If (architector == 0) See solving_of_linear_equation.
+
+	Else                  See producing_a_dsp.
+
+End of instruction. 
+
+Instruction of solving_of_linear_equation:
+
+	If (bricks == 0) See solving_of_equation_without_variable.
+
+	Else             List of commands:
+
+			 Write 1.
+
+			 Write -1 * cement / bricks.
+			
+			 End of commands.
+
+End of instruction. 
+
+Instruction of solving_of_equation_without_variable:
+
+	If (cement == 0) See proccessing_infinit_roots_case.
+
+	Else             See proccessing_no_roots_case.
+
+End of instruction.
+
+Instruction of proccessing_infinit_roots_case:
+
+	Write 8.
+
+End of instruction.
+
+Instruction of proccessing_no_roots_case:
+
+	Write 0.
+
+End of instruction.
+
+Instruction of producing_a_dsp:
+
+	dsp = bricks * bricks - 4 * cement * architector.
+
+	If (dsp < 0) See proccessing_no_roots_case.
+	
+	Else         If (dsp == 0) See proccessing_one_root_case.
+	
+	             Else          See proccessing_two_roots_case.
+
+End of instruction.
+
+Instruction of proccessing_one_root_case:
+
+	Write 1.
+
+	Write -1 * bricks / (2 * architector).
+
+End of instruction.
+
+Instruction of proccessing_two_roots_case:
+
+	Write 2.
+
+	Write (-1 * bricks + dsp ^ (1 / 2)) / (2 * architector).
+
+	Write (-1 * bricks - dsp ^ (1 / 2)) / (2 * architector).
+
+End of instruction.

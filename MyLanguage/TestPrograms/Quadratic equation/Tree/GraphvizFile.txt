@@ -1,0 +1,303 @@
+digraph PL
+{
+rankdir=HR;
+"0000000000A31AA0" [style="filled", fillcolor="#FF7700", label="USER_FUNC | quadratic_equation"];
+"0000000000A36D80" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A31AD0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0000000000A31B00" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0000000000A31AD0" -> "0000000000A31B00"
+"0000000000A31B30" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0000000000A36CF0" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A31B30" -> "0000000000A36CF0"
+"0000000000A36D20" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0000000000A36D50" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0000000000A36D20" -> "0000000000A36D50"
+"0000000000A31B30" -> "0000000000A36D20"
+"0000000000A31AD0" -> "0000000000A31B30"
+"0000000000A36D80" -> "0000000000A31AD0"
+"0000000000A37100" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A36DB0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0000000000A36E10" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0000000000A36DE0" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0000000000A36E10" -> "0000000000A36DE0"
+"0000000000A36E40" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0000000000A36E10" -> "0000000000A36E40"
+"0000000000A36DB0" -> "0000000000A36E10"
+"0000000000A370D0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0000000000A36F50" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A36E70" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A36EA0" [style="filled", fillcolor="#FF3030", label="VAR | solving_of_linear_equation"];
+"0000000000A36E70" -> "0000000000A36EA0"
+"0000000000A36F50" -> "0000000000A36E70"
+"0000000000A370D0" -> "0000000000A36F50"
+"0000000000A37160" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A36FE0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A371C0" [style="filled", fillcolor="#FF3030", label="VAR | producing_a_dsp"];
+"0000000000A36FE0" -> "0000000000A371C0"
+"0000000000A37160" -> "0000000000A36FE0"
+"0000000000A370D0" -> "0000000000A37160"
+"0000000000A36DB0" -> "0000000000A370D0"
+"0000000000A37100" -> "0000000000A36DB0"
+"0000000000A37130" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | hlt"];
+"0000000000A37100" -> "0000000000A37130"
+"0000000000A36D80" -> "0000000000A37100"
+"0000000000A31AA0" -> "0000000000A36D80"
+"0000000000A37010" [style="filled", fillcolor="#FF7700", label="USER_FUNC | solving_of_linear_equation"];
+"0000000000A37730" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A36F80" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0000000000A37040" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0000000000A36FB0" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A37040" -> "0000000000A36FB0"
+"0000000000A37070" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0000000000A37040" -> "0000000000A37070"
+"0000000000A36F80" -> "0000000000A37040"
+"0000000000A37D30" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0000000000A37220" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A37190" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A371F0" [style="filled", fillcolor="#FF3030", label="VAR | solving_of_equation_without_variable"];
+"0000000000A37190" -> "0000000000A371F0"
+"0000000000A37220" -> "0000000000A37190"
+"0000000000A37D30" -> "0000000000A37220"
+"0000000000A36F20" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A37250" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A37280" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A37250" -> "0000000000A37280"
+"0000000000A36F20" -> "0000000000A37250"
+"0000000000A378B0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A370A0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A378E0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0000000000A37CD0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A37E50" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0000000000A37CD0" -> "0000000000A37E50"
+"0000000000A37850" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0000000000A37CD0" -> "0000000000A37850"
+"0000000000A378E0" -> "0000000000A37CD0"
+"0000000000A37880" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A378E0" -> "0000000000A37880"
+"0000000000A370A0" -> "0000000000A378E0"
+"0000000000A378B0" -> "0000000000A370A0"
+"0000000000A36F20" -> "0000000000A378B0"
+"0000000000A37D30" -> "0000000000A36F20"
+"0000000000A36F80" -> "0000000000A37D30"
+"0000000000A37730" -> "0000000000A36F80"
+"0000000000A37E80" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A37730" -> "0000000000A37E80"
+"0000000000A37010" -> "0000000000A37730"
+"0000000000A37910" [style="filled", fillcolor="#FF7700", label="USER_FUNC | solving_of_equation_without_variable"];
+"0000000000A37C10" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A37790" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0000000000A37D00" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0000000000A37C40" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0000000000A37D00" -> "0000000000A37C40"
+"0000000000A37D60" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0000000000A37D00" -> "0000000000A37D60"
+"0000000000A37790" -> "0000000000A37D00"
+"0000000000A37940" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0000000000A37A90" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A377C0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A37760" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_infinit_roots_case"];
+"0000000000A377C0" -> "0000000000A37760"
+"0000000000A37A90" -> "0000000000A377C0"
+"0000000000A37940" -> "0000000000A37A90"
+"0000000000A37AF0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A379D0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A37BE0" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_no_roots_case"];
+"0000000000A379D0" -> "0000000000A37BE0"
+"0000000000A37AF0" -> "0000000000A379D0"
+"0000000000A37940" -> "0000000000A37AF0"
+"0000000000A37790" -> "0000000000A37940"
+"0000000000A37C10" -> "0000000000A37790"
+"0000000000A377F0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A37C10" -> "0000000000A377F0"
+"0000000000A37910" -> "0000000000A37C10"
+"0000000000A37C70" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_infinit_roots_case"];
+"0000000000A37EB0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A37D90" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A37B50" [style="filled", fillcolor="#00FF00", label="NUM | 8"];
+"0000000000A37D90" -> "0000000000A37B50"
+"0000000000A37EB0" -> "0000000000A37D90"
+"0000000000A37CA0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A37EB0" -> "0000000000A37CA0"
+"0000000000A37C70" -> "0000000000A37EB0"
+"0000000000A37970" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_no_roots_case"];
+"0000000000A37DC0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A37DF0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A379A0" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0000000000A37DF0" -> "0000000000A379A0"
+"0000000000A37DC0" -> "0000000000A37DF0"
+"0000000000A37E20" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A37DC0" -> "0000000000A37E20"
+"0000000000A37970" -> "0000000000A37DC0"
+"0000000000A37B20" [style="filled", fillcolor="#FF7700", label="USER_FUNC | producing_a_dsp"];
+"0000000000A386C0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A37A00" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | ="];
+"0000000000A37A30" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0000000000A37A00" -> "0000000000A37A30"
+"0000000000A38270" [style="filled", fillcolor="#FFFF00", label="MATH_OP | -"];
+"0000000000A37820" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A37AC0" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A37820" -> "0000000000A37AC0"
+"0000000000A37B80" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A37820" -> "0000000000A37B80"
+"0000000000A38270" -> "0000000000A37820"
+"0000000000A37F70" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A38600" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A37A60" [style="filled", fillcolor="#00FF00", label="NUM | 4"];
+"0000000000A38600" -> "0000000000A37A60"
+"0000000000A37BB0" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0000000000A38600" -> "0000000000A37BB0"
+"0000000000A37F70" -> "0000000000A38600"
+"0000000000A38240" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0000000000A37F70" -> "0000000000A38240"
+"0000000000A38270" -> "0000000000A37F70"
+"0000000000A37A00" -> "0000000000A38270"
+"0000000000A386C0" -> "0000000000A37A00"
+"0000000000A38690" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38570" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0000000000A382A0" [style="filled", fillcolor="#EECFA1", label="COMPARING | <"];
+"0000000000A38300" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0000000000A382A0" -> "0000000000A38300"
+"0000000000A382D0" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0000000000A382A0" -> "0000000000A382D0"
+"0000000000A38570" -> "0000000000A382A0"
+"0000000000A38120" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0000000000A38510" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38030" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A381E0" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_no_roots_case"];
+"0000000000A38030" -> "0000000000A381E0"
+"0000000000A38510" -> "0000000000A38030"
+"0000000000A38120" -> "0000000000A38510"
+"0000000000A38480" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A380C0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0000000000A38210" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0000000000A38360" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0000000000A38210" -> "0000000000A38360"
+"0000000000A38450" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0000000000A38210" -> "0000000000A38450"
+"0000000000A380C0" -> "0000000000A38210"
+"0000000000A38420" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0000000000A38090" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38060" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A37F40" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_one_root_case"];
+"0000000000A38060" -> "0000000000A37F40"
+"0000000000A38090" -> "0000000000A38060"
+"0000000000A38420" -> "0000000000A38090"
+"0000000000A380F0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A385A0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0000000000A383F0" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_two_roots_case"];
+"0000000000A385A0" -> "0000000000A383F0"
+"0000000000A380F0" -> "0000000000A385A0"
+"0000000000A38420" -> "0000000000A380F0"
+"0000000000A380C0" -> "0000000000A38420"
+"0000000000A38480" -> "0000000000A380C0"
+"0000000000A38120" -> "0000000000A38480"
+"0000000000A38570" -> "0000000000A38120"
+"0000000000A38690" -> "0000000000A38570"
+"0000000000A37FA0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A38690" -> "0000000000A37FA0"
+"0000000000A386C0" -> "0000000000A38690"
+"0000000000A37B20" -> "0000000000A386C0"
+"0000000000A38330" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_one_root_case"];
+"0000000000A38150" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38000" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A385D0" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A38000" -> "0000000000A385D0"
+"0000000000A38150" -> "0000000000A38000"
+"0000000000A383C0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38630" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A38660" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0000000000A38390" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A37FD0" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0000000000A38390" -> "0000000000A37FD0"
+"0000000000A38180" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A38390" -> "0000000000A38180"
+"0000000000A38660" -> "0000000000A38390"
+"0000000000A38540" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A384B0" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0000000000A38540" -> "0000000000A384B0"
+"0000000000A381B0" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0000000000A38540" -> "0000000000A381B0"
+"0000000000A38660" -> "0000000000A38540"
+"0000000000A38630" -> "0000000000A38660"
+"0000000000A383C0" -> "0000000000A38630"
+"0000000000A384E0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A383C0" -> "0000000000A384E0"
+"0000000000A38150" -> "0000000000A383C0"
+"0000000000A38330" -> "0000000000A38150"
+"0000000000A38B70" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_two_roots_case"];
+"0000000000A38900" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38CF0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A38990" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0000000000A38CF0" -> "0000000000A38990"
+"0000000000A38900" -> "0000000000A38CF0"
+"0000000000A38C60" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38BA0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A38D20" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0000000000A38A80" [style="filled", fillcolor="#FFFF00", label="MATH_OP | +"];
+"0000000000A38C00" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A38BD0" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0000000000A38C00" -> "0000000000A38BD0"
+"0000000000A38870" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A38C00" -> "0000000000A38870"
+"0000000000A38A80" -> "0000000000A38C00"
+"0000000000A389F0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | ^"];
+"0000000000A389C0" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0000000000A389F0" -> "0000000000A389C0"
+"0000000000A38B40" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0000000000A38A20" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A38B40" -> "0000000000A38A20"
+"0000000000A38C90" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0000000000A38B40" -> "0000000000A38C90"
+"0000000000A389F0" -> "0000000000A38B40"
+"0000000000A38A80" -> "0000000000A389F0"
+"0000000000A38D20" -> "0000000000A38A80"
+"0000000000A38A50" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A38CC0" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0000000000A38A50" -> "0000000000A38CC0"
+"0000000000A38C30" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0000000000A38A50" -> "0000000000A38C30"
+"0000000000A38D20" -> "0000000000A38A50"
+"0000000000A38BA0" -> "0000000000A38D20"
+"0000000000A38C60" -> "0000000000A38BA0"
+"0000000000A38840" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000A38ED0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000A38810" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0000000000A38780" [style="filled", fillcolor="#FFFF00", label="MATH_OP | -"];
+"0000000000A388D0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A387E0" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0000000000A388D0" -> "0000000000A387E0"
+"0000000000A38D50" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0000000000A388D0" -> "0000000000A38D50"
+"0000000000A38780" -> "0000000000A388D0"
+"0000000000A38DB0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | ^"];
+"0000000000A38D80" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0000000000A38DB0" -> "0000000000A38D80"
+"0000000000A38E70" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0000000000A387B0" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0000000000A38E70" -> "0000000000A387B0"
+"0000000000A38750" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0000000000A38E70" -> "0000000000A38750"
+"0000000000A38DB0" -> "0000000000A38E70"
+"0000000000A38780" -> "0000000000A38DB0"
+"0000000000A38810" -> "0000000000A38780"
+"0000000000A38E10" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0000000000A38AB0" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0000000000A38E10" -> "0000000000A38AB0"
+"0000000000A38DE0" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0000000000A38E10" -> "0000000000A38DE0"
+"0000000000A38810" -> "0000000000A38E10"
+"0000000000A38ED0" -> "0000000000A38810"
+"0000000000A38840" -> "0000000000A38ED0"
+"0000000000A388A0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0000000000A38840" -> "0000000000A388A0"
+"0000000000A38C60" -> "0000000000A38840"
+"0000000000A38900" -> "0000000000A38C60"
+"0000000000A38B70" -> "0000000000A38900"
+"0000000000A38330" -> "0000000000A38B70"
+"0000000000A37B20" -> "0000000000A38330"
+"0000000000A37970" -> "0000000000A37B20"
+"0000000000A37C70" -> "0000000000A37970"
+"0000000000A37910" -> "0000000000A37C70"
+"0000000000A37010" -> "0000000000A37910"
+"0000000000A31AA0" -> "0000000000A37010"
+}

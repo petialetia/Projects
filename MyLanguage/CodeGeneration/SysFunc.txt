@@ -1,0 +1,12 @@
+SYS_FUNC (ASSIGNMENT, =,        Assignment)
+
+SYS_FUNC (REQUIRED,   Required, Required)
+
+SYS_FUNC (SEE,        See,      See)
+
+SYS_FUNC (WRITE,      Write,    Write)
+
+SYS_FUNC (RETURN,     Return,   Return)
+
+SYS_FUNC (HLT,        hlt,      Hlt)
+

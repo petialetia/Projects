@@ -1,0 +1,25 @@
+in
+pop rax
+push 1
+pop rbx
+push 1
+pop rcx
+call taking_factorial
+push rbx
+out
+hlt
+taking_factorial:
+push rax
+push rcx
+ja :1
+push rcx
+push 1
+add
+pop rcx
+push rcx
+push rbx
+mul
+pop rbx
+call taking_factorial
+1:
+ret

@@ -1,0 +1,27 @@
+digraph PL
+{
+rankdir=HR;
+"0000000000D06D10" [style="filled", fillcolor="#FF7700", label="USER_FUNC | sum"];
+"0000000000D06E00" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000D06D40" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0000000000D06D70" [style="filled", fillcolor="#FF3030", label="VAR | first_term"];
+"0000000000D06D40" -> "0000000000D06D70"
+"0000000000D06DA0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0000000000D06DD0" [style="filled", fillcolor="#FF3030", label="VAR | second_term"];
+"0000000000D06DA0" -> "0000000000D06DD0"
+"0000000000D06D40" -> "0000000000D06DA0"
+"0000000000D06E00" -> "0000000000D06D40"
+"0000000000D06EF0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0000000000D06E30" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0000000000D06EC0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | +"];
+"0000000000D06E60" [style="filled", fillcolor="#FF3030", label="VAR | first_term"];
+"0000000000D06EC0" -> "0000000000D06E60"
+"0000000000D06E90" [style="filled", fillcolor="#FF3030", label="VAR | second_term"];
+"0000000000D06EC0" -> "0000000000D06E90"
+"0000000000D06E30" -> "0000000000D06EC0"
+"0000000000D06EF0" -> "0000000000D06E30"
+"0000000000D06F20" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | hlt"];
+"0000000000D06EF0" -> "0000000000D06F20"
+"0000000000D06E00" -> "0000000000D06EF0"
+"0000000000D06D10" -> "0000000000D06E00"
+}

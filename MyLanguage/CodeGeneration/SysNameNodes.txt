@@ -1,0 +1,7 @@
+SYS_NAME_NODES (SYS_FUNC,  sys_func,  SysFunc)
+
+SYS_NAME_NODES (MATH_OP,   math_op,   MathOp)
+
+SYS_NAME_NODES (COMPARING, comparing, Comparing)
+
+SYS_NAME_NODES (CONDITION, condition, Condition)

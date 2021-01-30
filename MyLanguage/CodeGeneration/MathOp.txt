@@ -1,0 +1,9 @@
+MATH_OP (ADD, +)
+
+MATH_OP (SUB, -)
+
+MATH_OP (MUL, *)
+
+MATH_OP (DIV, /)
+
+MATH_OP (POW, ^)

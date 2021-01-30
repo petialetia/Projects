@@ -1,0 +1,27 @@
+General::= Main {UFunc}* '\0'
+
+Main::= 'Guide how to build ' FuncName ':' FuncBody 
+
+UFunc::= 'Instruction of ' FuncName ':' FuncBody
+
+FuncName::= ['a' - 'z', '_'] +
+
+FuncBody::= Command+ 'End of instruction.' 
+
+Command::=  {{ SysFunc | Assigment} } | CondOper | LoopOper
+
+SysFunc::= FuncName Arg {',' Arg}*  '.'
+
+Var::= ['a' - 'z', '_']+
+
+Assigment::= Var '=' Expression '.'
+
+CondOper::= 'If' '(' Condition ')' CondCommand | 'If' '(' Condition ')' CondCommand 'Else' CondCommand
+
+Condition::= Expression "сравнение" Expression
+ 
+CondCommand::= Command | List of commands: {Command '.'}* End of commands.
+
+LoopOper::= 'While' '(' Condition ')' CondCommand 
+ 
+

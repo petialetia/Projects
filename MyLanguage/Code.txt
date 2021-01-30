@@ -1,0 +1,7 @@
+Guide how to build sum:
+
+	Required first_term, second_term.
+
+	Write first_term + second_term.
+
+End of instruction. 

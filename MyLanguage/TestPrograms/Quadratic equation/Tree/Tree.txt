@@ -1,0 +1,448 @@
+4 | quadratic_equation
+{
+7
+{
+0 | 1
+{
+5 | architector
+}
+{
+0 | 1
+{
+5 | bricks
+}
+{
+0 | 1
+{
+5 | cement
+}
+}
+}
+}
+{
+7
+{
+3 | 0
+{
+2 | 4
+{
+5 | architector
+}
+{
+6 | 0
+}
+}
+{
+3 | 1
+{
+7
+{
+0 | 2
+{
+5 | solving_of_linear_equation
+}
+}
+}
+{
+7
+{
+0 | 2
+{
+5 | producing_a_dsp
+}
+}
+}
+}
+}
+{
+0 | 5
+}
+}
+}
+{
+4 | solving_of_linear_equation
+{
+7
+{
+3 | 0
+{
+2 | 4
+{
+5 | bricks
+}
+{
+6 | 0
+}
+}
+{
+3 | 1
+{
+7
+{
+0 | 2
+{
+5 | solving_of_equation_without_variable
+}
+}
+}
+{
+7
+{
+0 | 3
+{
+6 | 1
+}
+}
+{
+7
+{
+0 | 3
+{
+1 | 3
+{
+1 | 2
+{
+6 | -1
+}
+{
+5 | cement
+}
+}
+{
+5 | bricks
+}
+}
+}
+}
+}
+}
+}
+{
+0 | 4
+}
+}
+{
+4 | solving_of_equation_without_variable
+{
+7
+{
+3 | 0
+{
+2 | 4
+{
+5 | cement
+}
+{
+6 | 0
+}
+}
+{
+3 | 1
+{
+7
+{
+0 | 2
+{
+5 | proccessing_infinit_roots_case
+}
+}
+}
+{
+7
+{
+0 | 2
+{
+5 | proccessing_no_roots_case
+}
+}
+}
+}
+}
+{
+0 | 4
+}
+}
+{
+4 | proccessing_infinit_roots_case
+{
+7
+{
+0 | 3
+{
+6 | 8
+}
+}
+{
+0 | 4
+}
+}
+{
+4 | proccessing_no_roots_case
+{
+7
+{
+0 | 3
+{
+6 | 0
+}
+}
+{
+0 | 4
+}
+}
+{
+4 | producing_a_dsp
+{
+7
+{
+0 | 0
+{
+5 | dsp
+}
+{
+1 | 1
+{
+1 | 2
+{
+5 | bricks
+}
+{
+5 | bricks
+}
+}
+{
+1 | 2
+{
+1 | 2
+{
+6 | 4
+}
+{
+5 | cement
+}
+}
+{
+5 | architector
+}
+}
+}
+}
+{
+7
+{
+3 | 0
+{
+2 | 3
+{
+5 | dsp
+}
+{
+6 | 0
+}
+}
+{
+3 | 1
+{
+7
+{
+0 | 2
+{
+5 | proccessing_no_roots_case
+}
+}
+}
+{
+7
+{
+3 | 0
+{
+2 | 4
+{
+5 | dsp
+}
+{
+6 | 0
+}
+}
+{
+3 | 1
+{
+7
+{
+0 | 2
+{
+5 | proccessing_one_root_case
+}
+}
+}
+{
+7
+{
+0 | 2
+{
+5 | proccessing_two_roots_case
+}
+}
+}
+}
+}
+}
+}
+}
+{
+0 | 4
+}
+}
+}
+{
+4 | proccessing_one_root_case
+{
+7
+{
+0 | 3
+{
+6 | 1
+}
+}
+{
+7
+{
+0 | 3
+{
+1 | 3
+{
+1 | 2
+{
+6 | -1
+}
+{
+5 | bricks
+}
+}
+{
+1 | 2
+{
+6 | 2
+}
+{
+5 | architector
+}
+}
+}
+}
+{
+0 | 4
+}
+}
+}
+{
+4 | proccessing_two_roots_case
+{
+7
+{
+0 | 3
+{
+6 | 2
+}
+}
+{
+7
+{
+0 | 3
+{
+1 | 3
+{
+1 | 0
+{
+1 | 2
+{
+6 | -1
+}
+{
+5 | bricks
+}
+}
+{
+1 | 4
+{
+5 | dsp
+}
+{
+1 | 3
+{
+6 | 1
+}
+{
+6 | 2
+}
+}
+}
+}
+{
+1 | 2
+{
+6 | 2
+}
+{
+5 | architector
+}
+}
+}
+}
+{
+7
+{
+0 | 3
+{
+1 | 3
+{
+1 | 1
+{
+1 | 2
+{
+6 | -1
+}
+{
+5 | bricks
+}
+}
+{
+1 | 4
+{
+5 | dsp
+}
+{
+1 | 3
+{
+6 | 1
+}
+{
+6 | 2
+}
+}
+}
+}
+{
+1 | 2
+{
+6 | 2
+}
+{
+5 | architector
+}
+}
+}
+}
+{
+0 | 4
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
