@@ -24,6 +24,8 @@ org 100h
 	videoram_ptr                     equ 0b800h
 
 	white_color                      equ 07h
+	
+	beginning_message_length         equ 37
 
 Start:
 	mov ah, 00h               ; clearing screen
@@ -32,16 +34,31 @@ Start:
 
    	mov ax, 1003h             ; enabling bold backgrounds (16 bg colors)
 	mov bl, 00h
-	int 10h 
-
-	xor bh, bh
-	call ReadUserNumber    
+	int 10h
 
 	mov bx, videoram_ptr
 	mov es, bx
 
-	mov bh, length_of_frame   
-	mov bl, width_of_frame    
+	mov ch, white_color
+	xor si, si
+	mov bx, offset BeginningMessage
+
+	call PrintMessage
+
+
+	mov ah, 03h
+	xor bh, bh
+	int 10h                              ; Read cursor position
+
+	mov ah, 02h
+	add dl, beginning_message_length + 1
+	int 10h                              ; Modify cursor position
+
+	xor bh, bh
+	call ReadUserNumber
+
+	mov bh, length_of_frame
+	mov bl, width_of_frame
 
 	mov si, y_frame_coordinate * 80 * 2 + x_frame_coordinate * 2  ; si = coordinate of left upper corner
 	mov ch, frame_edge                                            ; ch = ASCCI code of symbol of edge
@@ -693,6 +710,7 @@ ReadUserNumberLoopEnd:
 
 	ret
 
+BeginningMessage db 'Print number you want to be converted', 00h
 
 BinaryMessage db 'Binary:', 00h
 
