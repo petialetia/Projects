@@ -8,8 +8,8 @@ org 100h
 	length_of_frame                  equ 33
 	width_of_frame                   equ 7
 
-	frame_color                      equ 44h
-	frame_shadow_color               equ 04h
+	frame_color                      equ 55h
+	frame_shadow_color               equ 05h
 	frame_edge                       equ 178
 
 	x_binary_number_coordinate       equ 54
@@ -179,7 +179,7 @@ DrawRectangle:
 	call DrawHorizontalLine ; DrawHorizontalLine (di, dh, cl, ch, es)
 
 	mov dh, bl
-	dec dh                  ; one of the corner pixels is already drawn
+	sub dh, 2               ; one of the corner pixels is already drawn, another will be drawn later
 	add di, 160
 
 	call DrawVerticalLine   ; DrawVerticalLine (di, dh, cl, ch, es)
@@ -192,12 +192,10 @@ DrawRectangle:
 	call DrawVerticalLine   ; DrawVerticalLine (di, dh, cl, ch, es)
 
 	mov dh, bh
-	sub dh, 2               ; both corner pixels are already drawn
+	dec dh                  ; 1 corner pixel is already drawn
 	add di, 2
 
 	call DrawHorizontalLine ; DrawHorizontalLine (di, dh, cl, ch, es)
-
-	add di, 2
 
 	ret
 
