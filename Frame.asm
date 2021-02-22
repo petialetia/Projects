@@ -8,6 +8,9 @@ org 100h
 	length_of_frame                  equ 33
 	width_of_frame                   equ 7
 
+	screen_length                    equ 80
+	screen_width                     equ 25
+
 	frame_color                      equ 55h
 	frame_shadow_color               equ 05h
 	frame_edge                       equ 178
@@ -60,23 +63,23 @@ Start:
 	mov bh, length_of_frame
 	mov bl, width_of_frame
 
-	mov si, y_frame_coordinate * 80 * 2 + x_frame_coordinate * 2  ; si = coordinate of left upper corner
-	mov ch, frame_edge                                            ; ch = ASCCI code of symbol of edge
-	mov cl, frame_color                                           ; cl = color
+	mov si, y_frame_coordinate * screen_length * 2 + x_frame_coordinate * 2  ; si = coordinate of left upper corner
+	mov ch, frame_edge                                                       ; ch = ASCCI code of symbol of edge
+	mov cl, frame_color                                                      ; cl = color
 
 	call DrawRectangle        ; DrawRectangle (si, bh, bl, cl, ch, es)
 
 	call SmallDelay
 
 	mov cl, frame_shadow_color
-	add di, 2*80+1*2
+	add di, 2 * screen_length + 1 * 2
 
 	call DrawLowerRightCorner ; Draws shadow
 
 	call SmallDelay
 
 
-	add di, 2*80+1*2
+	add di, 2 * screen_length + 1 * 2
 	dec ch
 
 	call DrawLowerRightCorner ; Draws shadow
@@ -84,7 +87,7 @@ Start:
 	call SmallDelay
 
 
-	add di, 2*80+1*2
+	add di, 2 * screen_length + 1 * 2
 	dec ch
 
 	call DrawLowerRightCorner ; Draws shadow
@@ -94,14 +97,14 @@ Start:
 
 
 	mov ch, white_color
-	mov si, 2*80*y_binary_number_coordinate + 2*(x_binary_number_coordinate - length_of_frame + 5)
+	mov si, 2 * screen_length * y_binary_number_coordinate + 2 * (x_binary_number_coordinate - length_of_frame + 5)
 	mov bx, offset BinaryMessage
 
 	call PrintMessage
 
 	call SmallDelay
 
-	mov si, 2*80*y_binary_number_coordinate + 2*x_binary_number_coordinate
+	mov si, 2 * screen_length * y_binary_number_coordinate + 2 * x_binary_number_coordinate
 
 	call WriteBinaryNumber
 
@@ -111,7 +114,7 @@ Start:
 
 
     	mov ch, white_color
-	mov si, 2*80*y_octal_number_coordinate + 2*(x_octal_number_coordinate - length_of_frame + 5)
+	mov si, 2 * screen_length * y_octal_number_coordinate + 2 * (x_octal_number_coordinate - length_of_frame + 5)
 	mov bx, offset OctalMessage
 
 	call PrintMessage
@@ -119,7 +122,7 @@ Start:
 	call SmallDelay
 
 
-	mov si, 2*80*y_octal_number_coordinate + 2*x_octal_number_coordinate
+	mov si, 2 * screen_length * y_octal_number_coordinate + 2 * x_octal_number_coordinate
 
 	call WriteOctalNumber
 
@@ -128,7 +131,7 @@ Start:
 
 
     	mov ch, white_color
-	mov si, 2*80*y_hexadecimal_number_coordinate + 2*(x_hexadecimal_number_coordinate - length_of_frame + 5)
+	mov si, 2 * screen_length * y_hexadecimal_number_coordinate + 2 * (x_hexadecimal_number_coordinate - length_of_frame + 5)
 	mov bx, offset HexadecimalMessage
 
 	call PrintMessage
@@ -136,7 +139,7 @@ Start:
 	call SmallDelay
 
 
-	mov si, 2*80*y_hexadecimal_number_coordinate + 2*x_hexadecimal_number_coordinate
+	mov si, 2 * screen_length * y_hexadecimal_number_coordinate + 2 * x_hexadecimal_number_coordinate
 
 	call WriteHexadecimalNumber
 
@@ -176,26 +179,26 @@ DrawRectangle:
 
 	mov dh, bh
 	mov di, si
-	call DrawHorizontalLine ; DrawHorizontalLine (di, dh, cl, ch, es)
+	call DrawHorizontalLine   ; DrawHorizontalLine (di, dh, cl, ch, es)
 
 	mov dh, bl
-	sub dh, 2               ; one of the corner pixels is already drawn, another will be drawn later
-	add di, 160
+	sub dh, 1 * 2             ; one of the corner pixels is already drawn, another will be drawn later
+	add di, 2 * screen_length
 
-	call DrawVerticalLine   ; DrawVerticalLine (di, dh, cl, ch, es)
+	call DrawVerticalLine     ; DrawVerticalLine (di, dh, cl, ch, es)
 
 	mov dh, bl
-	dec dh                  ; one of the corner pixels is already drawn
+	dec dh                    ; one of the corner pixels is already drawn
 	mov di, si
-	add di, 160
+	add di, 2 * screen_length
 
-	call DrawVerticalLine   ; DrawVerticalLine (di, dh, cl, ch, es)
+	call DrawVerticalLine     ; DrawVerticalLine (di, dh, cl, ch, es)
 
 	mov dh, bh
-	dec dh                  ; 1 corner pixel is already drawn
-	add di, 2
+	dec dh                    ; 1 corner pixel is already drawn
+	add di, 1 * 2
 
-	call DrawHorizontalLine ; DrawHorizontalLine (di, dh, cl, ch, es)
+	call DrawHorizontalLine   ; DrawHorizontalLine (di, dh, cl, ch, es)
 
 	ret
 
@@ -238,7 +241,7 @@ DrawHorizontalLine:
 
 	ExitDrawHorLoop:
 
-		sub di, 2                  ; coming back on 1 pixel to the left
+		sub di, 1 * 2              ; coming back on 1 pixel to the left
 
 	 	ret
 
@@ -269,10 +272,10 @@ DrawVerticalLine:
 
 	DrawVerLoop:
 
-		mov byte ptr es:[di], ch   ; print part of the edge
+		mov byte ptr es:[di], ch      ; print part of the edge
 		inc di
-		mov byte ptr es:[di], cl   ; print color of the edge
-		add di, 2*80 - 1           ; moving to next pixel down
+		mov byte ptr es:[di], cl      ; print color of the edge
+		add di, 2 * screen_length - 1 ; moving to next pixel down
 
 		dec dh
 		je ExitDrawVerLoop
@@ -281,7 +284,7 @@ DrawVerticalLine:
 
 	ExitDrawVerLoop:
 
-		sub di, 2*80               ; coming back on 1 pixel to the up
+		sub di, 2 * screen_length     ; coming back on 1 pixel to the up
 
 	 	ret
 
@@ -357,7 +360,7 @@ DrawHorizontalLineBackwards:
 		mov byte ptr es:[si], ch   ;print part of the edge
 		inc si
 		mov byte ptr es:[si], cl   ;print color of the edge
-		sub si, 3                  ;moving to next pixel on the left
+		sub si, 1 + 1 * 2          ;moving to next pixel on the left
 
 		dec dh
 
@@ -367,7 +370,7 @@ DrawHorizontalLineBackwards:
 
 	ExitDrawHorBackLoop:
 
-		add si, 2                  ;coming forth on 1 pixel to the right
+		add si, 1 * 2              ;coming forth on 1 pixel to the right
 
 	 	ret
 
@@ -398,10 +401,10 @@ DrawVerticalLineBackwards:
 
 	DrawVerBackLoop:
 
-		mov byte ptr es:[si], ch   ; print part of the edge
+		mov byte ptr es:[si], ch      ; print part of the edge
 		inc si
-		mov byte ptr es:[si], cl   ; print color of the edge
-		sub si, 161                ; moving to next pixel up
+		mov byte ptr es:[si], cl      ; print color of the edge
+		sub si, 1 + 2 * screen_length ; moving to next pixel up
 
 		dec dh
 		je ExitDrawVerBackLoop
@@ -410,7 +413,7 @@ DrawVerticalLineBackwards:
 
 	ExitDrawVerBackLoop:
 
-		sub si, 160                ; coming back on 1 pixel to the down
+		sub si, 2 * screen_length     ; coming back on 1 pixel to the down
 
 	 	ret
 
@@ -512,7 +515,7 @@ PrintBinaryFigure:
 
         call WriteDecimalFigure
 
-        sub si, 2
+        sub si, 2 * 1
 
         or bx, bx
         jne WriteBinaryNumberLoopBegin
@@ -547,7 +550,7 @@ WriteOctalNumberLoopBegin:
 
         call WriteDecimalFigure
 
-        sub si, 2
+        sub si, 2 * 1
 
         shr bx, 3
         jne WriteOctalNumberLoopBegin
@@ -582,7 +585,7 @@ WriteHexadecimalNumberLoopBegin:
 
         call WriteHexadecimalFigure
 
-        sub si, 2
+        sub si, 2 * 1
 
         shr bx, 4
         jne WriteHexadecimalNumberLoopBegin
@@ -669,7 +672,7 @@ ReadUserNumber:
 ;Reads number (up to 65535 including) you entered from keyboard,
 ;	space is sign of end
 ;
-;	!!! Warning: number greater than 65535 wil be readen incorrectly
+;	!!! Warning: number greater than 65535 will be readen incorrectly
 ;
 ;------------------------------------------------
 ;
@@ -677,7 +680,7 @@ ReadUserNumber:
 ;
 ;Exit:  ax = readen number
 ;
-;Destr: ax, bx, cx
+;Destr: ax, bx, cx, dx
 ;
 ;------------------------------------------------
 
