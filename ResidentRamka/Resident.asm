@@ -229,7 +229,6 @@ ContinueTimerInterrupt:
 EndOfTimerInterrupt:    
 
 			pop ds bx ax
-			popf
 			db 0eah
 
 old_timer_ofs           dw 0
@@ -265,7 +264,6 @@ EndOfKeyboardInterrupt:
 
 			mov byte ptr [bx], al
 			pop ds bx ax
-			popf
 			db 0eah
 
 old_keyboard_ofs        dw 0
