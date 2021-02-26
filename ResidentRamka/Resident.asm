@@ -154,7 +154,6 @@ Start:
 	int 21h
 
 my_timer_interrupt      proc
-			pushf
 			push ax bx ds 
 			
 			mov ax, cs
@@ -241,7 +240,6 @@ old_timer_seg           dw 0
 ;--------------------------------------------------------------------------------------------------
 
 my_keyboard_interrupt   proc
-			pushf
 			push ax bx ds
 
 			mov ax, cs
@@ -376,7 +374,7 @@ MESSAGE_REGISTER ss
 MESSAGE_REGISTER cs
 
 
-			include my_fun.asm
+			include MyFunc.asm
 
 EndOfProgramm:
 
