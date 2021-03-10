@@ -14,7 +14,7 @@
 
 section .bss
         
-        num_of_args                     equ 6
+        num_of_args                     equ 13
         buffer_size_in_bytes            equ 9                                          ;2
         buffer_size                     equ 512               ; 2^buffer_size_in_bytes ;4
         max_num_of_writings_from_buffer equ 36028797018963968 ; 2^64 / buffer_size     ;4611686018427387904
@@ -24,6 +24,13 @@ section .text
 global _start            
 
 _start:     
+            push 15
+            push 31
+            push '!'
+            push 100
+            push 3802
+            push LoveMsg
+            push 15
             push 31
             push '!'
             push 100
@@ -60,8 +67,7 @@ MyPrintf:
                         mov rbp, rsp
                         
                         push r12
-                        
-                        ;mov rsi
+                        push r13
 
                         mov rsi, [rbp + 8*2]
                     
@@ -79,9 +85,7 @@ MyPrintfLoopBegin:
                         
                         cmp byte [rsi], 0
                         je EndOfMyPrintf   
-                        
-                        ;call MyPrintfPullSymbolInBuffer
-                        
+                                                
                         MyPrintfPullSymbolInBufferFromReg rsi
                         
 MyPrintfIncrement:  
@@ -97,6 +101,8 @@ MyPrintfProcessVariable:
                         
                         cmp byte [rsi], 'x'
                         ja MyPrintfAtypicalParam
+                        
+                        xor r9, r9
                         
                         mov r9b, byte [rsi]
                         sub r9, 'b'
@@ -165,20 +171,10 @@ MyPrintfOctal:
 
                         mov r9d, dword [r8]
                         mov r12, MyPrintfCalculationBuffer + 32
+        
+                        mov cl, 3
                         
-MyPrintfOctalLoop:
-                        
-                        dec r12
-                        
-                        mov byte [r12], "0"
-                        
-                        mov ecx, r9d
-                        and ecx, 111b
-                        
-                        add byte [r12], cl
-                        
-                        shr r9, 3
-                        jnz MyPrintfOctalLoop
+                        call MyPrintfTranslateNumber
                         
                         call MyPrintfPullSymbolsInBufferFromCalculationBuffer                  
                         
@@ -188,26 +184,9 @@ MyPrintfHexadecimal:
                         mov r9d, dword [r8]
                         mov r12, MyPrintfCalculationBuffer + 32
                         
-MyPrintfHexadecimalLoop:
+                        mov cl, 4
                         
-                        dec r12
-                        
-                        mov byte [r12], "0"
-                        
-                        mov ecx, r9d
-                        and ecx, 1111b
-                        
-                        cmp cl, 9
-                        jna MyPrintfHexadecimalDigit
-                        
-                        add byte [r12], "a" - "9" - 1
-                        
-MyPrintfHexadecimalDigit:
-                        
-                        add byte [r12], cl
-                        
-                        shr r9, 4
-                        jnz MyPrintfHexadecimalLoop
+                        call MyPrintfTranslateNumber
                         
                         call MyPrintfPullSymbolsInBufferFromCalculationBuffer
                         
@@ -234,15 +213,6 @@ MyPrintfBinaryNoIncrement:
                         or r9, r9
                         jnz MyPrintfBinaryLoop
                         
-                        ;cmp byte [r12], 0
-                        ;je MyPrintfProcessVariableEnd
-                        
-                        ;MyPrintfPullSymbolInBufferFromReg r12
-                        
-                        ;inc r12
-                        
-                        ;jmp MyPrintfBinaryPrintLoop
-                        
                         call MyPrintfPullSymbolsInBufferFromCalculationBuffer
                         
 MyPrintfProcessVariableEnd:
@@ -254,7 +224,6 @@ MyPrintfAtypicalParam:
 
                         dec rsi
                         
-                        ;call MyPrintfPullSymbolInBuffer
                         MyPrintfPullSymbolInBufferFromReg rsi
                         
                         
@@ -265,8 +234,6 @@ MyPrintfAtypicalParam:
                         
                         cmp byte [rsi], 0
                         je EndOfMyPrintf
-                        
-                        ;call MyPrintfPullSymbolInBuffer
                         
                         MyPrintfPullSymbolInBufferFromReg rsi
                         
@@ -291,6 +258,7 @@ EndOfMyPrintf:
                         shl rax, buffer_size_in_bytes
                         add rax, rdx
                         
+                        pop r13
                         pop r12
                         
                         pop rbp
@@ -319,6 +287,21 @@ SetUpForSysWrite:
             ret
             
 MyPrintfPullSymbolInBuffer:
+
+;------------------------------------------------
+;Sets up register for syscall write
+;------------------------------------------------
+
+;Entry: rdx = offset inside buffer
+;       r9b = symbol need to be moved
+;       r10 = num of writings from buffer
+;
+;Exit:  rdx = new offser insise buffer
+;       r10 = num of writings from buffer
+;
+;Destr: r9, r11, rcx
+
+;------------------------------------------------
     
             mov byte [rdx + MyPrintfBuffer], r9b
                         
@@ -342,6 +325,18 @@ MyPrintfPullSymbolInBufferReturn:
             ret
             
 MyPrintfPullSymbolsInBufferFromCalculationBuffer:
+
+;------------------------------------------------
+;Sets up register for syscall write
+;------------------------------------------------
+
+;Entry: r12 = addres of calculation buffer
+;
+;Exit:  r12 = addres of first '\0' in calculation buffer
+;
+;Destr: r9, r11, rcx
+
+;------------------------------------------------
             
             cmp byte [r12], 0
             je MyPrintfPullSymbolsInBufferFromCalculationBufferExit
@@ -355,6 +350,28 @@ MyPrintfPullSymbolsInBufferFromCalculationBuffer:
 MyPrintfPullSymbolsInBufferFromCalculationBufferExit:
 
             ret
+            
+MyPrintfTranslateNumber:
+
+                        mov r11, 1
+                        shl r11, cl
+                        dec r11
+                        
+MyPrintfTranslateNumberLoop:
+
+                        dec r12
+                        
+                        mov r13d, r9d
+                        and r13d, r11d
+                        
+                        mov r13b, byte [r13d + MyPrintfDigitsBuffer]
+                        
+                        mov byte [r12], r13b
+                        
+                        shr r9, cl
+                        jnz MyPrintfTranslateNumberLoop
+                        
+                        ret
 
             
 section     .data
@@ -362,6 +379,10 @@ section     .data
 MyPrintfBuffer:
 
     resb buffer_size
+    
+MyPrintfDigitsBuffer:
+
+    db "0123456789ABCDEF"
     
 MyPrintfCalculationBuffer:
 
@@ -382,21 +403,7 @@ MyPrintfTable:
     times 'x' - 's' - 1 dq MyPrintfIncorrectPercent ; 't' - 'w'
     
                         dq MyPrintfHexadecimal      ;%x
-    times '~' - 'x' + 1 dq MyPrintfIncorrectPercent ; 'y' - 127
-            
-;TestMsg:        db "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!1234!!!abcdefghijklmnopqrstuvwxyz", 0x0a, 0
 
-;Msg:        db "%d == %b == %o == %x", 0x0a, 0
-
-DedMsg:      db "I %s %x%d%%%c%b", 0x0a, 0
+DedMsg:      db "I %s %x%d%%%c%b  %o %~", 0x0a, "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!1234!!!abcdefghijklmnopqrstuvwxyz", 0x0a, "I %s %x%d%%%c%b  %o %~", 0x0a, 0
 
 LoveMsg:     db "love", 0
-
-;Petya:      db "Petya", 0
-
-;Molodec:    db "Molodec", 0
-
-;TestMsg:    db "Privet", 0
-
-;01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234
-;012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!
