@@ -289,7 +289,7 @@ SetUpForSysWrite:
 MyPrintfPullSymbolInBuffer:
 
 ;------------------------------------------------
-;Sets up register for syscall write
+;Pulls char to buffer
 ;------------------------------------------------
 
 ;Entry: rdx = offset inside buffer
@@ -327,7 +327,7 @@ MyPrintfPullSymbolInBufferReturn:
 MyPrintfPullSymbolsInBufferFromCalculationBuffer:
 
 ;------------------------------------------------
-;Sets up register for syscall write
+;Pulls char from calculation buffer to writing buffer
 ;------------------------------------------------
 
 ;Entry: r12 = addres of calculation buffer
@@ -352,6 +352,18 @@ MyPrintfPullSymbolsInBufferFromCalculationBufferExit:
             ret
             
 MyPrintfTranslateNumber:
+
+;------------------------------------------------
+;Translates number, pulls it into calculation buffer
+;------------------------------------------------
+
+;Entry: cl = x, when 2^x is base of number system
+;
+;Exit:  (none)
+;
+;Destr: r9, r11, r12, r13
+
+;------------------------------------------------
 
                         mov r11, 1
                         shl r11, cl
