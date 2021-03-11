@@ -7,7 +7,7 @@
 
 %macro MyPrintfPullSymbolInWritingBufferFromReg 1
 
-        mov r9b, byte [%1]
+        mov cl, byte [%1]
         call MyPrintfPullSymbolInWritingBuffer
         
 %endmacro
@@ -56,10 +56,20 @@ MyPrintf:
 ;Entry:
 ;       last pushed value      = pointer on message
 ;       previous pushed values = values of variables in message
-;       r10 == 0 (must be)
-;       rdx == 0 (must be)
 ;
 ;Exit: (none)
+;
+;Using registers:
+;
+;       rax - temp values
+;       rcx - temp values
+;       rdx - temp values
+;       rsi - pointer on Writing bufer
+;       rdi - num of full Writing bufer writings
+;       r8  - offset inside format string
+;       r9  - offset of next value in stack
+;       r10 - temp values
+;       r11 - num of written symbols in writing buffer
 ;
 ;Destr: rsi, rax, rdi, rdx, rcx, r8, r9  
 
@@ -68,68 +78,65 @@ MyPrintf:
                         push rbp
                         mov rbp, rsp
                         
-                        push r12
-                        push r13
+                        push rbx
 
-                        mov rsi, [rbp + 8*2]
-                    
-                        mov r8, rbp                 ; r8 offset of current variable inside stack
-                        add r8, 3*8
-
-                        call SetUpForSysWrite
+                        mov r8, [rbp + 8*2]
+                        lea r9, [rbp + 8*3]
                         
-                        ;xor r10, r10                ; r10 = num of full buffer writings
-                        ;xor rdx, rdx                ; rdx = num of written symbols in buffer
+                        xor rdi, rdi
+                        xor r11, r11
+                        
+                        mov rsi, MyPrintfWritingBuffer
                         
 MyPrintfLoopBegin:
-                        cmp byte [rsi], '%'
+                        cmp byte [r8], '%'
                         je MyPrintfProcessVariable
                         
-                        cmp byte [rsi], 0
+                        cmp byte [r8], 0
                         je EndOfMyPrintf   
                                                 
-                        MyPrintfPullSymbolInWritingBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg r8
                         
 MyPrintfIncrement:  
-                        inc rsi     
+                        inc r8     
                         jmp MyPrintfLoopBegin
                         
 
 MyPrintfProcessVariable: 
-                        inc rsi     
+                        inc r8     
                         
-                        cmp byte [rsi], 'b'
+                        cmp byte [r8], 'b'
                         jb MyPrintfAtypicalParam
                         
-                        cmp byte [rsi], 'x'
+                        cmp byte [r8], 'x'
                         ja MyPrintfAtypicalParam
                         
-                        xor r9, r9
+                        xor rcx, rcx
                         
-                        mov r9b, byte [rsi]
-                        sub r9, 'b'
-                        shl r9, 3
+                        mov cl, byte [r8]
+                        sub cl, 'b'
+                        shl cl, 3
                         
-                        jmp [r9 + MyPrintfTable]
+                        jmp [rcx + MyPrintfTable]
 
 MyPrintfSymbol:
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg r8
+                        MyPrintfPullSymbolInWritingBufferFromReg r9
                         
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfString:
                         
-                        mov r12, [r8]
+                        mov r10, [r9]
                         
 MyPrintfStringLoop:
                         
-                        cmp byte [r12], 0
+                        cmp byte [r10], 0
                         je MyPrintfStringExit
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg r12
+                        MyPrintfPullSymbolInWritingBufferFromReg r10
                         
-                        inc r12
+                        inc r10
                         
                         jmp MyPrintfStringLoop
                         
@@ -138,32 +145,28 @@ MyPrintfStringExit:
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfInteger:
-                        push rdx
+                        ;push rdx
 
-                        mov eax, dword [r8]
+                        mov eax, dword [r9]
                         
                         mov rcx, 10
                         
-                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfIntegerLoop:
-                        dec r12        
+                        dec r10        
                                 
-                        mov byte [r12], "0" 
+                        mov byte [r10], "0" 
                          
                         xor rdx, rdx
                         
                         div rcx
                         
-                        add byte [r12], dl
+                        add byte [r10], dl
                         
                         or rax, rax
                         
                         jnz MyPrintfIntegerLoop
-                        
-                        pop rdx
-                        
-                        call SetUpForSysWrite
                         
                         call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer                  
                         
@@ -171,8 +174,8 @@ MyPrintfIntegerLoop:
 
 MyPrintfOctal:
 
-                        mov r9d, dword [r8]
-                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        mov eax, dword [r9]
+                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
         
                         mov cl, 3
                         
@@ -183,8 +186,8 @@ MyPrintfOctal:
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfHexadecimal:
-                        mov r9d, dword [r8]
-                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        mov eax, dword [r9]
+                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
                         mov cl, 4
                         
@@ -197,71 +200,77 @@ MyPrintfHexadecimal:
 
 MyPrintfBinary:
                         
-                        mov r9d, dword [r8]
-                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        mov ecx, dword [r9]
+                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfBinaryLoop:                        
                         
-                        dec r12
+                        dec r10
                         
-                        mov byte [r12], "0"
-                        shr r9, 1
+                        mov byte [r10], "0"
+                        shr ecx, 1
                         jnb MyPrintfBinaryNoIncrement
                         
-                        inc byte [r12]
+                        inc byte [r10]
                         
 MyPrintfBinaryNoIncrement:
 
-                        or r9, r9
+                        or ecx, ecx
                         jnz MyPrintfBinaryLoop
                         
                         call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer
                         
 MyPrintfProcessVariableEnd:
 
-                        add r8, 8
+                        add r9, 8
                         jmp MyPrintfIncrement
                         
 MyPrintfAtypicalParam:
 
-                        dec rsi
+                        dec r8
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg r8
                         
                         
-                        inc rsi
+                        inc r8
                         
-                        cmp byte [rsi], '%'
+                        cmp byte [r8], '%'
                         je MyPrintfIncrement
                         
-                        cmp byte [rsi], 0
+                        cmp byte [r8], 0
                         je EndOfMyPrintf
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg r8
                         
                         jmp MyPrintfIncrement
                         
 MyPrintfIncorrectPercent:
 
-                        dec rsi
+                        dec r8
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg r8
                         
-                        inc rsi
+                        inc r8
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg r8
                         
                         jmp MyPrintfIncrement
                         
 EndOfMyPrintf:
-                        mov rsi, MyPrintfWritingBuffer
+                        ;mov rsi, MyPrintfWritingBuffer
+                        mov rdi, r10
+                        
+                        call SetUpForSysWrite
+                        
+                        mov rdx, r11
+                        
                         syscall
+                        
                         mov rax, r10
                         shl rax, buffer_size_in_bytes
                         add rax, rdx
                         
-                        pop r13
-                        pop r12
+                        pop rbx
                         
                         pop rbp
                         
@@ -305,22 +314,24 @@ MyPrintfPullSymbolInWritingBuffer:
 
 ;------------------------------------------------
     
-            mov byte [rdx + MyPrintfWritingBuffer], r9b
+            mov byte [r11 + MyPrintfWritingBuffer], cl
                         
-            inc rdx
+            inc r11
                         
-            cmp rdx, buffer_size
+            cmp r11, buffer_size
             jne MyPrintfPullSymbolInWritingBufferReturn
                     
-            mov r9, rsi
-            mov rsi, MyPrintfWritingBuffer
+            mov r10, rdi
+            mov rdx, r11
+            
+            call SetUpForSysWrite
                         
             syscall                     ; sys write64
                         
-            mov rsi, r9                        
-            xor rdx, rdx
-            inc r10
-            mov rax, 0x01
+            mov rdi, r10
+            inc rdi
+            
+            xor r11, r11
            
 MyPrintfPullSymbolInWritingBufferReturn:           
            
@@ -340,12 +351,12 @@ MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer:
 
 ;------------------------------------------------
             
-            cmp byte [r12], 0
+            cmp byte [r10], 0
             je MyPrintfPullSymbolsInWritingBufferFromCalculationBufferExit
                     
-            MyPrintfPullSymbolInWritingBufferFromReg r12
+            MyPrintfPullSymbolInWritingBufferFromReg r10
                         
-            inc r12
+            inc r10
             
             jmp MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer 
              
@@ -367,22 +378,22 @@ MyPrintfTranslateNumber:
 
 ;------------------------------------------------
 
-                        mov r11, 1
-                        shl r11, cl
-                        dec r11
+                        mov rdx, 1
+                        shl rdx, cl
+                        dec rdx
                         
 MyPrintfTranslateNumberLoop:
 
-                        dec r12
+                        dec r10
                         
-                        mov r13d, r9d
-                        and r13d, r11d
+                        mov ebx, eax
+                        and ebx, edx
                         
-                        mov r13b, byte [r13d + MyPrintfDigitsBuffer]
+                        mov bl, byte [ebx + MyPrintfDigitsBuffer]
                         
-                        mov byte [r12], r13b
+                        mov byte [r10], bl
                         
-                        shr r9, cl
+                        shr eax, cl
                         jnz MyPrintfTranslateNumberLoop
                         
                         ret
