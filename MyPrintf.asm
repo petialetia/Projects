@@ -46,9 +46,13 @@ _start:
             push LoveMsg
             call MyPrintf
             
+            add rsp, 8
+            
             push rax
             push TestMsg
             call MyPrintf
+
+            add rsp, 8 * 2
             
             mov rax, 0x3C      ; exit64 (rdi)
             xor rdi, rdi
