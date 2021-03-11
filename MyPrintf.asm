@@ -41,7 +41,14 @@ _start:
             push DedMsg
             call MyPrintf
             
-            add rsp, 8 * num_of_args        
+            add rsp, 8 * num_of_args    
+            
+            push LoveMsg
+            call MyPrintf
+            
+            push rax
+            push TestMsg
+            call MyPrintf
             
             mov rax, 0x3C      ; exit64 (rdi)
             xor rdi, rdi
@@ -258,7 +265,7 @@ MyPrintfIncorrectPercent:
                         
 EndOfMyPrintf:
                         ;mov rsi, MyPrintfWritingBuffer
-                        mov rdi, r10
+                        mov r10, rdi
                         
                         call SetUpForSysWrite
                         
@@ -432,3 +439,5 @@ MyPrintfTable:
 DedMsg:      db "I %s %x%d%%%c%b  %o %~", 0x0a, "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!1234!!!abcdefghijklmnopqrstuvwxyz", 0x0a, "I %s %x%d%%%c%b  %o %~", 0x0a, 0
 
 LoveMsg:     db "love", 0
+
+TestMsg:     db " = %d2", 0x0a, 0
