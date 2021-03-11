@@ -7,6 +7,21 @@
 
 %macro MyPrintfPullSymbolInWritingBufferFromReg 1
 
+;------------------------------------------------
+;Pulls char from register to writing buffer
+;------------------------------------------------
+
+;Entry: 1 = register nedded to be pulled
+;       rdi = num of writings from buffer
+;       r11 = offset inside buffer           
+;
+;Exit:  rdi = num of writings from buffer
+;       r11 = new offser insise buffer
+;
+;Destr: rax, rbx, rcx, rdx
+
+;------------------------------------------------
+
         mov cl, byte [%1]
         call MyPrintfPullSymbolInWritingBuffer
         
@@ -15,9 +30,8 @@
 section .bss
         
         num_of_args                     equ 13
-        buffer_size_in_bytes            equ 9                                          ;2
-        buffer_size                     equ 512               ; 2^buffer_size_in_bytes ;4
-        max_num_of_writings_from_buffer equ 36028797018963968 ; 2^64 / buffer_size     ;4611686018427387904
+        buffer_size_power2              equ 9                                          ;2
+        buffer_size                     equ 512                 ; 2^buffer_size_power2 ;4
         
         calculation_buffer_size         equ 33
 
@@ -286,7 +300,7 @@ EndOfMyPrintf:
                         syscall
                         
                         mov rax, r10
-                        shl rax, buffer_size_in_bytes
+                        shl rax, buffer_size_power2
                         add rax, rdx
                         
                         pop rbx
@@ -319,7 +333,7 @@ SetUpForSysWrite:
 MyPrintfPullSymbolInWritingBuffer:
 
 ;------------------------------------------------
-;Pulls char to buffer
+;Pulls char to writing buffer
 ;------------------------------------------------
 
 ;Entry: cl  = symbol need to be moved
@@ -329,7 +343,7 @@ MyPrintfPullSymbolInWritingBuffer:
 ;Exit:  rdi = num of writings from buffer
 ;       r11 = new offser insise buffer
 ;
-;Destr: rax, rcx, rdx, r10
+;Destr: rax, rbx, rcx, rdx
 
 ;------------------------------------------------
     
@@ -340,14 +354,14 @@ MyPrintfPullSymbolInWritingBuffer:
             cmp r11, buffer_size
             jne MyPrintfPullSymbolInWritingBufferReturn
                     
-            mov r10, rdi
+            mov rbx, rdi
             mov rdx, r11
             
             call SetUpForSysWrite
                         
             syscall                     ; sys write64
                         
-            mov rdi, r10
+            mov rdi, rbx
             inc rdi
             
             xor r11, r11
@@ -366,7 +380,7 @@ MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer:
 ;
 ;Exit:  r10 = addres of first '\0' in calculation buffer
 ;
-;Destr: rax, rcx, rdx, r10
+;Destr: rax, rbx, rcx, rdx, r10
 
 ;------------------------------------------------
             
