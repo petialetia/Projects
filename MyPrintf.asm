@@ -5,10 +5,10 @@
 ; nasm -f elf64 -l 1-nasm.lst 1-nasm.s  ;  ld -s -o 1-nasm 1-nasm.o
 
 
-%macro MyPrintfPullSymbolInBufferFromReg 1
+%macro MyPrintfPullSymbolInWritingBufferFromReg 1
 
         mov r9b, byte [%1]
-        call MyPrintfPullSymbolInBuffer
+        call MyPrintfPullSymbolInWritingBuffer
         
 %endmacro
 
@@ -18,6 +18,8 @@ section .bss
         buffer_size_in_bytes            equ 9                                          ;2
         buffer_size                     equ 512               ; 2^buffer_size_in_bytes ;4
         max_num_of_writings_from_buffer equ 36028797018963968 ; 2^64 / buffer_size     ;4611686018427387904
+        
+        calculation_buffer_size         equ 33
 
 section .text
 
@@ -86,7 +88,7 @@ MyPrintfLoopBegin:
                         cmp byte [rsi], 0
                         je EndOfMyPrintf   
                                                 
-                        MyPrintfPullSymbolInBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg rsi
                         
 MyPrintfIncrement:  
                         inc rsi     
@@ -112,7 +114,7 @@ MyPrintfProcessVariable:
 
 MyPrintfSymbol:
                         
-                        MyPrintfPullSymbolInBufferFromReg r8
+                        MyPrintfPullSymbolInWritingBufferFromReg r8
                         
                         jmp MyPrintfProcessVariableEnd
 
@@ -125,7 +127,7 @@ MyPrintfStringLoop:
                         cmp byte [r12], 0
                         je MyPrintfStringExit
                         
-                        MyPrintfPullSymbolInBufferFromReg r12
+                        MyPrintfPullSymbolInWritingBufferFromReg r12
                         
                         inc r12
                         
@@ -142,7 +144,7 @@ MyPrintfInteger:
                         
                         mov rcx, 10
                         
-                        mov r12, MyPrintfCalculationBuffer + 32
+                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfIntegerLoop:
                         dec r12        
@@ -163,32 +165,32 @@ MyPrintfIntegerLoop:
                         
                         call SetUpForSysWrite
                         
-                        call MyPrintfPullSymbolsInBufferFromCalculationBuffer                  
+                        call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer                  
                         
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfOctal:
 
                         mov r9d, dword [r8]
-                        mov r12, MyPrintfCalculationBuffer + 32
+                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
         
                         mov cl, 3
                         
                         call MyPrintfTranslateNumber
                         
-                        call MyPrintfPullSymbolsInBufferFromCalculationBuffer                  
+                        call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer                  
                         
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfHexadecimal:
                         mov r9d, dword [r8]
-                        mov r12, MyPrintfCalculationBuffer + 32
+                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
                         mov cl, 4
                         
                         call MyPrintfTranslateNumber
                         
-                        call MyPrintfPullSymbolsInBufferFromCalculationBuffer
+                        call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer
                         
 
                         jmp MyPrintfProcessVariableEnd
@@ -196,7 +198,7 @@ MyPrintfHexadecimal:
 MyPrintfBinary:
                         
                         mov r9d, dword [r8]
-                        mov r12, MyPrintfCalculationBuffer + 32
+                        mov r12, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfBinaryLoop:                        
                         
@@ -213,7 +215,7 @@ MyPrintfBinaryNoIncrement:
                         or r9, r9
                         jnz MyPrintfBinaryLoop
                         
-                        call MyPrintfPullSymbolsInBufferFromCalculationBuffer
+                        call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer
                         
 MyPrintfProcessVariableEnd:
 
@@ -224,7 +226,7 @@ MyPrintfAtypicalParam:
 
                         dec rsi
                         
-                        MyPrintfPullSymbolInBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg rsi
                         
                         
                         inc rsi
@@ -235,7 +237,7 @@ MyPrintfAtypicalParam:
                         cmp byte [rsi], 0
                         je EndOfMyPrintf
                         
-                        MyPrintfPullSymbolInBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg rsi
                         
                         jmp MyPrintfIncrement
                         
@@ -243,16 +245,16 @@ MyPrintfIncorrectPercent:
 
                         dec rsi
                         
-                        MyPrintfPullSymbolInBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg rsi
                         
                         inc rsi
                         
-                        MyPrintfPullSymbolInBufferFromReg rsi
+                        MyPrintfPullSymbolInWritingBufferFromReg rsi
                         
                         jmp MyPrintfIncrement
                         
 EndOfMyPrintf:
-                        mov rsi, MyPrintfBuffer
+                        mov rsi, MyPrintfWritingBuffer
                         syscall
                         mov rax, r10
                         shl rax, buffer_size_in_bytes
@@ -286,7 +288,7 @@ SetUpForSysWrite:
 
             ret
             
-MyPrintfPullSymbolInBuffer:
+MyPrintfPullSymbolInWritingBuffer:
 
 ;------------------------------------------------
 ;Pulls char to buffer
@@ -303,15 +305,15 @@ MyPrintfPullSymbolInBuffer:
 
 ;------------------------------------------------
     
-            mov byte [rdx + MyPrintfBuffer], r9b
+            mov byte [rdx + MyPrintfWritingBuffer], r9b
                         
             inc rdx
                         
             cmp rdx, buffer_size
-            jne MyPrintfPullSymbolInBufferReturn
+            jne MyPrintfPullSymbolInWritingBufferReturn
                     
             mov r9, rsi
-            mov rsi, MyPrintfBuffer
+            mov rsi, MyPrintfWritingBuffer
                         
             syscall                     ; sys write64
                         
@@ -320,11 +322,11 @@ MyPrintfPullSymbolInBuffer:
             inc r10
             mov rax, 0x01
            
-MyPrintfPullSymbolInBufferReturn:           
+MyPrintfPullSymbolInWritingBufferReturn:           
            
             ret
             
-MyPrintfPullSymbolsInBufferFromCalculationBuffer:
+MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer:
 
 ;------------------------------------------------
 ;Pulls char from calculation buffer to writing buffer
@@ -339,15 +341,15 @@ MyPrintfPullSymbolsInBufferFromCalculationBuffer:
 ;------------------------------------------------
             
             cmp byte [r12], 0
-            je MyPrintfPullSymbolsInBufferFromCalculationBufferExit
+            je MyPrintfPullSymbolsInWritingBufferFromCalculationBufferExit
                     
-            MyPrintfPullSymbolInBufferFromReg r12
+            MyPrintfPullSymbolInWritingBufferFromReg r12
                         
             inc r12
             
-            jmp MyPrintfPullSymbolsInBufferFromCalculationBuffer 
+            jmp MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer 
              
-MyPrintfPullSymbolsInBufferFromCalculationBufferExit:
+MyPrintfPullSymbolsInWritingBufferFromCalculationBufferExit:
 
             ret
             
@@ -388,7 +390,7 @@ MyPrintfTranslateNumberLoop:
             
 section     .data
 
-MyPrintfBuffer:
+MyPrintfWritingBuffer:
 
     resb buffer_size
     
@@ -398,7 +400,7 @@ MyPrintfDigitsBuffer:
     
 MyPrintfCalculationBuffer:
 
-    resb 33             ; for int and '\0'
+    resb calculation_buffer_size             ; for int and '\0'
 
 
 MyPrintfTable:
