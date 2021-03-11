@@ -167,8 +167,6 @@ MyPrintfStringExit:
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfInteger:
-                        ;push rdx
-
                         mov eax, dword [r9]
                         
                         mov rcx, 10
@@ -279,7 +277,6 @@ MyPrintfIncorrectPercent:
                         jmp MyPrintfIncrement
                         
 EndOfMyPrintf:
-                        ;mov rsi, MyPrintfWritingBuffer
                         mov r10, rdi
                         
                         call SetUpForSysWrite
@@ -325,14 +322,14 @@ MyPrintfPullSymbolInWritingBuffer:
 ;Pulls char to buffer
 ;------------------------------------------------
 
-;Entry: rdx = offset inside buffer
-;       r9b = symbol need to be moved
-;       r10 = num of writings from buffer
+;Entry: cl  = symbol need to be moved
+;       rdi = num of writings from buffer
+;       r11 = offset inside buffer           
 ;
-;Exit:  rdx = new offser insise buffer
-;       r10 = num of writings from buffer
+;Exit:  rdi = num of writings from buffer
+;       r11 = new offser insise buffer
 ;
-;Destr: r9, r11, rcx
+;Destr: rax, rcx, rdx, r10
 
 ;------------------------------------------------
     
@@ -365,11 +362,11 @@ MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer:
 ;Pulls char from calculation buffer to writing buffer
 ;------------------------------------------------
 
-;Entry: r12 = addres of calculation buffer
+;Entry: r10 = addres of calculation buffer
 ;
-;Exit:  r12 = addres of first '\0' in calculation buffer
+;Exit:  r10 = addres of first '\0' in calculation buffer
 ;
-;Destr: r9, r11, rcx
+;Destr: rax, rcx, rdx, r10
 
 ;------------------------------------------------
             
@@ -392,11 +389,13 @@ MyPrintfTranslateNumber:
 ;Translates number, pulls it into calculation buffer
 ;------------------------------------------------
 
-;Entry: cl = x, when 2^x is base of number system
+;Entry: eax = number needed to be transleted
+;       cl  = x, when 2^x is base of number system
+;       r10 = pointer on calculation buffer
 ;
-;Exit:  (none)
+;Exit:  r10 = pointer on translated number
 ;
-;Destr: r9, r11, r12, r13
+;Destr: ebx, rdx,
 
 ;------------------------------------------------
 
