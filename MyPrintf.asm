@@ -232,7 +232,6 @@ MyPrintfHexadecimal:
                         
                         call MyPrintfPullSymbolsInWritingBufferFromCalculationBuffer
                         
-
                         jmp MyPrintfProcessVariableEnd
 
 MyPrintfBinary:
@@ -266,7 +265,6 @@ MyPrintfAtypicalParam:
                         dec r8
                         
                         MyPrintfPullSymbolInWritingBufferFromReg r8
-                        
                         
                         inc r8
                         
@@ -435,7 +433,6 @@ MyPrintfTranslateNumberLoop:
                         
                         ret
 
-            
 section     .data
 
 MyPrintfWritingBuffer:
