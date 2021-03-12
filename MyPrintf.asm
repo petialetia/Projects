@@ -98,7 +98,7 @@ MyPrintf:
 ;Using registers:
 ;
 ;       rax - temp values
-;       tbx - temp values
+;       rbx - temp values
 ;       rcx - temp values
 ;       rdx - temp values
 ;       rsi - pointer on Writing buffer
