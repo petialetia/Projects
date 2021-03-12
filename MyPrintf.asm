@@ -101,11 +101,11 @@ MyPrintf:
 ;       tbx - temp values
 ;       rcx - temp values
 ;       rdx - temp values
-;       rsi - pointer on Writing bufer
-;       rdi - num of full Writing bufer writings
+;       rsi - pointer on Writing buffer
+;       rdi - num of full Writing buffer writings
 ;       r8  - offset inside format string
 ;       r9  - offset of next value in stack
-;       r10 - temp values
+;       r10 - pointer on Calculation buffer
 ;       r11 - num of written symbols in writing buffer
 ;
 ;Destr: rsi, rax, rdi, rdx, rcx, r8, r9  
@@ -124,6 +124,7 @@ MyPrintf:
                         xor r11, r11
                         
                         mov rsi, MyPrintfWritingBuffer
+                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfLoopBegin:
                         cmp byte [r8], '%'
@@ -164,16 +165,16 @@ MyPrintfSymbol:
 
 MyPrintfString:
                         
-                        mov r10, [r9]
+                        mov rbx, [r9]
                         
 MyPrintfStringLoop:
                         
-                        cmp byte [r10], 0
+                        cmp byte [rbx], 0
                         je MyPrintfStringExit
                         
-                        MyPrintfPullSymbolInWritingBufferFromReg r10
+                        MyPrintfPullSymbolInWritingBufferFromReg rbx
                         
-                        inc r10
+                        inc rbx
                         
                         jmp MyPrintfStringLoop
                         
@@ -186,7 +187,7 @@ MyPrintfInteger:
                         
                         mov rcx, 10
                         
-                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfIntegerLoop:
                         dec r10        
@@ -210,7 +211,7 @@ MyPrintfIntegerLoop:
 MyPrintfOctal:
 
                         mov eax, dword [r9]
-                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
         
                         mov cl, 3
                         
@@ -222,7 +223,7 @@ MyPrintfOctal:
 
 MyPrintfHexadecimal:
                         mov eax, dword [r9]
-                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
                         mov cl, 4
                         
@@ -236,7 +237,7 @@ MyPrintfHexadecimal:
 MyPrintfBinary:
                         
                         mov ecx, dword [r9]
-                        mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
+                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfBinaryLoop:                        
                         
@@ -465,11 +466,11 @@ MyPrintfTable:
     
                         dq MyPrintfHexadecimal      ;%x
 
-DedMsg:      db "I %s %x%d%%%c%b  %o %~", 0x0a, "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!1234!!!abcdefghijklmnopqrstuvwxyz", 0x0a, "I %s %x%d%%%c%b  %o %~", 0x0a, 0
+DedMsg:      db "I %s %x%d%%%c%b  %o %~", 0x0a, "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!1234!!!abcdefghijklmnopqrstuvwxyz", 0x0a, "I %s %x%d%%%c%b  %o %!", 0x0a, 0
 
 LoveMsg:     db "love", 0
 
-TestMsg:     db " = %d2", 0x0a, 0
+TestMsg:     db " == %d2", 0x0a, 0
 
 TestMsg1:    db "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890!1234", 0 ;516
 
