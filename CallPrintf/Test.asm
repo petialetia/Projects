@@ -1,4 +1,4 @@
-; nasm -f elf64 -l Test.lst Test.asm ; gcc -no-pie -o Test Test.o ; ./Test
+; nasm -f elf64 -l Test.lst Test.asm && gcc -no-pie -o Test Test.o && ./Test
 ; Get your "Segmentation fault (core dumped)""
 
 global main
