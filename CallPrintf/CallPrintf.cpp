@@ -1,4 +1,4 @@
-//nasm -f elf64 -l MyPrintf.lst MyPrintf.asm // gcc -no-pie -o CallPrintf CallPrintf.cpp Printf.o // ./CallPrintf
+//nasm -f elf64 -l MyPrintf.lst MyPrintf.asm && gcc -no-pie -o CallPrintf CallPrintf.cpp Printf.o && ./CallPrintf
 
 #include <stdio.h>
 

@@ -1,4 +1,4 @@
-; nasm -f elf64 -l PrintfFromAsm.lst PrintfFromAsm.asm ; gcc -no-pie -o PrintfFromAsm PrintfFromAsm.o ; ./PrintfFromAsm
+; nasm -f elf64 -l PrintfFromAsm.lst PrintfFromAsm.asm && gcc -no-pie -o PrintfFromAsm PrintfFromAsm.o && ./PrintfFromAsm
 
 global main
 extern printf
