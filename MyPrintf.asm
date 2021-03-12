@@ -1,8 +1,13 @@
 ;:================================================
-;: 0-Linux-nasm-64.s                   (c)Ded,2012
+;: My own printf with unique option: 
+;;         %b - it prints number in binary format.
+;;
+;; Use it wisely!!!
+;;                              (c)petialetia,2021
 ;:================================================
 
-; nasm -f elf64 -l 1-nasm.lst 1-nasm.s  ;  ld -s -o 1-nasm 1-nasm.o
+; nasm -f elf64 -l MyPrintf.lst MyPrintf.asm ; ld -s -o MyPrintf  MyPrintf.o ; ./MyPrintf
+
 
 
 %macro MyPrintfPullSymbolInWritingBufferFromReg 1
@@ -30,8 +35,8 @@
 section .bss
         
         num_of_args                     equ 13
-        buffer_size_power2              equ 9                                          ;2
-        buffer_size                     equ 512                 ; 2^buffer_size_power2 ;4
+        buffer_size_power2              equ 9 
+        buffer_size                     equ 512                 
         
         calculation_buffer_size         equ 33
 
@@ -187,8 +192,6 @@ MyPrintfInteger:
                         
                         mov rcx, 10
                         
-                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
-                        
 MyPrintfIntegerLoop:
                         dec r10        
                                 
@@ -211,7 +214,6 @@ MyPrintfIntegerLoop:
 MyPrintfOctal:
 
                         mov eax, dword [r9]
-                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
         
                         mov cl, 3
                         
@@ -223,7 +225,6 @@ MyPrintfOctal:
 
 MyPrintfHexadecimal:
                         mov eax, dword [r9]
-                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
                         mov cl, 4
                         
@@ -237,7 +238,6 @@ MyPrintfHexadecimal:
 MyPrintfBinary:
                         
                         mov ecx, dword [r9]
-                        ;mov r10, MyPrintfCalculationBuffer + calculation_buffer_size - 1
                         
 MyPrintfBinaryLoop:                        
                         
