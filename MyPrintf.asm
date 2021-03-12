@@ -6,7 +6,7 @@
 ;;                              (c)petialetia,2021
 ;:================================================
 
-; nasm -f elf64 -l MyPrintf.lst MyPrintf.asm ; ld -s -o MyPrintf  MyPrintf.o ; ./MyPrintf
+; nasm -f elf64 -l MyPrintf.lst MyPrintf.asm && ld -s -o MyPrintf  MyPrintf.o && ./MyPrintf
 
 
 
@@ -265,7 +265,7 @@ MyPrintfAtypicalParam:
                         dec r8
                         
                         MyPrintfPullSymbolInWritingBufferFromReg r8
-                        
+    
                         inc r8
                         
                         cmp byte [r8], '%'
@@ -432,7 +432,7 @@ MyPrintfTranslateNumberLoop:
                         jnz MyPrintfTranslateNumberLoop
                         
                         ret
-
+            
 section     .data
 
 MyPrintfWritingBuffer:
