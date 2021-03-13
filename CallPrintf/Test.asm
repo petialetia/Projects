@@ -25,7 +25,7 @@ main:
         xor rax, rax
         call printf
 
-        mov rsp, 8*7
+        add rsp, 8*7
 
         mov rax, 0x3c
         xor rdi, rdi
