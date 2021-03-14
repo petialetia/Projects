@@ -207,7 +207,7 @@ MyPrintfIntegerLoop:
                         
                         jnz MyPrintfIntegerLoop 
                         
-                        call MyPrintfCopySymbolsInWritingBufferFromCalculationBuffer                  
+                        call MyPrintfCopySymbolsFromCalculationBuffer                  
                         
                         jmp MyPrintfProcessVariableEnd
 
@@ -227,7 +227,7 @@ MyPrintfProcessNumber:
                         
                         call MyPrintfTranslateNumber
                         
-                        call MyPrintfCopySymbolsInWritingBufferFromCalculationBuffer
+                        call MyPrintfCopySymbolsFromCalculationBuffer
             
                         jmp MyPrintfProcessVariableEnd
 
@@ -250,7 +250,7 @@ MyPrintfBinaryNoIncrement:
                         or ecx, ecx
                         jnz MyPrintfBinaryLoop ; translate number till there is ero in ecx
                         
-                        call MyPrintfCopySymbolsInWritingBufferFromCalculationBuffer
+                        call MyPrintfCopySymbolsFromCalculationBuffer
                         
 MyPrintfProcessVariableEnd:
 
@@ -369,7 +369,7 @@ MyPrintfCopySymbolInWritingBufferReturn:
            
                         ret
             
-MyPrintfCopySymbolsInWritingBufferFromCalculationBuffer:
+MyPrintfCopySymbolsFromCalculationBuffer:
 
 ;------------------------------------------------
 ;Copies char from calculation buffer to writing buffer
@@ -384,15 +384,15 @@ MyPrintfCopySymbolsInWritingBufferFromCalculationBuffer:
 ;------------------------------------------------
             
                         cmp byte [r10], 0 ; checking for '\0'
-                        je MyPrintfCopySymbolsInWritingBufferFromCalculationBufferExit
+                        je MyPrintfCopySymbolsFromCalculationBufferExit
                                 
                         MyPrintfCopySymbolInWritingBufferFromReg [r10] ; r10 is pointer to the end of Calculation buffer
                                     
                         inc r10
                         
-                        jmp MyPrintfCopySymbolsInWritingBufferFromCalculationBuffer 
+                        jmp MyPrintfCopySymbolsFromCalculationBuffer 
              
-MyPrintfCopySymbolsInWritingBufferFromCalculationBufferExit:
+MyPrintfCopySymbolsFromCalculationBufferExit:
 
                         ret                 
             
