@@ -17,7 +17,7 @@ global EndOfMyPrintf
 global MyPrintfIncrement
 global MyPrintfDigitsBuffer
 
-%macro MyPrintfCopySymbolInWritingBufferFromReg 1
+%macro MyPrintfCopySymbolInWritingBufferFrom 1
 
 ;------------------------------------------------
 ;Copies char from register to writing buffer
@@ -97,7 +97,7 @@ MyPrintfLoopBegin:
                         cmp byte [r8], 0           ; checking for end of format string
                         je EndOfMyPrintf   
                                                 
-                        MyPrintfCopySymbolInWritingBufferFromReg [r8] ; copy symbol
+                        MyPrintfCopySymbolInWritingBufferFrom [r8] ; copy symbol
                         
 MyPrintfIncrement:  
                         inc r8                     ; moving to the next symbol  
@@ -220,7 +220,7 @@ MyPrintfCopySymbolsFromCalculationBuffer:
                         cmp byte [r10], 0 ; checking for '\0'
                         je MyPrintfCopySymbolsFromCalculationBufferExit
                                 
-                        MyPrintfCopySymbolInWritingBufferFromReg [r10] ; r10 is pointer to the end of Calculation buffer
+                        MyPrintfCopySymbolInWritingBufferFrom [r10] ; r10 is pointer to the end of Calculation buffer
                                     
                         inc r10
                         

@@ -8,7 +8,7 @@ extern MyPrintfDigitsBuffer
 global MyPrintfTable
 global MyPrintfAtypicalParam
 
-%macro MyPrintfCopySymbolInWritingBufferFromReg 1
+%macro MyPrintfCopySymbolInWritingBufferFrom 1
 
 ;------------------------------------------------
 ;Copies char from register to writing buffer
@@ -35,7 +35,7 @@ section .text
 
 MyPrintfSymbol:
                         
-                        MyPrintfCopySymbolInWritingBufferFromReg [r9] ; copy symbol
+                        MyPrintfCopySymbolInWritingBufferFrom [r9] ; copy symbol
                         
                         jmp MyPrintfProcessVariableEnd
 
@@ -48,7 +48,7 @@ MyPrintfStringLoop:
                         cmp byte [rbx], 0          ; copy symbols from string till '\0'
                         je MyPrintfStringExit
                         
-                        MyPrintfCopySymbolInWritingBufferFromReg [rbx]
+                        MyPrintfCopySymbolInWritingBufferFrom [rbx]
                         
                         inc rbx ; move to next symbol
                         
@@ -132,7 +132,7 @@ MyPrintfAtypicalParam:
 
                         dec r8                 ; move to %
                         
-                        MyPrintfCopySymbolInWritingBufferFromReg [r8] ; copy %
+                        MyPrintfCopySymbolInWritingBufferFrom [r8] ; copy %
     
                         inc r8                 ; move to atypucal param
                         
@@ -142,7 +142,7 @@ MyPrintfAtypicalParam:
                         cmp byte [r8], 0
                         je EndOfMyPrintf
                         
-                        MyPrintfCopySymbolInWritingBufferFromReg [r8]
+                        MyPrintfCopySymbolInWritingBufferFrom [r8]
                         
                         jmp MyPrintfIncrement
                         
@@ -150,11 +150,11 @@ MyPrintfIncorrectPercent:
 
                         dec r8                  ; move to %
                         
-                        MyPrintfCopySymbolInWritingBufferFromReg [r8] ; copy %
+                        MyPrintfCopySymbolInWritingBufferFrom [r8] ; copy %
                         
                         inc r8                  ; move to incorrect param
                         
-                        MyPrintfCopySymbolInWritingBufferFromReg [r8]  ; copy incorrect param
+                        MyPrintfCopySymbolInWritingBufferFrom [r8]  ; copy incorrect param
                         
                         jmp MyPrintfIncrement
 
