@@ -1,7 +1,5 @@
 #include "ForCrack\\TXLib.h"
 
-//#pragma comment(lib, "C:\Winmm\winmm.dll")
-
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -16,6 +14,7 @@ const double TEXT_X = 600;
 const double TEXT_Y = 160;
 
 HDC PrepareScreen ();
+void PrintMessageWithPause (const char* message, double* text_y);
 int CountHash (char* buffer, size_t num_of_elems);
 int ror (int num);
 void IncorrectFileMessage (double* text_y);
@@ -27,19 +26,13 @@ int main (int argC, char* argV[])
 
     double text_y = TEXT_Y;
 
-    txTextOut (TEXT_X, text_y, "Step 1: Reading your file");
-    text_y += 20;
-
-    Sleep (1000);
+    PrintMessageWithPause ("Step 1: Reading your file", &text_y);
 
     text source = {};
 
     ProcessInput (argC, argV, &source, STANDART_INPUT_FILE);
 
-    txTextOut (TEXT_X, text_y, "Step 2: Counting hash");
-    text_y += 20;
-
-    Sleep (1000);
+    PrintMessageWithPause ("Step 2: Counting hash", &text_y);
 
     if (CountHash (source.pointer_on_buffer, source.file_length) != RIGHT_HASH)
     {
@@ -74,6 +67,14 @@ HDC PrepareScreen ()
     txSetTextAlign (TA_CENTER);
 
     return background;
+}
+
+void PrintMessageWithPause (const char* message, double* text_y)
+{
+    txTextOut (TEXT_X, *text_y, message);
+    *text_y += 20;
+
+    Sleep (1000);
 }
 
 int CountHash (char* buffer, size_t num_of_elems)
@@ -112,10 +113,7 @@ void IncorrectFileMessage (double* text_y)
 
 void CrackFile (char* buffer, size_t length, double* text_y)
 {
-    txTextOut (TEXT_X, *text_y, "Step 3: Cracking");
-    *text_y += 20;
-
-    Sleep (1000);
+    PrintMessageWithPause ("Step 3: Cracking", text_y);
 
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wconversion"
@@ -127,12 +125,9 @@ void CrackFile (char* buffer, size_t length, double* text_y)
 
     #pragma GCC diagnostic pop
 
-    txTextOut (TEXT_X, *text_y, "Step 4: ...    ");
-    *text_y += 20;
+    PrintMessageWithPause ("Step 4: ...    ", text_y);
 
-    Sleep (1000);
-
-    FILE* cracked = fopen ("cracked.com", "wb");
+    FILE* cracked = fopen ("Cracked.com", "wb");
 
     for (size_t i = 0; i < length; i++)
     {
