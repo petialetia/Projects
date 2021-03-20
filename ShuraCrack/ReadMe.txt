@@ -10,6 +10,6 @@
 
 2) Через создание кряк-версии CrackMe.com с помощью программы Crack.exe
 
-	Для этого нужно запустить Crack.exe и подать ему на ввод CrackMe.com. После работы программы создастся cracked.com, которая не будет требовать пароля, а сразу выведет "Fine, you entered successfully."
+	Для этого нужно запустить Crack.exe и подать ему на ввод CrackMe.com. После работы программы создастся Cracked.com, которая не будет требовать пароля, а сразу выведет "Fine, you entered successfully."
 
-												   powered by Ded and his TXLib 
+												 						       powered by Ded and his TXLib 
