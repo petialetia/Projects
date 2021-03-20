@@ -132,7 +132,7 @@ void CrackFile (char* buffer, size_t length, double* text_y)
 
     Sleep (1000);
 
-    FILE* cracked = fopen ("cracked.com", "wb");
+    FILE* cracked = fopen ("Cracked.com", "wb");
 
     for (size_t i = 0; i < length; i++)
     {
