@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#include "ForCrack\\TextFunctions.cpp"
+#include "ForCrack\\TextFunctions.hpp"
 
 const char* const STANDART_INPUT_FILE = "CrackMe.com";
 
@@ -132,7 +132,7 @@ void CrackFile (char* buffer, size_t length, double* text_y)
 
     Sleep (1000);
 
-    FILE* cracked = fopen ("Cracked.com", "wb");
+    FILE* cracked = fopen ("cracked.com", "wb");
 
     for (size_t i = 0; i < length; i++)
     {
