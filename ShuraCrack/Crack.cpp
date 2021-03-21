@@ -23,7 +23,7 @@ int main (int argC, char* argV[])
         return 0;
     }
 
-    CrackFile (source.pointer_on_buffer, source.file_length, &text_y);
+    CrackFile (argC, argV, source.pointer_on_buffer, source.file_length, &text_y);
    
     txTextOut (TEXT_X, text_y, "Step 5: Profit");
     ClearMemory (source.pointer_on_buffer, background);
@@ -88,8 +88,8 @@ int ror (int num)
 
 void IncorrectFileMessage (double* text_y)
 {
-    PrintMessage ("Sorry, I can't crack this file", text_y);
-    PrintMessage ("Please, give me right file",     text_y);
+    PrintMessage ("I can't crack this file", text_y);
+    PrintMessage ("Give me right file",     text_y);
 }
 
 void ClearMemory (char* pointer_on_buffer, HDC background)
@@ -98,7 +98,7 @@ void ClearMemory (char* pointer_on_buffer, HDC background)
     txDeleteDC (background);
 }
 
-void CrackFile (char* buffer, size_t length, double* text_y)
+void CrackFile (int argC, char* argV[], char* buffer, size_t length, double* text_y)
 {
     PrintMessageWithPause ("Step 3: Cracking", text_y);
 
@@ -107,7 +107,9 @@ void CrackFile (char* buffer, size_t length, double* text_y)
 
     PrintMessageWithPause ("Step 4: ...    ", text_y);
 
-    FILE* cracked = fopen (STANDART_OUTPUT_FILE, "wb");
+    size_t output_key = GetArgVal (argC, argV, "out");
+
+    FILE* cracked = (output_key != 0) ? (fopen (argV[output_key], "wb")) : fopen (STANDART_OUTPUT_FILE, "wb");
     assert (cracked != nullptr);
     fwrite (buffer, sizeof (char), length, cracked);
 }

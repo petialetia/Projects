@@ -34,4 +34,4 @@ int CountCheckSum (char* buffer, size_t num_of_elems);
 int ror (int num);
 void IncorrectFileMessage (double* text_y);
 void ClearMemory (char* pointer_on_buffer, HDC background);
-void CrackFile (char* buffer, size_t length, double* text_y);
+void CrackFile (int argC, char* argV[], char* buffer, size_t length, double* text_y);
