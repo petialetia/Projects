@@ -35,7 +35,7 @@ HDC PrepareScreen ()
 {
     txCreateWindow (LENGTH_OF_WINDOW, WIDTH_OF_WINDOW);
 
-    HDC  background = txLoadImage ("ForCrack\\Image.bmp");
+    HDC  background = txLoadImage (BACKGROUND_IMAGE);
 
     assert (background);
 

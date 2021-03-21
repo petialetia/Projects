@@ -23,6 +23,8 @@ const double NEXT_LINE_OFFSET = 20;
 const uint8_t CODE_JMP    = 0xEB;
 const uint8_t CODE_OFFSET = 0x1E;
 
+const char* const BACKGROUND_IMAGE = "ForCrack\\Image.bmp";
+
 const char* const MAIN_SOUND    = "ForCrack\\Running-in-the-90_s.wav";
 const char* const FAILURE_SOUND = "ForCrack\\FailureSound.wav";
 const char* const SUCCESS_SOUND = "ForCrack\\SuccessSound.wav";
