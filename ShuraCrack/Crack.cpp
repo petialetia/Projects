@@ -16,19 +16,13 @@ int main (int argC, char* argV[])
 
     if (CountCheckSum (source.pointer_on_buffer, source.file_length) != RIGHT_CHECK_SUM)
     {
-        IncorrectFileMessage (&text_y);
-        ClearMemory (source.pointer_on_buffer, background);
-	PlaySound (NULL, NULL, 0); // Stop playing main sound
-	PlaySound (FAILURE_SOUND, NULL, SND_ASYNC);            
+        FailureEnding (&text_y, source.pointer_on_buffer, background);
         return 0;
     }
 
     CrackFile (argC, argV, source.pointer_on_buffer, source.file_length, &text_y);
-   
-    txTextOut (TEXT_X, text_y, "Step 5: Profit");
-    ClearMemory (source.pointer_on_buffer, background);
-    PlaySound (NULL, NULL, 0); // Stop playing main sound
-    PlaySound (SUCCESS_SOUND, NULL, SND_ASYNC);
+
+    SuccessEnding (text_y, source.pointer_on_buffer, background);
 }
 
 HDC PrepareScreen ()
@@ -61,7 +55,7 @@ void PrintMessage (const char* message, double* text_y)
     *text_y += NEXT_LINE_OFFSET;
 }
 
-int CountCheckSum (char* buffer, size_t num_of_elems)  
+int CountCheckSum (char* buffer, size_t num_of_elems)
 {
     int check_sum = 0;
 
@@ -86,6 +80,14 @@ int ror (int num)
     return num;
 }
 
+void FailureEnding (double* text_y, char* pointer_on_buffer, HDC background)
+{
+    IncorrectFileMessage (text_y);
+    ClearMemory (pointer_on_buffer, background);
+    PlaySound (NULL, NULL, 0); // Stop playing main sound
+    PlaySound (FAILURE_SOUND, NULL, SND_ASYNC);
+}
+
 void IncorrectFileMessage (double* text_y)
 {
     PrintMessage ("I can't crack this file", text_y);
@@ -102,8 +104,8 @@ void CrackFile (int argC, char* argV[], char* buffer, size_t length, double* tex
 {
     PrintMessageWithPause ("Step 3: Cracking", text_y);
 
-    buffer[0] = CODE_JMP; 
-    buffer[1] = CODE_OFFSET; 
+    buffer[0] = CODE_JMP;
+    buffer[1] = CODE_OFFSET;
 
     PrintMessageWithPause ("Step 4: ...    ", text_y);
 
@@ -112,4 +114,12 @@ void CrackFile (int argC, char* argV[], char* buffer, size_t length, double* tex
     FILE* cracked = (output_key != 0) ? (fopen (argV[output_key], "wb")) : fopen (STANDART_OUTPUT_FILE, "wb");
     assert (cracked != nullptr);
     fwrite (buffer, sizeof (char), length, cracked);
+}
+
+void SuccessEnding (double text_y, char* pointer_on_buffer, HDC background)
+{
+    txTextOut (TEXT_X, text_y, "Step 5: Profit");
+    ClearMemory (pointer_on_buffer, background);
+    PlaySound (NULL, NULL, 0); // Stop playing main sound
+    PlaySound (SUCCESS_SOUND, NULL, SND_ASYNC);
 }

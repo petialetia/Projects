@@ -34,6 +34,8 @@ void PrintMessageWithPause (const char* message, double* text_y);
 void PrintMessage (const char* message, double* text_y);
 int CountCheckSum (char* buffer, size_t num_of_elems);
 int ror (int num);
+void FailureEnding (double* text_y, char* pointer_on_buffer, HDC background);
 void IncorrectFileMessage (double* text_y);
 void ClearMemory (char* pointer_on_buffer, HDC background);
 void CrackFile (int argC, char* argV[], char* buffer, size_t length, double* text_y);
+void SuccessEnding (double text_y, char* pointer_on_buffer, HDC background);
