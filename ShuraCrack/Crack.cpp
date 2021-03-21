@@ -1,60 +1,39 @@
-#include "ForCrack\\TXLib.h"
-
-#include <windows.h>
-#include <mmsystem.h>
-
-#include "ForCrack\\TextFunctions.hpp"
-
-const char* const STANDART_INPUT_FILE = "CrackMe.com";
-
-const int RIGHT_HASH = 12163;
-
-const double TEXT_X = 600;
-
-const double TEXT_Y = 160;
-
-HDC PrepareScreen ();
-void PrintMessageWithPause (const char* message, double* text_y);
-int CountHash (char* buffer, size_t num_of_elems);
-int ror (int num);
-void IncorrectFileMessage (double* text_y);
-void CrackFile (char* buffer, size_t length, double* text_y);
+#include "Crack.hpp"
 
 int main (int argC, char* argV[])
 {
     HDC background = PrepareScreen ();
 
-    double text_y = TEXT_Y;
+    PlaySound (MAIN_SOUND, NULL, SND_ASYNC + SND_LOOP);
 
+    double text_y = START_TEXT_Y;
     PrintMessageWithPause ("Step 1: Reading your file", &text_y);
 
     text source = {};
-
     ProcessInput (argC, argV, &source, STANDART_INPUT_FILE);
 
     PrintMessageWithPause ("Step 2: Counting hash", &text_y);
 
-    if (CountHash (source.pointer_on_buffer, source.file_length) != RIGHT_HASH)
+    if (CountCheckSum (source.pointer_on_buffer, source.file_length) != RIGHT_CHECK_SUM)
     {
         IncorrectFileMessage (&text_y);
-        free (source.pointer_on_buffer);
-        txDeleteDC (background);
+        ClearMemory (source.pointer_on_buffer, background);
+	PlaySound (NULL, NULL, 0); // Stop playing main sound
+	PlaySound (FAILURE_SOUND, NULL, SND_ASYNC);            
         return 0;
     }
 
     CrackFile (source.pointer_on_buffer, source.file_length, &text_y);
-    free (source.pointer_on_buffer);
-
+   
     txTextOut (TEXT_X, text_y, "Step 5: Profit");
-
-    txDeleteDC (background);
+    ClearMemory (source.pointer_on_buffer, background);
+    PlaySound (NULL, NULL, 0); // Stop playing main sound
+    PlaySound (SUCCESS_SOUND, NULL, SND_ASYNC);
 }
 
 HDC PrepareScreen ()
 {
-    sndPlaySound ("ForCrack\\Running-in-the-90_s.wav", SND_ASYNC + SND_LOOP);
-
-    txCreateWindow (1200, 675);
+    txCreateWindow (LENGTH_OF_WINDOW, WIDTH_OF_WINDOW);
 
     HDC  background = txLoadImage ("ForCrack\\Image.bmp");
 
@@ -71,23 +50,28 @@ HDC PrepareScreen ()
 
 void PrintMessageWithPause (const char* message, double* text_y)
 {
-    txTextOut (TEXT_X, *text_y, message);
-    *text_y += 20;
+    PrintMessage (message, text_y);
 
     Sleep (1000);
 }
 
-int CountHash (char* buffer, size_t num_of_elems)
+void PrintMessage (const char* message, double* text_y)
 {
-    int hash = 0;
+    txTextOut (TEXT_X, *text_y, message);
+    *text_y += NEXT_LINE_OFFSET;
+}
+
+int CountCheckSum (char* buffer, size_t num_of_elems)  
+{
+    int check_sum = 0;
 
     for (size_t i = 0; i < num_of_elems; i++)
     {
-        hash += buffer[i];
-        ror (hash);
+        check_sum += buffer[i];
+        ror (check_sum);
     }
 
-    return hash;
+    return check_sum;
 }
 
 int ror (int num)
@@ -104,33 +88,26 @@ int ror (int num)
 
 void IncorrectFileMessage (double* text_y)
 {
-    txTextOut (TEXT_X, *text_y, "Sorry, I can't crack this file");
-    *text_y += 20;
+    PrintMessage ("Sorry, I can't crack this file", text_y);
+    PrintMessage ("Please, give me right file",     text_y);
+}
 
-    txTextOut (TEXT_X, *text_y, "Please, give me right file");
-    *text_y += 20;
+void ClearMemory (char* pointer_on_buffer, HDC background)
+{
+    free (pointer_on_buffer);
+    txDeleteDC (background);
 }
 
 void CrackFile (char* buffer, size_t length, double* text_y)
 {
     PrintMessageWithPause ("Step 3: Cracking", text_y);
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wconversion"
-
-    //disabling warning for meaning of my replacement to be more clear
-
-    buffer[0] = 0xEB; //jmp
-    buffer[1] = 0x1E; //offset for jmp
-
-    #pragma GCC diagnostic pop
+    buffer[0] = CODE_JMP; 
+    buffer[1] = CODE_OFFSET; 
 
     PrintMessageWithPause ("Step 4: ...    ", text_y);
 
-    FILE* cracked = fopen ("Cracked.com", "wb");
-
-    for (size_t i = 0; i < length; i++)
-    {
-        fprintf (cracked, "%c", buffer[i]);
-    }
+    FILE* cracked = fopen (STANDART_OUTPUT_FILE, "wb");
+    assert (cracked != nullptr);
+    fwrite (buffer, sizeof (char), length, cracked);
 }

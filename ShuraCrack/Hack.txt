@@ -1,3 +1,2 @@
 00000000000000000000000000000000000000000000000000000000Fine, you entered successfully.$
-Hi! Write the password to sing in: 
-Sorry, but the access denied. The password is wrong.
+

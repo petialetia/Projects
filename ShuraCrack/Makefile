@@ -3,7 +3,7 @@ options = -Wall -Wextra
 run: Crack.exe
 	Crack.exe
 
-Crack.exe : Crack.cpp ForCrack\TextFunctions.o 
+Crack.exe : Crack.cpp Crack.hpp ForCrack\TextFunctions.o 
 	g++ Crack.cpp ForCrack\TextFunctions.o -mconsole ForCrack\winmm.dll -o Crack.exe $(options)
 
 TextFunctions.o : ForCrack\TextFunctions.cpp ForCrack\TextFunctions.hpp
