@@ -47,9 +47,9 @@ int main ()
                 float current_x = start_x;
                 float current_y = start_y;
 
-                int i = 0;
+                int counter = 0;
 
-                for (; i < MAX_COUNTER; i++)
+                for (; counter < MAX_COUNTER; counter++)
                 {
                     float x_squared = current_x*current_x,
                           y_squared = current_y*current_y,
@@ -63,7 +63,7 @@ int main ()
                     current_y = xy + xy + start_y;
                 }
 
-                screen[i_y][i_x] = { (i%255) * i / 255, i%255, 0};
+                screen[i_y][i_x] = { (counter%255) * counter / 255, counter%255, 0};
                 //screen[i_y][i_x] = {i, i, i};
             }
         }
