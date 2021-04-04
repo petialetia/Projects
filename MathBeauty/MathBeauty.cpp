@@ -1,136 +1,40 @@
-#include <immintrin.h>
-#include <time.h>
-#include <SDL2/SDL.h>
-
-const int SCREEN_LENGTH = 768;//1200;
-const int SCREEN_WIDTH  = 512;//800;
-
-const float ZERO_POINT_X = 2 * SCREEN_LENGTH / 3;//800.f;
-const float ZERO_POINT_Y = SCREEN_WIDTH / 2;//400.f;
-
-const float START_SCALE = SCREEN_WIDTH / 2;//400;
-
-//const int SCALE_INCREASING = 1.5;
-
-const float SCALE_INCREASING = 1.1;
-
-const float MAX_R = 1000;
-
-const __m256 MAX_R_VECTOR = _mm256_set1_ps (1000.f);
-
-const int MAX_COUNTER = 256;
-
-const int ESC_SCAN_CODE = 41;
-
-const int UP_SCAN_CODE    = 26;
-const int DOWN_SCAN_CODE  = 22;
-const int LEFT_SCAN_CODE  = 4;
-const int RIGHT_SCAN_CODE = 7;
-const int PLUS_SCAN_CODE  = 8;
-const int MINUS_SCAN_CODE = 20;
-
-const int BYTE_SIZE = 8;
-
-const int TITLE_SIZE = 100;
-
-const int VECTOR_SIZE = 8;
-
-struct sdl_window_info
-{
-    SDL_Window*   window   = nullptr;
-    SDL_Renderer* renderer = nullptr;
-    SDL_Surface*  surface  = nullptr;
-};
-
-struct screen_info
-{
-    float center_pixel_x = 0;
-    float center_pixel_y = 0;
-    float scale          = 0;
-};
-
-void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info);
-
-void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color);
-uint32_t Color (unsigned char red, unsigned char green, unsigned char blue, unsigned char a = 255);
-
-void MoveSet (SDL_Event* event, screen_info* scr_info);
-
-void WriteFPS (sdl_window_info* win_info, int fps);
+#include "MathBeauty.hpp"
 
 int main ()
 {
     sdl_window_info win_info {};
-
-    win_info.window = SDL_CreateWindow ("Test", /*1920 + */(1920 - SCREEN_LENGTH)/2, (1080 - SCREEN_WIDTH)/2, SCREEN_LENGTH, SCREEN_WIDTH, SDL_WINDOW_MAXIMIZED);
-
-    /*if (win_info.window == nullptr)
-    {
-	    std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
-	    return 1;
-    }*/    
-
-    win_info.renderer = SDL_CreateRenderer (win_info.window, -1, SDL_RENDERER_ACCELERATED);
-
-    win_info.surface = SDL_GetWindowSurface (win_info.window); 
-
-    SDL_Event event = {};
-
-    /*for (int x = 0; x < SCREEN_LENGTH; x++)
-    {
-        for (int y = 0; y < SCREEN_WIDTH; y++)
-        {
-            SetPixel (&win_info, x, y, Color (0, 0, 0));
-        }
-    }*/
-
-    //SetPixel (&win_info, 0, 0, Color (255, 255, 255));
-
-    SDL_UpdateWindowSurface (win_info.window);
+    OpenWindowWithSurface (&win_info);
 
     screen_info scr_info = {(SCREEN_LENGTH/2 - ZERO_POINT_X)/START_SCALE, (SCREEN_WIDTH/2 - ZERO_POINT_Y)/START_SCALE, 1/START_SCALE};
-
-    //printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
-
-    //printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH * scr_info.scale / 2, scr_info.center_pixel_x - SCREEN_LENGTH * scr_info.scale / 2 );
+    SDL_Event event = {};
 
     bool is_programm_ended = false;
 
     while (!is_programm_ended)
     {
-        clock_t start_time = clock ();
-
-        CalculateMandelbrot (&win_info, &scr_info);
-        SDL_UpdateWindowSurface (win_info.window);
-
-        clock_t end_time = clock ();
-
-        WriteFPS (&win_info, CLOCKS_PER_SEC / (end_time - start_time));
-
-        while (SDL_PollEvent (&event))
-        {
-            if (event.type == SDL_QUIT) 
-            {
-                SDL_DestroyWindow (win_info.window);
-                SDL_Quit();
-                is_programm_ended = true;
-            }
-            else 
-            {
-                if (event.type == SDL_KEYDOWN)
-                {
-                    if (event.key.keysym.scancode == ESC_SCAN_CODE) 
-                    {
-                        SDL_DestroyWindow (win_info.window);
-                        SDL_Quit();
-                        is_programm_ended = true;
-                    }
-                    else MoveSet (&event, &scr_info);
-                }
-            }
-        }
+        DrawFrame (&win_info, &scr_info);
+        CheckEvent (&win_info, &scr_info, &event, &is_programm_ended);
     }
 
+}
+
+void OpenWindowWithSurface (sdl_window_info* win_info)
+{
+    win_info->window = SDL_CreateWindow ("Mandelbrot", (1920 - SCREEN_LENGTH)/2, (1080 - SCREEN_WIDTH)/2, SCREEN_LENGTH, SCREEN_WIDTH, SDL_WINDOW_MAXIMIZED);
+
+    win_info->surface = SDL_GetWindowSurface (win_info->window); 
+}
+
+void DrawFrame (sdl_window_info* win_info, screen_info* scr_info)
+{
+    clock_t start_time = clock ();
+
+    CalculateMandelbrot (win_info, scr_info);
+    SDL_UpdateWindowSurface (win_info->window);
+
+    clock_t end_time = clock ();
+
+    WriteFPS (win_info, CLOCKS_PER_SEC / (end_time - start_time));
 }
 
 void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
@@ -153,51 +57,34 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
             {
                 started_x_array[i] = start_x + ((float) i)*step_x;
                 started_y_array[i] = start_y;
-
-                //started_x_array[i] = (i + i_x - SCREEN_LENGTH / 2) * scr_info->scale - scr_info->center_pixel_x;
-                //started_y_array[i] = (i + i_y - SCREEN_WIDTH  / 2) * scr_info->scale - scr_info->center_pixel_y;
             }
 
-            __m256 started_x = _mm256_load_ps (started_x_array);
-            __m256 started_y = _mm256_load_ps (started_y_array);
+            __m256 started_x = _mm256_load_ps (started_x_array),
+                   started_y = _mm256_load_ps (started_y_array);
 
-            __m256 current_x = _mm256_setzero_ps ();
-            __m256 current_y = _mm256_setzero_ps ();
+            __m256 current_x = _mm256_setzero_ps (),
+                   current_y = _mm256_setzero_ps ();
 
             int counters[VECTOR_SIZE] = {0};
 
             for (int main_counter = 0; main_counter < MAX_COUNTER; main_counter++)
             {
-                __m256 x_squared = _mm256_mul_ps (current_x, current_x);
-                __m256 y_squared = _mm256_mul_ps (current_y, current_y);
+                __m256 x_squared = _mm256_mul_ps (current_x, current_x),
+                       y_squared = _mm256_mul_ps (current_y, current_y);
 
-                __m256 r_squared = _mm256_add_ps (x_squared, y_squared);
-
-                int mask = _mm256_movemask_ps (_mm256_cmp_ps (r_squared/*_mm256_add_ps (x_squared, y_squared)*/, MAX_R_VECTOR, _CMP_LT_OS));
+                int mask = _mm256_movemask_ps (_mm256_cmp_ps (_mm256_add_ps (x_squared, y_squared), MAX_R_VECTOR, _CMP_LT_OS));
 
                 if (!mask) break;
 
-                int bit = 1;
-
-                for (int i = 0; i < VECTOR_SIZE; i++)
-                {
-                   if (mask & bit) counters[i]++;
-
-                   bit = bit << 1;
-                }
+                for (int i = 0, bit = 1; i < VECTOR_SIZE; i++, bit <<= 1) if (mask & bit) counters[i]++;
 
                 __m256 xy = _mm256_mul_ps (current_x, current_y);
 
                 current_x = _mm256_add_ps (_mm256_sub_ps (x_squared, y_squared), started_x);
                 current_y = _mm256_add_ps (_mm256_add_ps (xy,        xy),        started_y);
-
             }
 
-            for (int i = 0; i < VECTOR_SIZE; i++)
-            {
-                SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i] * 2, counters[i]) * 3);
-                //SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i], counters[i]));
-            }
+            for (int i = 0; i < VECTOR_SIZE; i++) SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i]*3, counters[i]) * 2);
         }
     }    
 }
@@ -223,24 +110,58 @@ void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color)
     *pixel = color;
 }
 
+void WriteFPS (sdl_window_info* win_info, int fps)
+{
+    static char title[TITLE_SIZE] = {};
+
+    snprintf (title, TITLE_SIZE, "FPS %d", fps);
+    SDL_SetWindowTitle (win_info->window, title);
+}
+
+void CheckEvent (sdl_window_info* win_info, screen_info* scr_info, SDL_Event* event, bool* is_programm_ended)
+{
+    while (SDL_PollEvent (event))
+        {
+            if (event->type == SDL_QUIT) 
+            {
+                ProcessEndEvent (win_info, is_programm_ended);
+            }
+            else 
+            {
+                if (event->type == SDL_KEYDOWN)
+                {
+                    if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) ProcessEndEvent (win_info, is_programm_ended);
+                    else MoveSet (event, scr_info);
+                }
+            }
+        }
+}
+
+void ProcessEndEvent (sdl_window_info* win_info, bool* is_programm_ended)
+{
+    SDL_DestroyWindow (win_info->window);
+    SDL_Quit();
+    *is_programm_ended = true;
+}
+
 void MoveSet (SDL_Event* event, screen_info* scr_info)
 {
     switch (event->key.keysym.scancode)
     {
         case SDL_SCANCODE_W:
-            scr_info->center_pixel_y += scr_info->scale;
+            scr_info->center_pixel_y += HORIZONTAL_MOVEMENT_OFFSET * scr_info->scale;
             break;
 
         case SDL_SCANCODE_S:
-            scr_info->center_pixel_y -= scr_info->scale;
+            scr_info->center_pixel_y -= HORIZONTAL_MOVEMENT_OFFSET * scr_info->scale;
             break;
 
         case SDL_SCANCODE_A:
-            scr_info->center_pixel_x -= scr_info->scale;
+            scr_info->center_pixel_x -= VERTICAL_MOVEMENT_OFFSET * scr_info->scale;
             break;
 
         case SDL_SCANCODE_D:
-            scr_info->center_pixel_x += scr_info->scale;
+            scr_info->center_pixel_x += VERTICAL_MOVEMENT_OFFSET * scr_info->scale;
             break;
 
         case SDL_SCANCODE_E:
@@ -254,14 +175,4 @@ void MoveSet (SDL_Event* event, screen_info* scr_info)
         default:
             break;
     }
-
-    //printf ("%d\n", event->key.keysym.scancode);
-}
-
-void WriteFPS (sdl_window_info* win_info, int fps)
-{
-    static char title[TITLE_SIZE] = {};
-
-    snprintf (title, TITLE_SIZE, "FPS %d", fps);
-    SDL_SetWindowTitle (win_info->window, title);
 }
