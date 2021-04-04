@@ -146,10 +146,6 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
         for (int i_x = 0; i_x < SCREEN_LENGTH; i_x += VECTOR_SIZE, start_x += VECTOR_SIZE * step_x)
         {
-            //float current_x = start_x;
-            //float current_y = start_y;
-            //int counter = 0;
-
             float started_x_array[VECTOR_SIZE] = {};
             float started_y_array[VECTOR_SIZE] = {};
 
@@ -164,21 +160,6 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
             __m256 current_x = _mm256_setzero_ps ();
             __m256 current_y = _mm256_setzero_ps ();
-
-
-            /*for (; counter < MAX_COUNTER; counter++)
-            {
-                float x_squared = current_x*current_x,
-                      y_squared = current_y*current_y,
-                      xy = current_x*current_y;
-
-                float r_squared = x_squared + y_squared;
-
-                if (r_squared >= MAX_R) break;
-
-                current_x = x_squared - y_squared + start_x;
-                current_y = xy + xy + start_y;
-            }*/
 
             int counters[VECTOR_SIZE] = {0};
 
@@ -209,9 +190,6 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
             }
 
-            //printf ("HEY\n");
-
-            //SetPixel (win_info, i_x, i_y, Color ((counter%256) * counter / 256, counter%256, 0));
             for (int i = 0; i < VECTOR_SIZE; i++)
             {
                 SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i] * 2, counters[i]) * 3);
