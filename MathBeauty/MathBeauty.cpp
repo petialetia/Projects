@@ -2,13 +2,13 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 
-const int SCREEN_LENGTH = 1200;
-const int SCREEN_WIDTH  = 800;
+const int SCREEN_LENGTH = 768;//1200;
+const int SCREEN_WIDTH  = 512;//800;
 
-const float ZERO_POINT_X = 800.f;
-const float ZERO_POINT_Y = 400.f;
+const float ZERO_POINT_X = 2 * SCREEN_LENGTH / 3;//800.f;
+const float ZERO_POINT_Y = SCREEN_WIDTH / 2;//400.f;
 
-const float START_SCALE = 400;
+const float START_SCALE = SCREEN_WIDTH / 2;//400;
 
 //const int SCALE_INCREASING = 1.5;
 
@@ -90,9 +90,9 @@ int main ()
 
     screen_info scr_info = {(SCREEN_LENGTH/2 - ZERO_POINT_X)/START_SCALE, (SCREEN_WIDTH/2 - ZERO_POINT_Y)/START_SCALE, 1/START_SCALE};
 
-    printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
+    //printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
 
-    printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH * scr_info.scale / 2, scr_info.center_pixel_x - SCREEN_LENGTH * scr_info.scale / 2 );
+    //printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH * scr_info.scale / 2, scr_info.center_pixel_x - SCREEN_LENGTH * scr_info.scale / 2 );
 
     bool is_programm_ended = false;
 
@@ -153,6 +153,9 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
             {
                 started_x_array[i] = start_x + ((float) i)*step_x;
                 started_y_array[i] = start_y;
+
+                //started_x_array[i] = (i + i_x - SCREEN_LENGTH / 2) * scr_info->scale - scr_info->center_pixel_x;
+                //started_y_array[i] = (i + i_y - SCREEN_WIDTH  / 2) * scr_info->scale - scr_info->center_pixel_y;
             }
 
             __m256 started_x = _mm256_load_ps (started_x_array);
@@ -170,7 +173,7 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
                 __m256 r_squared = _mm256_add_ps (x_squared, y_squared);
 
-                int mask = _mm256_movemask_ps (_mm256_cmp_ps (r_squared, MAX_R_VECTOR, _CMP_LT_OS));
+                int mask = _mm256_movemask_ps (_mm256_cmp_ps (r_squared/*_mm256_add_ps (x_squared, y_squared)*/, MAX_R_VECTOR, _CMP_LT_OS));
 
                 if (!mask) break;
 
@@ -193,6 +196,7 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
             for (int i = 0; i < VECTOR_SIZE; i++)
             {
                 SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i] * 2, counters[i]) * 3);
+                //SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i], counters[i]));
             }
         }
     }    
@@ -223,28 +227,31 @@ void MoveSet (SDL_Event* event, screen_info* scr_info)
 {
     switch (event->key.keysym.scancode)
     {
-        case UP_SCAN_CODE:
+        case SDL_SCANCODE_W:
             scr_info->center_pixel_y += scr_info->scale;
             break;
 
-        case DOWN_SCAN_CODE:
+        case SDL_SCANCODE_S:
             scr_info->center_pixel_y -= scr_info->scale;
             break;
 
-        case LEFT_SCAN_CODE:
+        case SDL_SCANCODE_A:
             scr_info->center_pixel_x -= scr_info->scale;
             break;
 
-        case RIGHT_SCAN_CODE:
+        case SDL_SCANCODE_D:
             scr_info->center_pixel_x += scr_info->scale;
             break;
 
-        case PLUS_SCAN_CODE:
+        case SDL_SCANCODE_E:
             scr_info->scale /= SCALE_INCREASING;
             break;
 
-        case MINUS_SCAN_CODE:
+        case SDL_SCANCODE_Q:
             scr_info->scale *= SCALE_INCREASING;
+            break;
+
+        default:
             break;
     }
 
