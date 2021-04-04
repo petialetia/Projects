@@ -10,6 +10,8 @@ const float ZERO_POINT_Y = 400.f;
 
 const float START_SCALE = 400;
 
+//const int SCALE_INCREASING = 1.5;
+
 const int SCALE_INCREASING = 2;
 
 const float MAX_R = 1000;
@@ -86,11 +88,11 @@ int main ()
 
     SDL_UpdateWindowSurface (win_info.window);
 
-    screen_info scr_info = {(SCREEN_LENGTH/2 - ZERO_POINT_X)/START_SCALE, (SCREEN_WIDTH/2 - ZERO_POINT_Y)/START_SCALE, START_SCALE};
+    screen_info scr_info = {(SCREEN_LENGTH/2 - ZERO_POINT_X)/START_SCALE, (SCREEN_WIDTH/2 - ZERO_POINT_Y)/START_SCALE, 1/START_SCALE};
 
-    //printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
+    printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
 
-    //printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH / (2 * scr_info.scale), scr_info.center_pixel_x - SCREEN_LENGTH / (2 * scr_info.scale));
+    printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH * scr_info.scale / 2, scr_info.center_pixel_x - SCREEN_LENGTH * scr_info.scale / 2 );
 
     bool is_programm_ended = false;
 
@@ -133,14 +135,14 @@ int main ()
 
 void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 {
-    float step_x = 1/scr_info->scale,
+    float step_x = scr_info->scale,
           step_y = step_x;
 
-    float start_y = scr_info->center_pixel_y + SCREEN_WIDTH / (2 * scr_info->scale);
+    float start_y = scr_info->center_pixel_y + SCREEN_WIDTH * scr_info->scale / 2;
 
     for (int i_y = 0; i_y < SCREEN_WIDTH; i_y++, start_y -= step_y)
     {
-        float start_x = scr_info->center_pixel_x - SCREEN_LENGTH / (2 * scr_info->scale); 
+        float start_x = scr_info->center_pixel_x - SCREEN_LENGTH * scr_info->scale / 2; 
 
         for (int i_x = 0; i_x < SCREEN_LENGTH; i_x += VECTOR_SIZE, start_x += VECTOR_SIZE * step_x)
         {
@@ -212,7 +214,7 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
             //SetPixel (win_info, i_x, i_y, Color ((counter%256) * counter / 256, counter%256, 0));
             for (int i = 0; i < VECTOR_SIZE; i++)
             {
-                SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i], counters[i]));
+                SetPixel (win_info, i_x + i, i_y, Color ((counters[i]%256) * counters[i] / 256, counters[i]%256, 0));
             }
         }
     }    
@@ -244,27 +246,27 @@ void MoveSet (SDL_Event* event, screen_info* scr_info)
     switch (event->key.keysym.scancode)
     {
         case UP_SCAN_CODE:
-            scr_info->center_pixel_y += 1/scr_info->scale;
+            scr_info->center_pixel_y += scr_info->scale;
             break;
 
         case DOWN_SCAN_CODE:
-            scr_info->center_pixel_y -= 1/scr_info->scale;
+            scr_info->center_pixel_y -= scr_info->scale;
             break;
 
         case LEFT_SCAN_CODE:
-            scr_info->center_pixel_x -= 1/scr_info->scale;
+            scr_info->center_pixel_x -= scr_info->scale;
             break;
 
         case RIGHT_SCAN_CODE:
-            scr_info->center_pixel_x += 1/scr_info->scale;
+            scr_info->center_pixel_x += scr_info->scale;
             break;
 
         case PLUS_SCAN_CODE:
-            scr_info->scale *= SCALE_INCREASING;
+            scr_info->scale /= SCALE_INCREASING;
             break;
 
         case MINUS_SCAN_CODE:
-            scr_info->scale /= SCALE_INCREASING;
+            scr_info->scale *= SCALE_INCREASING;
             break;
     }
 
