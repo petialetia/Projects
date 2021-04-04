@@ -1,5 +1,7 @@
+options = -Wall -Wextra -pedantic -O3
+
 run: MathBeauty.out
 	./MathBeauty.out
 
 MathBeauty.out : MathBeauty.cpp
-	g++ MathBeauty.cpp -lSDL2 -o MathBeauty.out
+	g++ MathBeauty.cpp -mavx -lSDL2 $(options) -o MathBeauty.out

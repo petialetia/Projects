@@ -1,11 +1,9 @@
+#include <immintrin.h>
 #include <time.h>
 #include <SDL2/SDL.h>
 
 const int SCREEN_LENGTH = 1200;
 const int SCREEN_WIDTH  = 800;
-
-//const float ZERO_POINT_X = 800.f;
-//const float ZERO_POINT_Y = 500.f;
 
 const float ZERO_POINT_X = 800.f;
 const float ZERO_POINT_Y = 400.f;
@@ -15,6 +13,8 @@ const float START_SCALE = 400;
 const int SCALE_INCREASING = 2;
 
 const float MAX_R = 1000;
+
+const __m256 MAX_R_VECTOR = _mm256_set1_ps (1000.f);
 
 const int MAX_COUNTER = 512;
 
@@ -29,7 +29,9 @@ const int MINUS_SCAN_CODE = 20;
 
 const int BYTE_SIZE = 8;
 
-const int TITLE_SIZE = 10;
+const int TITLE_SIZE = 100;
+
+const int VECTOR_SIZE = 8;
 
 struct sdl_window_info
 {
@@ -86,9 +88,9 @@ int main ()
 
     screen_info scr_info = {(SCREEN_LENGTH/2 - ZERO_POINT_X)/START_SCALE, (SCREEN_WIDTH/2 - ZERO_POINT_Y)/START_SCALE, START_SCALE};
 
-    printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
+    //printf ("%f %f\n", scr_info.center_pixel_x, scr_info.center_pixel_y); 
 
-    printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH / (2 * scr_info.scale), scr_info.center_pixel_x - SCREEN_LENGTH / (2 * scr_info.scale));
+    //printf ("%f %f\n", scr_info.center_pixel_y + SCREEN_WIDTH / (2 * scr_info.scale), scr_info.center_pixel_x - SCREEN_LENGTH / (2 * scr_info.scale));
 
     bool is_programm_ended = false;
 
@@ -131,8 +133,8 @@ int main ()
 
 void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 {
-    float step_x = 1/scr_info->scale;
-    float step_y = 1/scr_info->scale;
+    float step_x = 1/scr_info->scale,
+          step_y = step_x;
 
     float start_y = scr_info->center_pixel_y + SCREEN_WIDTH / (2 * scr_info->scale);
 
@@ -140,13 +142,29 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
     {
         float start_x = scr_info->center_pixel_x - SCREEN_LENGTH / (2 * scr_info->scale); 
 
-        for (int i_x = 0; i_x < SCREEN_LENGTH; i_x++, start_x += step_x)
+        for (int i_x = 0; i_x < SCREEN_LENGTH; i_x += VECTOR_SIZE, start_x += VECTOR_SIZE * step_x)
         {
-            float current_x = start_x;
-            float current_y = start_y;
-            int counter = 0;
+            //float current_x = start_x;
+            //float current_y = start_y;
+            //int counter = 0;
 
-            for (; counter < MAX_COUNTER; counter++)
+            float started_x_array[VECTOR_SIZE] = {};
+            float started_y_array[VECTOR_SIZE] = {};
+
+            for (int i = 0; i < VECTOR_SIZE; i++)
+            {
+                started_x_array[i] = start_x + ((float) i)*step_x;
+                started_y_array[i] = start_y;
+            }
+
+            __m256 started_x = _mm256_load_ps (started_x_array);
+            __m256 started_y = _mm256_load_ps (started_y_array);
+
+            __m256 current_x = _mm256_setzero_ps ();
+            __m256 current_y = _mm256_setzero_ps ();
+
+
+            /*for (; counter < MAX_COUNTER; counter++)
             {
                 float x_squared = current_x*current_x,
                       y_squared = current_y*current_y,
@@ -158,11 +176,44 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
                 current_x = x_squared - y_squared + start_x;
                 current_y = xy + xy + start_y;
+            }*/
+
+            int counters[VECTOR_SIZE] = {0};
+
+            for (int main_counter = 0; main_counter < MAX_COUNTER; main_counter++)
+            {
+                __m256 x_squared = _mm256_mul_ps (current_x, current_x);
+                __m256 y_squared = _mm256_mul_ps (current_y, current_y);
+
+                __m256 r_squared = _mm256_add_ps (x_squared, y_squared);
+
+                int mask = _mm256_movemask_ps (_mm256_cmp_ps (r_squared, MAX_R_VECTOR, _CMP_LT_OS));
+
+                if (!mask) break;
+
+                int bit = 1;
+
+                for (int i = 0; i < VECTOR_SIZE; i++)
+                {
+                   if (mask & bit) counters[i]++;
+
+                   bit = bit << 1;
+                }
+
+                __m256 xy = _mm256_mul_ps (current_x, current_y);
+
+                current_x = _mm256_add_ps (_mm256_sub_ps (x_squared, y_squared), started_x);
+                current_y = _mm256_add_ps (_mm256_add_ps (xy,        xy),        started_y);
+
             }
 
-            //SetPixel (win_info, i_x, i_y, Color ((counter%256) * counter / 256, counter%256, 0));
+            //printf ("HEY\n");
 
-            SetPixel (win_info, i_x, i_y, Color (counter, counter, counter));
+            //SetPixel (win_info, i_x, i_y, Color ((counter%256) * counter / 256, counter%256, 0));
+            for (int i = 0; i < VECTOR_SIZE; i++)
+            {
+                SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i], counters[i]));
+            }
         }
     }    
 }
