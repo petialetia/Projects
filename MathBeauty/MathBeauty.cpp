@@ -12,7 +12,7 @@ const float START_SCALE = 400;
 
 //const int SCALE_INCREASING = 1.5;
 
-const float SCALE_INCREASING = 1.4;
+const float SCALE_INCREASING = 1.1;
 
 const float MAX_R = 1000;
 
@@ -214,7 +214,7 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
             //SetPixel (win_info, i_x, i_y, Color ((counter%256) * counter / 256, counter%256, 0));
             for (int i = 0; i < VECTOR_SIZE; i++)
             {
-                SetPixel (win_info, i_x + i, i_y, Color (counters[i] * 2, counters[i] * 3, counters[i]));
+                SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i] * 2, counters[i]) * 3);
             }
         }
     }    
