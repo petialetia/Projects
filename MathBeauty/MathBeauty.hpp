@@ -41,9 +41,9 @@ void DrawFrame (sdl_window_info* win_info, screen_info* scr_info);
 
 void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info);
 
-void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color);
+inline void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color);
 
-uint32_t Color (unsigned char red, unsigned char green, unsigned char blue, unsigned char a = 255);
+inline uint32_t Color (unsigned char red, unsigned char green, unsigned char blue, unsigned char a = 255);
 
 void WriteFPS (sdl_window_info* win_info, int fps);
 

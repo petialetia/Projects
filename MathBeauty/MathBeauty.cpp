@@ -15,7 +15,6 @@ int main ()
         DrawFrame (&win_info, &scr_info);
         CheckEvent (&win_info, &scr_info, &event, &is_programm_ended);
     }
-
 }
 
 void OpenWindowWithSurface (sdl_window_info* win_info)
@@ -50,46 +49,41 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
         for (int i_x = 0; i_x < SCREEN_LENGTH; i_x += VECTOR_SIZE, start_x += VECTOR_SIZE * step_x)
         {
-            float started_x_array[VECTOR_SIZE] = {};
-            float started_y_array[VECTOR_SIZE] = {};
+            __m256 start_x_vector = _mm256_setr_ps (start_x,              start_x + 1 * step_x, start_x + 2 * step_x, start_x + 3 * step_x,
+                                                    start_x + 4 * step_x, start_x + 5 * step_x, start_x + 6 * step_x, start_x + 7 * step_x);
 
-            for (int i = 0; i < VECTOR_SIZE; i++)
-            {
-                started_x_array[i] = start_x + ((float) i)*step_x;
-                started_y_array[i] = start_y;
-            }
-
-            __m256 started_x = _mm256_load_ps (started_x_array),
-                   started_y = _mm256_load_ps (started_y_array);
+            __m256 start_y_vector = _mm256_set1_ps (start_y);
 
             __m256 current_x = _mm256_setzero_ps (),
                    current_y = _mm256_setzero_ps ();
 
-            int counters[VECTOR_SIZE] = {0};
+            __m256i counters = _mm256_set1_epi32 (0);
 
             for (int main_counter = 0; main_counter < MAX_COUNTER; main_counter++)
             {
                 __m256 x_squared = _mm256_mul_ps (current_x, current_x),
                        y_squared = _mm256_mul_ps (current_y, current_y);
 
-                int mask = _mm256_movemask_ps (_mm256_cmp_ps (_mm256_add_ps (x_squared, y_squared), MAX_R_VECTOR, _CMP_LT_OS));
+                __m256 cmp = _mm256_cmp_ps (_mm256_add_ps (x_squared, y_squared), MAX_R_VECTOR, _CMP_LT_OS);
 
-                if (!mask) break;
+                int mask = _mm256_movemask_ps (cmp);
 
-                for (int i = 0, bit = 1; i < VECTOR_SIZE; i++, bit <<= 1) if (mask & bit) counters[i]++;
+                if (mask == 0) break;
+
+                counters = _mm256_add_epi32 (counters, _mm256_castps_si256 (cmp));
 
                 __m256 xy = _mm256_mul_ps (current_x, current_y);
 
-                current_x = _mm256_add_ps (_mm256_sub_ps (x_squared, y_squared), started_x);
-                current_y = _mm256_add_ps (_mm256_add_ps (xy,        xy),        started_y);
+                current_x = _mm256_add_ps (_mm256_sub_ps (x_squared, y_squared), start_x_vector);
+                current_y = _mm256_add_ps (_mm256_add_ps (xy,        xy),        start_y_vector);
             }
-
-            for (int i = 0; i < VECTOR_SIZE; i++) SetPixel (win_info, i_x + i, i_y, Color (counters[i], counters[i]*3, counters[i]) * 2);
+            uint32_t* counter = (uint32_t*) &counters;
+            for (int i = 0; i < VECTOR_SIZE; i++) SetPixel (win_info, i_x + i, i_y, Color (counter[i]*5, counter[i], counter[i]*5));
         }
     }    
 }
 
-uint32_t Color (unsigned char red, unsigned char green, unsigned char blue, unsigned char a)
+inline uint32_t Color (unsigned char red, unsigned char green, unsigned char blue, unsigned char a)
 {
     uint32_t color = a;
     color <<= BYTE_SIZE;
@@ -101,7 +95,7 @@ uint32_t Color (unsigned char red, unsigned char green, unsigned char blue, unsi
     return color;
 }
 
-void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color)
+inline void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color)
 {
     uint32_t* pixel = (uint32_t*)((uint8_t*)win_info->surface->pixels + y * win_info->surface->pitch +
                                                                         x * win_info->surface->format->BytesPerPixel);
