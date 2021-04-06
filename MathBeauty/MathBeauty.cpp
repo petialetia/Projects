@@ -19,13 +19,20 @@ int main ()
 
 void OpenWindowWithSurface (sdl_window_info* win_info)
 {
-    win_info->window = SDL_CreateWindow ("Mandelbrot", (1920 - SCREEN_LENGTH)/2, (1080 - SCREEN_WIDTH)/2, SCREEN_LENGTH, SCREEN_WIDTH, SDL_WINDOW_MAXIMIZED);
+    assert (win_info != nullptr);
 
-    win_info->surface = SDL_GetWindowSurface (win_info->window); 
+    win_info->window = SDL_CreateWindow ("Mandelbrot", (1920 - SCREEN_LENGTH)/2, (1080 - SCREEN_WIDTH)/2, SCREEN_LENGTH, SCREEN_WIDTH, SDL_WINDOW_MAXIMIZED);
+    assert (win_info->window != nullptr);
+
+    win_info->surface = SDL_GetWindowSurface (win_info->window);
+    assert (win_info->surface != nullptr); 
 }
 
 void DrawFrame (sdl_window_info* win_info, screen_info* scr_info)
 {
+    assert (win_info != nullptr);
+    assert (scr_info != nullptr);
+
     clock_t start_time = clock ();
 
     CalculateMandelbrot (win_info, scr_info);
@@ -38,6 +45,9 @@ void DrawFrame (sdl_window_info* win_info, screen_info* scr_info)
 
 void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 {
+    assert (win_info != nullptr);
+    assert (scr_info != nullptr);
+
     float step_x = scr_info->scale,
           step_y = step_x;
 
@@ -97,6 +107,8 @@ inline uint32_t Color (unsigned char red, unsigned char green, unsigned char blu
 
 inline void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color)
 {
+    assert (win_info != nullptr);
+
     uint32_t* pixel = (uint32_t*)((uint8_t*)win_info->surface->pixels + y * win_info->surface->pitch +
                                                                         x * win_info->surface->format->BytesPerPixel);
 
@@ -106,6 +118,9 @@ inline void SetPixel (sdl_window_info* win_info, int x, int y, uint32_t color)
 
 void WriteFPS (sdl_window_info* win_info, int fps)
 {
+    assert (win_info != nullptr);
+    assert (fps >= 0);
+
     static char title[TITLE_SIZE] = {};
 
     snprintf (title, TITLE_SIZE, "FPS %d", fps);
@@ -114,6 +129,11 @@ void WriteFPS (sdl_window_info* win_info, int fps)
 
 void CheckEvent (sdl_window_info* win_info, screen_info* scr_info, SDL_Event* event, bool* is_programm_ended)
 {
+    assert (win_info          != nullptr);
+    assert (scr_info          != nullptr);
+    assert (event             != nullptr);
+    assert (is_programm_ended != nullptr);
+
     while (SDL_PollEvent (event))
         {
             if (event->type == SDL_QUIT) 
@@ -133,13 +153,19 @@ void CheckEvent (sdl_window_info* win_info, screen_info* scr_info, SDL_Event* ev
 
 void ProcessEndEvent (sdl_window_info* win_info, bool* is_programm_ended)
 {
+    assert (win_info          != nullptr);
+    assert (is_programm_ended != nullptr);
+
     SDL_DestroyWindow (win_info->window);
-    SDL_Quit();
+    SDL_Quit ();
     *is_programm_ended = true;
 }
 
 void MoveSet (SDL_Event* event, screen_info* scr_info)
 {
+    assert (event    != nullptr);
+    assert (scr_info != nullptr);
+
     switch (event->key.keysym.scancode)
     {
         case SDL_SCANCODE_W:

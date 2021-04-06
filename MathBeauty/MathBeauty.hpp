@@ -2,6 +2,9 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 
+//#define NDEBUG //Отключает ассерты
+#include <assert.h>
+
 const int SCREEN_LENGTH = 768;//1200;
 const int SCREEN_WIDTH  = 512;//800;
 
@@ -15,7 +18,7 @@ const int VERTICAL_MOVEMENT_OFFSET = 10;
 const int HORIZONTAL_MOVEMENT_OFFSET = 10;
 
 const int MAX_COUNTER = 512;
-const __m256 MAX_R_VECTOR = _mm256_set1_ps (1000.f);
+const __m256 MAX_R_VECTOR = _mm256_set1_ps (1000.0);
 
 const int BYTE_SIZE = 8;
 const int TITLE_SIZE = 100;
