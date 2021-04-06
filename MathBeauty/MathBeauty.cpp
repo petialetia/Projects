@@ -51,6 +51,13 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
     float step_x = scr_info->scale,
           step_y = step_x;
 
+    const float step_x_mul_2 = step_x * 2;
+    const float step_x_mul_3 = step_x * 3;
+    const float step_x_mul_4 = step_x * 4;
+    const float step_x_mul_5 = step_x * 5;
+    const float step_x_mul_6 = step_x * 6;
+    const float step_x_mul_7 = step_x * 7;        
+
     float start_y = scr_info->center_pixel_y + SCREEN_WIDTH * scr_info->scale / 2;
 
     for (int i_y = 0; i_y < SCREEN_WIDTH; i_y++, start_y -= step_y)
@@ -59,8 +66,8 @@ void CalculateMandelbrot (sdl_window_info* win_info, screen_info* scr_info)
 
         for (int i_x = 0; i_x < SCREEN_LENGTH; i_x += VECTOR_SIZE, start_x += VECTOR_SIZE * step_x)
         {
-            __m256 start_x_vector = _mm256_setr_ps (start_x,              start_x + 1 * step_x, start_x + 2 * step_x, start_x + 3 * step_x,
-                                                    start_x + 4 * step_x, start_x + 5 * step_x, start_x + 6 * step_x, start_x + 7 * step_x);
+            __m256 start_x_vector = _mm256_setr_ps (start_x,                start_x + step_x,       start_x + step_x_mul_2, start_x + step_x_mul_3,
+                                                    start_x + step_x_mul_4, start_x + step_x_mul_5, start_x + step_x_mul_6, start_x + step_x_mul_7);
 
             __m256 start_y_vector = _mm256_set1_ps (start_y);
 
