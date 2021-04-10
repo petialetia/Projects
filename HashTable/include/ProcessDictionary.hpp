@@ -1,7 +1,7 @@
 #include "TextFunctions.hpp"
 #include "ForHashTable.hpp"
 
-const char* const STANDART_DICTIONARY_FILE = "Dictionary.txt";
+const char* const STANDART_DICTIONARY_FILE = "../Dictionary.txt";
 
 const size_t APPROX_VECTOR_SIZE = 15;
 
