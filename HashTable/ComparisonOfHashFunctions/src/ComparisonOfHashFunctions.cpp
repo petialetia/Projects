@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>  
 #include <cstdint>
-#include "../../include/TextFunctions.hpp"
 #include "../../include/HashTable.hpp"
 #include "../../include/HashFunctionCollection.hpp"
 #include "../../include/ProcessDictionary.hpp"

@@ -3,7 +3,7 @@ options = -Wall -Wextra -pedantic
 run: ComparisonOfHashFunctions.out
 	./ComparisonOfHashFunctions.out in ../Dictionary.txt out ResultTable.csv
 
-ComparisonOfHashFunctions.out: src/ComparisonOfHashFunctions.cpp src/ComparisonOfHashFunctions.hpp ../bin/TextFunctions.o ../bin/HashTable.o ../bin/HashFunctionCollection.o ../bin/ProcessDictionary.o
+ComparisonOfHashFunctions.out: src/ComparisonOfHashFunctions.cpp ../bin/TextFunctions.o ../bin/HashTable.o ../bin/HashFunctionCollection.o ../bin/ProcessDictionary.o
 	g++ src/ComparisonOfHashFunctions.cpp ../bin/TextFunctions.o ../bin/HashTable.o ../bin/Vector.o ../bin/HashFunctionCollection.o ../bin/ProcessDictionary.o $(options) -o ComparisonOfHashFunctions.out
 
 ../bin/TextFunctions.o: ../src/TextFunctions.cpp ../include/TextFunctions.hpp
