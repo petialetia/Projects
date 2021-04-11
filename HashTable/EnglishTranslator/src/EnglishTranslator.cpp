@@ -13,6 +13,8 @@ const size_t MAX_WORD_LENGHT = 50;
 struct translation_info
 {
     size_t index = 0;
+    size_t old_index = 0;
+
     size_t line_length = 0;
     size_t length_of_word = 0;
     bool is_translation_ended = false;
@@ -80,8 +82,8 @@ void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, c
 
     fprintf (html_file, "<meta charset=\"UTF-8\">\n<html>\n<body>\n<pre>\n");
 
-    char orig_word       [MAX_WORD_LENGHT + 1] = {};
-    char second_orig_word[MAX_WORD_LENGHT + 1] = {};
+    //char orig_word       [MAX_WORD_LENGHT + 1] = {};
+    //char second_orig_word[MAX_WORD_LENGHT + 1] = {};
 
     char word_combination[2*MAX_WORD_LENGHT + 2] = {}; //+2 for ' ' and '/0'
 
@@ -89,20 +91,16 @@ void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, c
 
     while (!translation_info.is_translation_ended)
     {
-        //printf ("%zu\n", translation_info.index);
-
         PrintSpaces (&translation_info, text, html_file);
 
         if (translation_info.is_translation_ended) break;
 
         CheckLineOverflow (&translation_info, html_file);
-        translation_info.length_of_word = GetNextWord (orig_word, &translation_info, text);
-
-        //printf ("<%s>\n", orig_word);
+        translation_info.length_of_word = GetNextWord (word_combination, &translation_info, text);
 
         if (translation_info.index + translation_info.length_of_word == text->file_length) translation_info.is_translation_ended = true;
 
-        strcpy (word_combination, orig_word);
+        //strcpy (word_combination, orig_word);
         strlwr (word_combination);
 
         const char* translated = FindHashTable (hash_table, word_combination);
@@ -115,61 +113,90 @@ void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, c
             bool is_different_lines = false;
             size_t i = 0;
 
+            translation_info.old_index = translation_info.index; 
             translation_info.index += translation_info.length_of_word;
 
             do
             {
                 if (text->pointer_on_buffer[translation_info.index + i] == '\n') 
                 {
-                    orig_word[translation_info.length_of_word + i] = ' ';
+                    word_combination[translation_info.length_of_word + i] = ' ';
                     is_different_lines = true;
                 }
-                else orig_word[translation_info.length_of_word + i] = text->pointer_on_buffer[translation_info.index + i];
+                else word_combination[translation_info.length_of_word + i] = text->pointer_on_buffer[translation_info.index + i];
                 i++; 
                 //printf ("<%s>\n", orig_word);
             }
             while (!isalpha (text->pointer_on_buffer[translation_info.index + i]));
-            orig_word[translation_info.length_of_word + i] = '\0';
+            word_combination[translation_info.length_of_word + i] = '\0';
 
             //printf ("<%s>\n", orig_word);
 
             translation_info.index += i;
 
-            size_t length_of_second_word = GetNextWord (second_orig_word, &translation_info, text);
+            size_t length_of_second_word = GetNextWord (&word_combination[translation_info.length_of_word + i], &translation_info, text);
 
             //printf ("<%s>\n", second_orig_word);
 
-            strcpy (&word_combination[translation_info.length_of_word], &orig_word[translation_info.length_of_word]);
-            strcpy (&word_combination[translation_info.length_of_word + i], second_orig_word);
+            //strcpy (&word_combination[translation_info.length_of_word], &orig_word[translation_info.length_of_word]);
+            //strcpy (&word_combination[translation_info.length_of_word + i], second_orig_word);
             strlwr (&word_combination[translation_info.length_of_word + i]);
 
-            //printf ("<%s>!!!\n", word_combination);
-
-            if (is_different_lines) orig_word[translation_info.length_of_word + i - 1] = '\0';
+            //if (is_different_lines) word_combination[translation_info.length_of_word + i - 1] = '\0';
 
             translated = FindHashTable (hash_table, word_combination);
 
             if (translated != nullptr) 
             {
                 translation_info.line_length += translation_info.length_of_word + i; 
-                fprintf (html_file, "<span title=\"%s\">%s", translated, orig_word);
+                fprintf (html_file, "<span title=\"%s\">", translated);
 
-                if (is_different_lines) 
+                if (is_different_lines)
                 {
+                    translation_info.index--;
+                    while (translation_info.old_index < translation_info.index)
+                    {
+                        fprintf (html_file, "%c", text->pointer_on_buffer[translation_info.old_index]);
+                        translation_info.old_index++;
+                    } 
                     fprintf (html_file, "\n");
                     translation_info.line_length = 0;
+                    translation_info.index++;
                 }
-                else CheckLineOverflow (&translation_info, html_file);
+                else
+                {
+                    while (translation_info.old_index < translation_info.index)
+                    {
+                        fprintf (html_file, "%c", text->pointer_on_buffer[translation_info.old_index]);
+                        translation_info.old_index++;
+                    }
+                    CheckLineOverflow (&translation_info, html_file);
+                }
 
-                fprintf (html_file, "%s</span>", second_orig_word);
+                //fprintf (html_file, "%s</span>", second_orig_word);
+
+                for (size_t i = 0; i < length_of_second_word; i++)
+                {
+                    fprintf (html_file, "%c", text->pointer_on_buffer[translation_info.index]);
+                    translation_info.index++;   
+                } 
+                fprintf (html_file, "</span>");
                 translation_info.line_length += length_of_second_word;
-                translation_info.index += length_of_second_word;
+                //translation_info.index += length_of_second_word;
             }
             else
             {
-                orig_word[translation_info.length_of_word] = '\0';
+                //word_combination[translation_info.length_of_word] = '\0';
                 translated = "ERROR";
-                fprintf (html_file, "<span title=\"%s\">%s</span>", translated, orig_word);
+                fprintf (html_file, "<span title=\"%s\">", translated);
+
+                for (size_t i = 0; i < translation_info.length_of_word; i++)
+                {
+                    fprintf (html_file, "%c", text->pointer_on_buffer[translation_info.old_index]);
+                    translation_info.old_index++;
+                }
+                fprintf (html_file, "</span>");
+
                 translation_info.line_length += translation_info.length_of_word;
                 translation_info.index -= i;
             }
@@ -179,8 +206,16 @@ void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, c
         }
         else
         {
-            translation_info.index += translation_info.length_of_word; 
-            fprintf (html_file, "<span title=\"%s\">%s", translated, orig_word); 
+            fprintf (html_file, "<span title=\"%s\">", translated);
+
+            for (size_t i = 0; i < translation_info.length_of_word; i++)
+            {
+                fprintf (html_file, "%c", text->pointer_on_buffer[translation_info.index]);
+                translation_info.index++;
+            }
+
+            fprintf (html_file, "</span>"); 
+
             translation_info.line_length += translation_info.length_of_word; 
             //translation_info.index += translation_info.length_of_word;   
         }
