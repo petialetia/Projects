@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../include/Vector.hpp"
 
 struct hash_table 

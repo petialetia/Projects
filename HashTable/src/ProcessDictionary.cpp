@@ -1,12 +1,12 @@
 #include "../include/ProcessDictionary.hpp"
 
-void ProcessDictionary (int argC, char** argV, for_hash_table* for_hash_table, text* dictionary)
+void ProcessDictionary (int argC, char** argV, for_hash_table* for_hash_table, text* dictionary, const char* dictionary_file_name)
 {
     assert (argV           != nullptr);
     assert (for_hash_table != nullptr);
     assert (dictionary     != nullptr);
 
-    ProcessInput (argC, argV, dictionary, STANDART_DICTIONARY_FILE);
+    ProcessInput (argC, argV, dictionary, dictionary_file_name);
 
     size_t num_of_lines = CountNumOfLines (dictionary);
     assert (num_of_lines != 0);
@@ -93,4 +93,15 @@ size_t FindMaxPrimeNumberInRange (size_t max_number)
 
     free (is_composite);
     return 0;
+}
+
+void FillHashTable (hash_table* hash_table, for_hash_table* for_hash_table, hash (*CountHash) (hash_table_val_type elem), 
+                    int (*Comparator) (hash_table_val_type left_value, hash_table_val_type right_value))
+{
+    BuildHashTable (hash_table, for_hash_table->length_of_table, CountHash, Comparator);
+
+    for (size_t i = 0; i < for_hash_table->num_of_translation_pairs; i++)
+    {
+        InsertHashTable (hash_table, for_hash_table->translation_pairs[i].eng_word, for_hash_table->translation_pairs[i].rus_word);
+    }
 }

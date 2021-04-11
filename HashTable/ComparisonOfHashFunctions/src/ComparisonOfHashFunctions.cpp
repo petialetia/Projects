@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <math.h>  
 #include <cstdint>
-#include "../../include/HashTable.hpp"
-#include "../../include/HashFunctionCollection.hpp"
 #include "../../include/ProcessDictionary.hpp"
+#include "../../include/TextFunctions.hpp"
+#include "../../include/HashTable.hpp"
+#include "../../include/HashFunctionsCollection.hpp"
+
 
 const char* const STANDART_CSV_FILE = "ResultTable.csv";
 
@@ -65,12 +67,7 @@ void TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*Co
 
     hash_table hash_table = {};
 
-    BuildHashTable (&hash_table, for_hash_table->length_of_table, CountHash, Comparator);
-
-    for (size_t i = 0; i < for_hash_table->num_of_translation_pairs; i++)
-    {
-        InsertHashTable (&hash_table, for_hash_table->translation_pairs[i].eng_word, for_hash_table->translation_pairs[i].rus_word);
-    }
+    FillHashTable (&hash_table, for_hash_table, CountHash, Comparator);
 
     for (size_t i = 0; i < for_hash_table->length_of_table; i++)
     {
