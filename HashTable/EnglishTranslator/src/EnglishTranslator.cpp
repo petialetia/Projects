@@ -1,56 +1,4 @@
-#include <ctype.h>
-
-#include "../../include/HashFunctionsCollection.hpp"
-#include "../../include/ProcessDictionary.hpp"
-#include "../../include/HashTable.hpp"
-
-const char* const STANDART_TEXT_FILE = "Test.txt";
-const char* const STANDART_HTML_FILE = "Translated.html";
-
-const char* const ERROR_MSG = "ERROR";
-
-const size_t MAX_LINE_LENGTH = 100;
-const size_t MAX_WORD_LENGHT = 50;
-
-struct translation_info
-{
-    char word_combination[2*MAX_WORD_LENGHT + 2] = {}; //+2 for ' ' and '/0'
-
-    size_t index = 0;
-    size_t old_index = 0;
-
-    size_t line_length = 0;
-    size_t length_of_word = 0;
-
-    bool is_translation_ended = false;
-
-    FILE* html_file = nullptr;
-};
-
-struct for_combination_word
-{
-    bool is_different_lines = false;
-
-    size_t num_of_spaces = 0;
-    size_t length_of_second_word = 0;
-
-    const char* translated = nullptr;
-};
-
-size_t CountNumOfWords (text* text);
-char** FillWords (text* text, size_t num_of_words);
-
-void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, const char* output_file_name = STANDART_HTML_FILE);
-void ProcessTranslation (translation_info* translation_info, text* text, hash_table* hash_table);
-void PrintSpaces (translation_info* translation_info, text* text);
-void CheckLineOverflow (translation_info* translation_info);
-size_t GetNextWord (char* orig_word, translation_info* translation_info, text* text);
-void strlwr (char* string);
-void ProcessAtypicalWord (translation_info* translation_info, text* text, hash_table* hash_table);
-void SkipSpaces (translation_info* translation_info, text* text, for_combination_word* comb_word_info);
-void PrintSingleWord (translation_info* translation_info, text* text, const char* translated);
-void PrintTwoWords (translation_info* translation_info, text* text, for_combination_word* comb_word_info);
-void PrintWord (text* text, FILE* html_file, size_t length, size_t* offset);
+#include "EnglishTranslator.hpp"
 
 int main (int argC, char** argV)
 {
@@ -73,25 +21,6 @@ int main (int argC, char** argV)
     DestroyHashTable (&hash_table);
     free (for_hash_table.translation_pairs);
     DestroyText (&dictionary);
-}
-
-size_t CountNumOfWords (text* text)
-{
-    assert (text != nullptr);
-
-    size_t num_of_words = 0;
-
-    for (size_t i = 0; i < text->file_length; i++)
-    {
-        if (isalpha (text->pointer_on_buffer[i]))
-        {
-            num_of_words++;
-            i++;
-            while (isalpha (text->pointer_on_buffer[i])) i++;
-        }
-    }
-
-    return num_of_words;
 }
 
 void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, const char* output_file_name)
@@ -228,16 +157,15 @@ void ProcessAtypicalWord (translation_info* translation_info, text* text, hash_t
     comb_word_info.translated = FindHashTable (hash_table, translation_info->word_combination);
 
     if (comb_word_info.translated != nullptr) PrintTwoWords (translation_info, text, &comb_word_info);
-    else
-    {
-        comb_word_info.translated = ERROR_MSG;
-        translation_info->index = translation_info->old_index; 
-        PrintSingleWord (translation_info, text, comb_word_info.translated);
-    }
+    else                                      ProcessShortening (translation_info, text, hash_table);
 }
 
 void SkipSpaces (translation_info* translation_info, text* text, for_combination_word* comb_word_info)
 {
+    assert (translation_info != nullptr);
+    assert (text             != nullptr);
+    assert (comb_word_info   != nullptr);
+
     do
     {
         if (text->pointer_on_buffer[translation_info->index + comb_word_info->num_of_spaces] == '\n') 
@@ -250,6 +178,29 @@ void SkipSpaces (translation_info* translation_info, text* text, for_combination
         comb_word_info->num_of_spaces++; 
     }
     while (!isalpha (text->pointer_on_buffer[translation_info->index + comb_word_info->num_of_spaces]));
+}
+
+void ProcessShortening (translation_info* translation_info, text* text, hash_table* hash_table)
+{
+    assert (translation_info != nullptr);
+    assert (text             != nullptr);
+    assert (hash_table       != nullptr);
+
+    translation_info->word_combination[translation_info->length_of_word - 1] = '\0';
+    translation_info->index = translation_info->old_index;
+
+    const char* translated = FindHashTable (hash_table, translation_info->word_combination); 
+
+    if (translated != nullptr) PrintSingleWord (translation_info, text, translated);
+    else
+    {
+        translation_info->word_combination[translation_info->length_of_word - 2] = '\0';
+        translated = FindHashTable (hash_table, translation_info->word_combination);
+
+        if (translated == nullptr) translated = ERROR_MSG;
+
+        PrintSingleWord (translation_info, text, translated);    
+    }
 }
 
 void PrintSingleWord (translation_info* translation_info, text* text, const char* translated)
