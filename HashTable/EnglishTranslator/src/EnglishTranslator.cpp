@@ -7,6 +7,8 @@
 const char* const STANDART_TEXT_FILE = "Test.txt";
 const char* const STANDART_HTML_FILE = "Translated.html";
 
+const char* const ERROR_MSG = "ERROR";
+
 const size_t MAX_LINE_LENGTH = 100;
 const size_t MAX_WORD_LENGHT = 50;
 
@@ -30,6 +32,8 @@ void CheckLineOverflow (translation_info* translation_info, FILE* html_file);
 size_t GetNextWord (char* orig_word, translation_info* translation_info, text* text);
 void strlwr (char* string);
 void PrintAtypicalWord (translation_info* translation_info, text* text, hash_table* hash_table, FILE* html_file, char* word_combination);
+void PrintSingleWord (translation_info* translation_info, text* text, FILE* html_file, const char* translated, size_t* offset);
+void PrintWord (text* text, FILE* html_file, size_t length, size_t* offset);
 
 int main (int argC, char** argV)
 {
@@ -113,24 +117,8 @@ void ProcessTranslation (text* text, hash_table* hash_table, FILE* html_file)
 
         const char* translated = FindHashTable (hash_table, word_combination);
 
-        if (translated == nullptr)
-        {
-            PrintAtypicalWord (&translation_info, text, hash_table, html_file, word_combination);
-        }
-        else
-        {
-            fprintf (html_file, "<span title=\"%s\">", translated);
-
-            for (size_t i = 0; i < translation_info.length_of_word; i++)
-            {
-                fprintf (html_file, "%c", text->pointer_on_buffer[translation_info.index]);
-                translation_info.index++;
-            }
-
-            fprintf (html_file, "</span>"); 
-
-            translation_info.line_length += translation_info.length_of_word; 
-        }
+        if (translated == nullptr) PrintAtypicalWord (&translation_info, text, hash_table, html_file, word_combination);
+        else                       PrintSingleWord   (&translation_info, text, html_file, translated, &translation_info.index); 
     }
 }
 
@@ -202,6 +190,12 @@ void strlwr (char* string)
 
 void PrintAtypicalWord (translation_info* translation_info, text* text, hash_table* hash_table, FILE* html_file, char* word_combination)
 {
+    assert (translation_info != nullptr);
+    assert (text             != nullptr);
+    assert (hash_table       != nullptr);
+    assert (html_file        != nullptr);
+    assert (word_combination != nullptr);
+
     bool is_different_lines = false;
     size_t i = 0;
     translation_info->old_index = translation_info->index; 
@@ -257,7 +251,7 @@ void PrintAtypicalWord (translation_info* translation_info, text* text, hash_tab
     }
     else
     {
-        translated = "ERROR";
+        translated = ERROR_MSG;
         fprintf (html_file, "<span title=\"%s\">", translated);
         for (size_t i = 0; i < translation_info->length_of_word; i++)
         {
@@ -267,5 +261,25 @@ void PrintAtypicalWord (translation_info* translation_info, text* text, hash_tab
         fprintf (html_file, "</span>");
         translation_info->line_length += translation_info->length_of_word;
         translation_info->index -= i;
+    }
+}
+
+void PrintSingleWord (translation_info* translation_info, text* text, FILE* html_file, const char* translated, size_t* offset)
+{
+    fprintf (html_file, "<span title=\"%s\">", translated);
+
+    PrintWord (text, html_file, translation_info->length_of_word, offset);
+
+    fprintf (html_file, "</span>"); 
+
+    translation_info->line_length += translation_info->length_of_word;
+}
+
+void PrintWord (text* text, FILE* html_file, size_t length, size_t* offset)
+{
+    for (size_t i = 0; i < length; i++)
+    {
+        fprintf (html_file, "%c", text->pointer_on_buffer[*offset]);
+        (*offset)++;
     }
 }
