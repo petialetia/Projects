@@ -47,6 +47,7 @@ void CheckLineOverflow (translation_info* translation_info);
 size_t GetNextWord (char* orig_word, translation_info* translation_info, text* text);
 void strlwr (char* string);
 void ProcessAtypicalWord (translation_info* translation_info, text* text, hash_table* hash_table);
+void SkipSpaces (translation_info* translation_info, text* text, for_combination_word* comb_word_info);
 void PrintSingleWord (translation_info* translation_info, text* text, const char* translated);
 void PrintTwoWords (translation_info* translation_info, text* text, for_combination_word* comb_word_info);
 void PrintWord (text* text, FILE* html_file, size_t length, size_t* offset);
@@ -216,23 +217,12 @@ void ProcessAtypicalWord (translation_info* translation_info, text* text, hash_t
     translation_info->old_index = translation_info->index; 
     translation_info->index += translation_info->length_of_word;
 
-    do
-    {
-        if (text->pointer_on_buffer[translation_info->index + comb_word_info.num_of_spaces] == '\n') 
-        {
-            translation_info->word_combination[translation_info->length_of_word + comb_word_info.num_of_spaces] = ' ';
-            comb_word_info.is_different_lines = true;
-        }
-        else translation_info->word_combination[translation_info->length_of_word + comb_word_info.num_of_spaces] = 
-                                                                                 text->pointer_on_buffer[translation_info->index + comb_word_info.num_of_spaces];
-        comb_word_info.num_of_spaces++; 
-    }
-    while (!isalpha (text->pointer_on_buffer[translation_info->index + comb_word_info.num_of_spaces]));
+    SkipSpaces (translation_info, text, &comb_word_info);
 
     translation_info->word_combination[translation_info->length_of_word + comb_word_info.num_of_spaces] = '\0';
     translation_info->index += comb_word_info.num_of_spaces;
     comb_word_info.length_of_second_word = GetNextWord (&translation_info->word_combination[translation_info->length_of_word + comb_word_info.num_of_spaces], 
-                                                                                                                                         translation_info, text);
+                                                        translation_info, text);
 
     strlwr (&translation_info->word_combination[translation_info->length_of_word + comb_word_info.num_of_spaces]);
     comb_word_info.translated = FindHashTable (hash_table, translation_info->word_combination);
@@ -244,6 +234,22 @@ void ProcessAtypicalWord (translation_info* translation_info, text* text, hash_t
         translation_info->index = translation_info->old_index; 
         PrintSingleWord (translation_info, text, comb_word_info.translated);
     }
+}
+
+void SkipSpaces (translation_info* translation_info, text* text, for_combination_word* comb_word_info)
+{
+    do
+    {
+        if (text->pointer_on_buffer[translation_info->index + comb_word_info->num_of_spaces] == '\n') 
+        {
+            translation_info->word_combination[translation_info->length_of_word + comb_word_info->num_of_spaces] = ' ';
+            comb_word_info->is_different_lines = true;
+        }
+        else translation_info->word_combination[translation_info->length_of_word + comb_word_info->num_of_spaces] = 
+                                                                                 text->pointer_on_buffer[translation_info->index + comb_word_info->num_of_spaces];
+        comb_word_info->num_of_spaces++; 
+    }
+    while (!isalpha (text->pointer_on_buffer[translation_info->index + comb_word_info->num_of_spaces]));
 }
 
 void PrintSingleWord (translation_info* translation_info, text* text, const char* translated)
