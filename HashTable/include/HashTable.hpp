@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../include/Vector.hpp"
+#include "../include/Bucket.hpp"
 
 struct hash_table 
 {
-    vector_info* columns = nullptr;
+    bucket_info* columns = nullptr;
     size_t length_of_table = 0;
 
     hash (*CountHash)  (hash_table_key_type elem) = nullptr;

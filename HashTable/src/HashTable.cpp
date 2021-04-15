@@ -10,11 +10,11 @@ void BuildHashTable (hash_table* hash_table,                       size_t length
 
     hash_table->length_of_table = length_of_table;
     
-    hash_table->columns = (vector_info*) calloc (sizeof (vector_info), hash_table->length_of_table);
+    hash_table->columns = (bucket_info*) calloc (sizeof (bucket_info), hash_table->length_of_table);
 
     for (size_t i = 0; i < hash_table->length_of_table; i++)
     {
-        BuildVector (&hash_table->columns[i]);
+        BuildBucket (&hash_table->columns[i]);
     }
 
     hash_table->CountHash  = CountHash;
@@ -27,7 +27,7 @@ void InsertHashTable (hash_table* hash_table, hash_table_key_type key, hash_tabl
 
     hash hash = hash_table->CountHash (key);
 
-    PushBackVector (&hash_table->columns[hash%hash_table->length_of_table], {key, val});
+    PushBackBucket (&hash_table->columns[hash%hash_table->length_of_table], {key, val});
 }
 
 hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type key)
@@ -36,7 +36,7 @@ hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type k
 
     hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
 
-    return FindVector (&hash_table->columns[hash], key, hash_table->Comparator);
+    return FindBucket (&hash_table->columns[hash], key, hash_table->Comparator);
 }
 
 void DestroyHashTable (hash_table* hash_table)
@@ -45,7 +45,7 @@ void DestroyHashTable (hash_table* hash_table)
 
     for (size_t i = 0; i < hash_table->length_of_table; i++)
     {
-        DestroyVector (&hash_table->columns[i]);
+        DestroyBucket (&hash_table->columns[i]);
     }
 
     free (hash_table->columns);

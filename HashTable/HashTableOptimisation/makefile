@@ -1,7 +1,8 @@
 options = -Wall -Wextra -pedantic
 
 run: EnglishTranslator.out
-	./EnglishTranslator.out in ../Dictionary.txt out Translated.html
+	valgrind --tool=callgrind ./EnglishTranslator.out in ../Dictionary.txt out Translated.html
+	callgrind_annotate callgrind.out.47450
 
 EnglishTranslator.out: src/EnglishTranslator.cpp src/EnglishTranslator.hpp ../bin/ProcessDictionary.o ../bin/TextFunctions.o ../bin/HashTable.o ../bin/HashFunctionsCollection.o ../bin/Vector.o
 	g++ src/EnglishTranslator.cpp ../bin/ProcessDictionary.o ../bin/TextFunctions.o ../bin/HashTable.o ../bin/HashFunctionCollection.o ../bin/Vector.o $(options) -o EnglishTranslator.out
