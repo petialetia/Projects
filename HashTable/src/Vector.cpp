@@ -25,6 +25,20 @@ void PushBackVector (vector_info* vector, vector_elem elem)
     vector->size++;   
 }
 
+hash_table_val_type FindVector (vector_info* vector, hash_table_key_type key, 
+                                int (*Comparator) (hash_table_key_type left_value, hash_table_key_type right_value))
+{
+    assert (vector     != nullptr);
+    assert (Comparator != nullptr);
+
+    for (size_t i = 0; i < vector->size; i++)
+    {
+        if (!Comparator (vector->data[i].key, key)) return vector->data[i].val;            
+    }
+
+    return POISON;    
+}
+
 void DestroyVector (vector_info* vector)
 {
     assert (vector != nullptr);

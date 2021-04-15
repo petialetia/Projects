@@ -1,7 +1,7 @@
 #include "../include/HashTable.hpp"
 
 void BuildHashTable (hash_table* hash_table,                       size_t length_of_table, 
-                     hash (*CountHash) (hash_table_val_type elem), int (*Comparator) (hash_table_val_type left_value, hash_table_val_type right_value))
+                     hash (*CountHash) (hash_table_val_type elem), int (*Comparator) (hash_table_key_type left_value, hash_table_key_type right_value))
 {
     assert (hash_table      != nullptr);
     assert (length_of_table != 0);
@@ -36,12 +36,7 @@ hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type k
 
     hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
 
-    for (size_t i = 0; i < hash_table->columns[hash].size; i++)
-    {
-        if (!hash_table->Comparator (hash_table->columns[hash].data[i].key, key)) return hash_table->columns[hash].data[i].val;            
-    }
-
-    return POISON; 
+    return FindVector (&hash_table->columns[hash], key, hash_table->Comparator);
 }
 
 void DestroyHashTable (hash_table* hash_table)

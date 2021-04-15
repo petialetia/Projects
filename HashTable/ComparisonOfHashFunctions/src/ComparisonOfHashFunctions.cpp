@@ -1,28 +1,32 @@
 #include <stdio.h>
-#include <math.h>  
+#include <math.h>
+#include <time.h>
 #include <cstdint>
 #include "../../include/ProcessDictionary.hpp"
 #include "../../include/TextFunctions.hpp"
 #include "../../include/HashTable.hpp"
 #include "../../include/HashFunctionsCollection.hpp"
 
+const char* const STANDART_CSV_FILE = "ResultTable15.csv";
 
-const char* const STANDART_CSV_FILE = "ResultTable.csv";
+const size_t APPROX_VECTOR_SIZE = 15;
 
 void TestHashFunctions (for_hash_table* for_hash_table, FILE* csv_file);
 
-void TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*CountHash) (hash_table_val_type elem), 
-                       int (*Comparator) (hash_table_val_type left_value, hash_table_val_type right_value) = strcmp);
+float TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*CountHash) (hash_table_key_type elem), 
+                        int (*Comparator) (hash_table_key_type left_value, hash_table_key_type right_value) = strcmp);
 
 int main (int argC, char** argV)
 {
     text           dictionary     = {};
     for_hash_table for_hash_table = {}; 
 
-    ProcessDictionary (argC, argV, &for_hash_table, &dictionary);
+    ProcessDictionary (argC, argV, &for_hash_table, &dictionary, STANDART_DICTIONARY_FILE, APPROX_VECTOR_SIZE);
 
     FILE* csv_file = OpenFile (argC, argV, "out", "w", STANDART_CSV_FILE);
     assert (csv_file != nullptr);
+
+    fprintf (csv_file, "Hash function name,Test runtime,Bucket's nums,");
 
     for (size_t i = 0; i < for_hash_table.length_of_table; i++)
     {
@@ -43,7 +47,10 @@ void TestHashFunctions (for_hash_table* for_hash_table, FILE* csv_file)
     assert (for_hash_table != nullptr);
     assert (csv_file       != nullptr);
 
-#define TEST_HASH_FUNCTION(HashFunction) TestHashFunction (for_hash_table, csv_file, HashFunction);
+#define TEST_HASH_FUNCTION(HashFunction)                      \
+                                                              \
+    fprintf (csv_file, "%s,", #HashFunction);                 \
+    TestHashFunction (for_hash_table, csv_file, HashFunction);\
 
     TEST_HASH_FUNCTION (CountUnaryHash)
     TEST_HASH_FUNCTION (CountLengthHash)
@@ -57,8 +64,8 @@ void TestHashFunctions (for_hash_table* for_hash_table, FILE* csv_file)
 
 }
 
-void TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*CountHash) (hash_table_val_type elem), 
-                       int (*Comparator) (hash_table_val_type left_value, hash_table_val_type right_value))
+float TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*CountHash) (hash_table_key_type elem), 
+                        int (*Comparator) (hash_table_key_type left_value, hash_table_key_type right_value))
 {
     assert (for_hash_table != nullptr);
     assert (csv_file       != nullptr);
@@ -67,7 +74,13 @@ void TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*Co
 
     hash_table hash_table = {};
 
-    FillHashTable (&hash_table, for_hash_table, CountHash, Comparator);
+    BuildHashTable (&hash_table, for_hash_table->length_of_table, CountHash, Comparator);
+
+    clock_t start_time = clock ();
+    FillHashTable (&hash_table, for_hash_table);
+    clock_t end_time = clock ();
+
+    fprintf (csv_file, "%f,Bucket sizes,", (float)(end_time - start_time)/CLOCKS_PER_SEC);
 
     for (size_t i = 0; i < for_hash_table->length_of_table; i++)
     {
@@ -77,4 +90,6 @@ void TestHashFunction (for_hash_table* for_hash_table, FILE* csv_file, hash (*Co
     fprintf (csv_file, "\n");
 
     DestroyHashTable (&hash_table);
+
+    return (float)(end_time - start_time)/CLOCKS_PER_SEC;
 }

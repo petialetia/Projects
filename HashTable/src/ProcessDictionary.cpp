@@ -1,10 +1,14 @@
 #include "../include/ProcessDictionary.hpp"
 
-void ProcessDictionary (int argC, char** argV, for_hash_table* for_hash_table, text* dictionary, const char* dictionary_file_name)
+void ProcessDictionary (int argC, char** argV, for_hash_table* for_hash_table, text* dictionary, 
+                        const char* dictionary_file_name, size_t approx_vector_size)
 {
-    assert (argV           != nullptr);
-    assert (for_hash_table != nullptr);
-    assert (dictionary     != nullptr);
+    assert (argV                 != nullptr);
+    assert (for_hash_table       != nullptr);
+    assert (dictionary           != nullptr);
+    assert (dictionary_file_name != nullptr);
+
+    assert (approx_vector_size > 0);
 
     ProcessInput (argC, argV, dictionary, dictionary_file_name);
 
@@ -14,7 +18,7 @@ void ProcessDictionary (int argC, char** argV, for_hash_table* for_hash_table, t
     for_hash_table->num_of_translation_pairs = num_of_lines/2;
     for_hash_table->translation_pairs = FillTranslationPairs (dictionary, for_hash_table->num_of_translation_pairs);
 
-    for_hash_table->length_of_table = FindMaxPrimeNumberInRange (for_hash_table->num_of_translation_pairs/APPROX_VECTOR_SIZE);
+    for_hash_table->length_of_table = FindMaxPrimeNumberInRange (for_hash_table->num_of_translation_pairs/approx_vector_size);
     assert (for_hash_table->length_of_table != 0); 
 }
 
@@ -95,11 +99,16 @@ size_t FindMaxPrimeNumberInRange (size_t max_number)
     return 0;
 }
 
-void FillHashTable (hash_table* hash_table, for_hash_table* for_hash_table, hash (*CountHash) (hash_table_val_type elem), 
-                    int (*Comparator) (hash_table_val_type left_value, hash_table_val_type right_value))
+void LoadDictionaryInHashTable (hash_table* hash_table, for_hash_table* for_hash_table, hash (*CountHash) (hash_table_val_type elem), 
+                                int (*Comparator) (hash_table_val_type left_value, hash_table_val_type right_value))
 {
     BuildHashTable (hash_table, for_hash_table->length_of_table, CountHash, Comparator);
 
+    FillHashTable (hash_table, for_hash_table);
+}
+
+void FillHashTable (hash_table* hash_table, for_hash_table* for_hash_table)
+{
     for (size_t i = 0; i < for_hash_table->num_of_translation_pairs; i++)
     {
         InsertHashTable (hash_table, for_hash_table->translation_pairs[i].eng_word, for_hash_table->translation_pairs[i].rus_word);

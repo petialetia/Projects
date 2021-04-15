@@ -3,6 +3,8 @@
 
 #include "ForHashTable.hpp"
 
+const size_t NUM_OF_HASH_FUNCTIONS = 7;
+
 const size_t BYTE_SIZE = 8;
 
 const size_t BIG_PRIME_NUMBER = 999983; // the biggest prime number less than 1 000 000
