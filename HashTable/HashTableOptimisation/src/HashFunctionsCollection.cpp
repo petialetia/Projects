@@ -62,7 +62,7 @@ size_t CountRolHash (hash_table_val_type elem)
 
 size_t CountPolynomialHash (hash_table_val_type elem)
 {
-    /*assert (elem != nullptr);
+    assert (elem != nullptr);
 
     __asm__(
         ".intel_syntax noprefix\n"
@@ -95,9 +95,9 @@ size_t CountPolynomialHash (hash_table_val_type elem)
             "ret\n"
         
         ".att_syntax\n"
-    );*/
+    );
 
-    assert (elem != nullptr);
+    /*assert (elem != nullptr);
 
     hash hash = 0;
 
@@ -106,7 +106,7 @@ size_t CountPolynomialHash (hash_table_val_type elem)
         hash = (hash * ((1 << BYTE_SIZE) - 1) + *elem) % BIG_PRIME_NUMBER;
     }
 
-    return hash;
+    return hash;*/
 }
 
 #undef ROR
