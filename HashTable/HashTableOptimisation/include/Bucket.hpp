@@ -19,12 +19,14 @@ const size_t START_BUCKET_CAPACITY = 15;
 
 const hash_table_val_type POISON = nullptr;
 
+__m256i CastStringToVector (const char* string);
+
 void BuildBucket (bucket_info* bucket, size_t start_capacity = START_BUCKET_CAPACITY);
 
 void PushBackBucket (bucket_info* bucket, bucket_elem elem);
 
 hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
-                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value, const int imm8));
+                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value));
 
 void DestroyBucket (bucket_info* bucket);
 

@@ -1,12 +1,12 @@
 #include "../include/Bucket.hpp"
 
-__m256 CastStringToVector (const char* string)
+__m256i CastStringToVector (const char* string)
 {
     assert (string != nullptr);
 
-    char buf[sizeof (__m256)] = {};
+    char buf[sizeof (__m256i)] = {};
     strcpy (buf, string);
-    return _mm256_loadu_ps((const float*)buf);
+    return _mm256_loadu_si256((const __m256i*)buf);
 }
 
 void BuildBucket (bucket_info* bucket, size_t start_capacity)
@@ -38,23 +38,23 @@ void PushBackBucket (bucket_info* bucket, bucket_elem elem)
 }
 
 hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
-                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value, const int imm8))
+                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
 {
     assert (bucket     != nullptr);
     assert (Comparator != nullptr);
 
-    //__m256 searchable_key_vector = CastStringToVector (key);
+    __m256i searchable_key_vector = CastStringToVector (key);
 
     for (size_t i = 0; i < bucket->size; i++)
     {
-        printf ("%s\n", bucket->data[i].key);
-        printf ("%s\n", key);
-        if (!(~Comparator (CastStringToVector (bucket->data[i].key), CastStringToVector (key), _CMP_EQ_OQ))) return bucket->data[i].val;   
-        printf ("%d\n", ~Comparator (CastStringToVector (bucket->data[i].key), CastStringToVector (key), _CMP_EQ_OQ)); 
-        printf ("HEY\n");         
+        //printf ("<%s>\n", bucket->data[i].key);
+        //printf ("<%s>\n", key);
+        if (!(~Comparator (CastStringToVector (bucket->data[i].key), searchable_key_vector /*key*/))) return bucket->data[i].val;   
+        //printf ("%d\n", ~Comparator (CastStringToVector (bucket->data[i].key), CastStringToVector (key))); 
+        //printf ("HEY\n");         
     }
 
-    printf ("HOY\n");
+    //printf ("HOY\n");
 
     return POISON;    
 }

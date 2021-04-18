@@ -115,7 +115,7 @@ size_t FindMaxPrimeNumberInRange (size_t max_number)
 }
 
 void LoadDictionaryInHashTable (hash_table* hash_table, for_hash_table* for_hash_table, hash (*CountHash) (hash_table_val_type elem), 
-                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value, const int imm8))
+                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
 {
     BuildHashTable (hash_table, for_hash_table->length_of_table, CountHash, Comparator);
 

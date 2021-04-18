@@ -1,15 +1,15 @@
 #include "../include/HashTable.hpp"
 
-int StandartComparator (/*__m256*/hash_table_cmp_type left_key, /*__m256*/hash_table_cmp_type right_key, const int imm8)
+int StandartComparator (/*__m256*/hash_table_cmp_type left_key, /*__m256*/hash_table_cmp_type right_key)
 {
-    return _mm256_movemask_ps (_mm256_cmp_ps (right_key, left_key, /*imm8*/_CMP_EQ_OQ));
+    return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (right_key, left_key /*imm8*//*_CMP_EQ_OQ*/));
 
     //return strcmp (left_key, right_key);
 }
 
 void BuildHashTable (hash_table* hash_table, size_t length_of_table, 
                      hash (*CountHash) (hash_table_val_type elem), 
-                     int  (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value, const int imm8))
+                     int  (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
 {
     assert (hash_table      != nullptr);
     assert (length_of_table != 0);
@@ -44,7 +44,7 @@ hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type k
 
     hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
 
-    printf ("%zu\n", hash);
+    //printf ("%zu\n", hash);
 
     return FindBucket (&hash_table->columns[hash], key, hash_table->Comparator);
 }
