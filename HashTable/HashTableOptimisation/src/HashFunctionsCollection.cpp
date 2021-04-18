@@ -103,7 +103,7 @@ size_t CountPolynomialHash (hash_table_val_type elem)
 
     for (; *elem != '\0'; elem++)
     {
-        hash = (hash * ((1 << BYTE_SIZE) - 1) + *elem) % BIG_PRIME_NUMBER;
+        hash = (hash * (1 << BYTE_SIZE) + *elem) % BIG_PRIME_NUMBER;
     }
 
     return hash;*/

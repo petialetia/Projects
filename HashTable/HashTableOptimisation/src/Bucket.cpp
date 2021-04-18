@@ -31,7 +31,7 @@ void PushBackBucket (bucket_info* bucket, bucket_elem elem)
     {
         bucket->capacity = bucket->capacity * GROWTH_COEF;
 
-        //bucket->data = (bucket_elem*) realloc (bucket->data, bucket->size * sizeof (bucket_elem) * GROWTH_COEF);
+        //bucket->data = (bucket_elem*) realloc (bucket->data, bucket->capacity * sizeof (bucket_elem));
 
         bucket_elem* new_data = (bucket_elem*) aligned_alloc (32, bucket->capacity * sizeof(bucket_elem));
         memcpy (new_data, bucket->data, bucket->size * sizeof (bucket_elem));
