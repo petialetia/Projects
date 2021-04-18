@@ -2,7 +2,7 @@
 
 int main (int argC, char** argV)
 {
-    text           dictionary     = {};
+    /*text           dictionary     = {};
     for_hash_table for_hash_table = {}; 
 
     ProcessDictionary (argC, argV, &for_hash_table, &dictionary);
@@ -10,6 +10,8 @@ int main (int argC, char** argV)
     hash_table hash_table = {};
 
     LoadDictionaryInHashTable (&hash_table, &for_hash_table, CountPolynomialHash);
+
+    //LoadDictionaryInHashTable (&hash_table, &for_hash_table, CountUnaryHash);
 
     text text = {};
 
@@ -20,15 +22,22 @@ int main (int argC, char** argV)
     DestroyText (&text);
     DestroyHashTable (&hash_table);
     free (for_hash_table.translation_pairs);
-    DestroyText (&dictionary);
+    DestroyText (&dictionary);*/
 
-    /*hash_table hash_table = {};
+    hash_table hash_table = {};
 
-    BuildHashTable (&hash_table, 2, CountPolynomialHash, strcmp);
+    BuildHashTable (&hash_table, 1300, CountPolynomialHash, StandartComparator);
 
     InsertHashTable (&hash_table, "test", "тест");
 
-    DestroyHashTable (&hash_table);*/
+    const char* translated = FindHashTable (&hash_table, "test"); 
+
+    if (translated == nullptr) printf ("Word isn't found\n");
+    else printf ("%s\n", translated);
+
+    //printf ("%s\n", FindHashTable (&hash_table, "test"));
+
+    DestroyHashTable (&hash_table);
 
     //printf ("%zu\n", CountPolynomialHash ("test"));
 }

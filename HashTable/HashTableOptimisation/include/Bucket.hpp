@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #include "ForHashTable.hpp"
 
@@ -23,7 +24,7 @@ void BuildBucket (bucket_info* bucket, size_t start_capacity = START_BUCKET_CAPA
 void PushBackBucket (bucket_info* bucket, bucket_elem elem);
 
 hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
-                                int (*Comparator) (hash_table_key_type left_value, hash_table_key_type right_value));
+                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value, const int imm8));
 
 void DestroyBucket (bucket_info* bucket);
 

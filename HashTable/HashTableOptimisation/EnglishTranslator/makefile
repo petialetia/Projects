@@ -14,10 +14,10 @@ EnglishTranslator.out: src/EnglishTranslator.cpp src/EnglishTranslator.hpp ../bi
 	g++ -c ../src/TextFunctions.cpp $(options) -o ../bin/TextFunctions.o
 
 ../bin/HashTable.o: ../src/HashTable.cpp ../include/HashTable.hpp
-	g++ -c ../src/HashTable.cpp $(options) -o ../bin/HashTable.o
+	g++ -c ../src/HashTable.cpp $(options) -mavx -o ../bin/HashTable.o
 
 ../bin/Bucket.o: ../src/Bucket.cpp ../include/Bucket.hpp
-	g++ -c ../src/Bucket.cpp $(options) -o ../bin/Bucket.o
+	g++ -c ../src/Bucket.cpp $(options) -mavx -o ../bin/Bucket.o
 
 ../bin/HashFunctionsCollection.o: ../src/HashFunctionsCollection.cpp ../include/HashFunctionsCollection.hpp ../include/ForHashTable.hpp
 	g++ -c ../src/HashFunctionsCollection.cpp $(options) -o ../bin/HashFunctionsCollection.o
