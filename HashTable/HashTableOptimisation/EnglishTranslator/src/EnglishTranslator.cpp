@@ -2,6 +2,8 @@
 
 int main (int argC, char** argV)
 {
+    //printf ("%zu\n", sizeof (hash_table_node));
+
     text           dictionary     = {};
     for_hash_table for_hash_table = {}; 
 
@@ -26,12 +28,14 @@ int main (int argC, char** argV)
 
     BuildHashTable (&hash_table, 1300, CountPolynomialHash, StandartComparator);
 
-    InsertHashTable (&hash_table, "eeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "тест");
+    InsertHashTable (&hash_table, "brother", "брат");
 
-    const char* translated = FindHashTable (&hash_table, "eeeeeeeeeeeeeeeeeeeeeeeeeeeeee"); 
+    //InsertHashTable (&hash_table, "take", "взять");
+
+    const char* translated = FindHashTable (&hash_table, "brother"); 
 
     if (translated == nullptr) printf ("Word isn't found\n");
-    else printf ("%s\n", translated);
+    else printf ("<%s>\n", translated);
 
     //printf ("%s\n", FindHashTable (&hash_table, "test"));
 

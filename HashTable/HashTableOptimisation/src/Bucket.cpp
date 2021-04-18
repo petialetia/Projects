@@ -14,9 +14,9 @@ void BuildBucket (bucket_info* bucket, size_t start_capacity)
     assert (bucket != nullptr);
     assert (start_capacity != 0);
 
-    bucket->data = (bucket_elem*) calloc (sizeof (bucket_elem), start_capacity);
+    //bucket->data = (bucket_elem*) calloc (sizeof (bucket_elem), start_capacity);
 
-    //bucket->data = (bucket_elem*) aligned_alloc (64, start_capacity*sizeof(bucket_elem));
+    bucket->data = (bucket_elem*) aligned_alloc (32, start_capacity*sizeof(bucket_elem));
 
     bucket->size = 0;
     bucket->capacity = start_capacity;
@@ -24,16 +24,32 @@ void BuildBucket (bucket_info* bucket, size_t start_capacity)
 
 void PushBackBucket (bucket_info* bucket, bucket_elem elem)
 {
+    //printf ("HI\n");
+
     assert (bucket != nullptr);
     assert (bucket->size <= bucket->capacity);
 
     if (bucket->capacity == bucket->size)
     {
-        bucket->data = (bucket_elem*) realloc (bucket->data, bucket->size * sizeof (bucket_elem) * GROWTH_COEF);
         bucket->capacity = bucket->capacity * GROWTH_COEF;
+
+        //bucket->data = (bucket_elem*) realloc (bucket->data, bucket->size * sizeof (bucket_elem) * GROWTH_COEF);
+
+        bucket_elem* new_data = (bucket_elem*) aligned_alloc (32, bucket->capacity * sizeof(bucket_elem));
+        memcpy (new_data, bucket->data, bucket->size * sizeof (bucket_elem));
+        free (bucket->data);
+        bucket->data = new_data;
     }  
 
     bucket->data[bucket->size] = elem;
+
+    /*u_int64_t string[8] = {};
+
+    string[0] = _mm256_extract_epi64 (bucket->data[bucket->size].key, 0);
+    string[1] = _mm256_extract_epi64 (bucket->data[bucket->size].key, 1);
+
+    printf ("<%s>!!\n", (char*) string);*/
+
     bucket->size++;   
 }
 
@@ -47,14 +63,8 @@ hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key,
 
     for (size_t i = 0; i < bucket->size; i++)
     {
-        //printf ("<%s>\n", bucket->data[i].key);
-        //printf ("<%s>\n", key);
-        if (!(~Comparator (CastStringToVector (bucket->data[i].key), searchable_key_vector /*key*/))) return bucket->data[i].val;   
-        //printf ("%d\n", ~Comparator (CastStringToVector (bucket->data[i].key), CastStringToVector (key))); 
-        //printf ("HEY\n");         
+        if (!(~Comparator (bucket->data[i].key, searchable_key_vector /*key*/))) return bucket->data[i].val;        
     }
-
-    //printf ("HOY\n");
 
     return POISON;    
 }
