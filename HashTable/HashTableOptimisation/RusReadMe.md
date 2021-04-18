@@ -12,7 +12,13 @@
 
 Замечаем, что одними из самых долгих функций является CountPolynomialHash и FindHashTable. Сперва я решил оптимизировать подсчёт хеша, поскольку к этой функции сводится почти любое взаимодействие с хеш-таблицей, в том числе и InsertHashTable.
 
-1) Переписывание CountPolynomialHash на ассемблере в виде ассемблерной вставки (-4,7% от времени работы)
+1) Переписывание CountPolynomialHash на ассемблере в виде ассемблерной вставки
+
+Вот как я переписал функцию хеширования;
+
+![](EnglishTranslator/Screenshots/PolynomialHashOptimised.png)
+
+Выхлоп от моих действий: -4,7% от времени работы
 
 ![](EnglishTranslator/Screenshots/CountPolynomialHashOptimised.jpg)
 
@@ -26,7 +32,13 @@
 
 ![](EnglishTranslator/Screenshots/FindHashTableAsm.jpg)
 
-3) Переписывание FindHashTable на ассемблере в виде отдельного файла FindHashTable.asm (-0,3% от времени работы)
+3) Переписывание FindHashTable на ассемблере в виде отдельного файла FindHashTable.asm
+
+Вот как я переписал FindHashTable:
+
+![](EnglishTranslator/Screenshots/FindHashTableOptimised.png)
+
+Выхлоп от моих действий: -0,3% от времени работы
 
 ![](EnglishTranslator/Screenshots/FindHashTableOptimised.jpg)
 

@@ -96,7 +96,7 @@ size_t CountPolynomialHash (hash_table_val_type elem)
         
         ".att_syntax\n"
     );
-
+}
     /*assert (elem != nullptr);
 
     hash hash = 0;
@@ -107,7 +107,7 @@ size_t CountPolynomialHash (hash_table_val_type elem)
     }
 
     return hash;*/
-}
+//}
 
 #undef ROR
 #undef ROL
