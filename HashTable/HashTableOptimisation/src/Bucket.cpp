@@ -24,8 +24,6 @@ void BuildBucket (bucket_info* bucket, size_t start_capacity)
 
 void PushBackBucket (bucket_info* bucket, bucket_elem elem)
 {
-    //printf ("HI\n");
-
     assert (bucket != nullptr);
     assert (bucket->size <= bucket->capacity);
 
@@ -42,19 +40,11 @@ void PushBackBucket (bucket_info* bucket, bucket_elem elem)
     }  
 
     bucket->data[bucket->size] = elem;
-
-    /*u_int64_t string[8] = {};
-
-    string[0] = _mm256_extract_epi64 (bucket->data[bucket->size].key, 0);
-    string[1] = _mm256_extract_epi64 (bucket->data[bucket->size].key, 1);
-
-    printf ("<%s>!!\n", (char*) string);*/
-
     bucket->size++;   
 }
 
-hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
-                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
+extern "C" hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
+                                           int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
 {
     assert (bucket     != nullptr);
     assert (Comparator != nullptr);

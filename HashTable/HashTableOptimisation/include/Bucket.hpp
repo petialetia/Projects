@@ -25,8 +25,8 @@ void BuildBucket (bucket_info* bucket, size_t start_capacity = START_BUCKET_CAPA
 
 void PushBackBucket (bucket_info* bucket, bucket_elem elem);
 
-hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
-                                int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value));
+extern "C" hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
+                                           int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value));
 
 void DestroyBucket (bucket_info* bucket);
 

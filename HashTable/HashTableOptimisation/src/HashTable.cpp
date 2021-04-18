@@ -1,24 +1,8 @@
 #include "../include/HashTable.hpp"
 
-int StandartComparator (/*__m256*/hash_table_cmp_type left_key, /*__m256*/hash_table_cmp_type right_key)
+int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key)
 {
-    //printf ("Test\n");
-
-    /*u_int64_t string[8] = {};
-
-    /*for (int i = 0; i < 2; i++)
-    {
-        string[i] = _mm256_extract_epi64 (left_key, i);
-    }*/
-
-    /*string[0] = _mm256_extract_epi64 (left_key, 0);
-    string[1] = _mm256_extract_epi64 (left_key, 1);
-
-    printf ("<%s>!!!\n", (char*) string);*/
-
-    //return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (left_key, right_key /*imm8*//*_CMP_EQ_OQ*/));
-
-    return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (left_key, right_key /*imm8*//*_CMP_EQ_OQ*/));
+    return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (left_key, right_key));
 
     //return strcmp (left_key, right_key);
 }
@@ -51,21 +35,17 @@ void InsertHashTable (hash_table* hash_table, hash_table_key_type key, hash_tabl
 
     hash hash = hash_table->CountHash (key);
 
-    //printf ("<%s>!\n", key);
-
     PushBackBucket (&hash_table->columns[hash%hash_table->length_of_table], {CastStringToVector(key), val});
 }
 
-hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type key)
+/*hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type key)
 {
     assert (hash_table != nullptr);
 
     hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
 
-    //printf ("%zu\n", hash);
-
     return FindBucket (&hash_table->columns[hash], key, hash_table->Comparator);
-}
+}*/
 
 void DestroyHashTable (hash_table* hash_table)
 {

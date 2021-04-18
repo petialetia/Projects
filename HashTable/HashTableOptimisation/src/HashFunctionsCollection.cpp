@@ -67,24 +67,24 @@ size_t CountPolynomialHash (hash_table_val_type elem)
     __asm__(
         ".intel_syntax noprefix\n"
 
-            "xor rax, rax\n"
-            "mov cl,  8\n"
-            "mov rsi, 999983\n"
+            "xor rax, rax\n"            //rax - hash
+            "mov cl,  8\n"              //cl  - offset for multiplication
+            "mov rsi, 999983\n"         //rsi - big prime number
 
         "COUNT_HASH_LOOP:\n"
 
-            "cmp byte ptr [rdi], 0\n"
+            "cmp byte ptr [rdi], 0\n"   //checking if string is ended
             "je END_OF_COUNT_HASH\n"
 
-            "shl rax, cl\n"
-            "adc al, [rdi]\n"
+            "shl rax, cl\n"             //multiplication
+            "adc al, [rdi]\n"           //addition of next letter
 
-            "xor rdx, rdx\n"
+            "xor rdx, rdx\n"            //needed for correct division
 
             "div rsi\n"
 
-            "mov rax, rdx\n"
-            "inc rdi\n"
+            "mov rax, rdx\n"            //mov remainder to rax 
+            "inc rdi\n"                 //prepare to process next letter
 
             "jmp COUNT_HASH_LOOP\n"
 

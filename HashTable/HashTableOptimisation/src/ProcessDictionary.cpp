@@ -54,21 +54,6 @@ translation_pair* FillTranslationPairs (text* dictionary, size_t num_of_translat
     }
     while ((i <= dictionary->file_length) && (dictionary->pointer_on_buffer[i] != '\0') && (num_of_pair < num_of_translation_pairs));
 
-    /*size_t max_len = 0;
-    const char* longest_word = nullptr;
-
-    for (size_t i = 0, len = 0; i < num_of_translation_pairs; i++)
-    {
-        len = strlen (translation_pairs[i].eng_word);
-        if (len > max_len) 
-        {
-            max_len = len;
-            longest_word = translation_pairs[i].eng_word; 
-        } 
-    }
-
-    printf ("%s = %zu\n", longest_word, max_len);*/
-
     return translation_pairs;
 }
 
