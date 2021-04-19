@@ -62,10 +62,6 @@
 
 ![](ComparisonOfHashFunctions/Graphics/CountPolynomialHash.png)
 
-График со сравнением 3 лучших хеш функций, на котором бакеты идут в порядке уменьшения их размера (синий - ror hash, рыжий - rol hash, серый - polynomial hash)
-
-![](ComparisonOfHashFunctions/Graphics/ComparisonGraphic.png)
-
 Больше подробностей в ридми в папке ComparisonOfHashFunctions
 
 ## Переводчик с английского
