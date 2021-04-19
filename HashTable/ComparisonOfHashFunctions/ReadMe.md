@@ -1,10 +1,10 @@
-First of all:
+> First of all:
 
-Всем, кто разумеет, что написано в этом предложении, советую читать ридми в оригинале, т.е. на русском языке, см. RusReadMe.md 
+>> Всем, кто разумеет, что написано в этом предложении, советую читать ридми в оригинале, т.е. на русском языке, см. RusReadMe.md 
 
-Second of all:
+> Second of all:
 
-Pardon my English
+>> Pardon my English
 
 Hash table task
 

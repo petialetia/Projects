@@ -1,5 +1,9 @@
 options = -Wall -Wextra -pedantic
 
+run: EnglishTranslator.out
+#	valgrind --tool=callgrind ./EnglishTranslator.out in ../../Dictionary.txt out Translated.html
+	./EnglishTranslator.out in ../../Dictionary.txt out Translated.html
+
 recompile:
 	g++ -c ../src/HashFunctionsCollection.cpp $(options) -o ../bin/HashFunctionsCollection.o
 	g++ -c ../src/Bucket.cpp $(options) -mavx -o ../bin/Bucket.o
@@ -16,9 +20,6 @@ test:
 	./EnglishTranslator.out in ../../Dictionary.txt out Translated.html
 	./EnglishTranslator.out in ../../Dictionary.txt out Translated.html
 
-run: EnglishTranslator.out
-#	valgrind --tool=callgrind ./EnglishTranslator.out in ../../Dictionary.txt out Translated.html
-	./EnglishTranslator.out in ../../Dictionary.txt out Translated.html
 
 EnglishTranslator.out: src/EnglishTranslator.cpp src/EnglishTranslator.hpp ../bin/ProcessDictionary.o ../bin/TextFunctions.o ../bin/HashTable.o ../bin/HashFunctionsCollection.o ../bin/Bucket.o ../bin/FindHashTable.o
 	g++ src/EnglishTranslator.cpp ../bin/ProcessDictionary.o ../bin/TextFunctions.o ../bin/HashTable.o ../bin/HashFunctionsCollection.o ../bin/Bucket.o ../bin/FindHashTable.o $(options) -o EnglishTranslator.out
