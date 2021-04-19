@@ -1,6 +1,7 @@
 #define NDEBUG
 
 #include <ctype.h>
+#include <time.h>
 
 #include "../../include/HashFunctionsCollection.hpp"
 #include "../../include/ProcessDictionary.hpp"
