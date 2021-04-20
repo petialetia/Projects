@@ -14,9 +14,15 @@ void BuildBucket (bucket_info* bucket, size_t start_capacity)
     assert (bucket != nullptr);
     assert (start_capacity != 0);
 
-    //bucket->data = (bucket_elem*) calloc (sizeof (bucket_elem), start_capacity);
+#ifdef AVX_INSTRUCTIONS
 
     bucket->data = (bucket_elem*) aligned_alloc (32, start_capacity*sizeof(bucket_elem));
+
+#else
+
+    bucket->data = (bucket_elem*) calloc (sizeof (bucket_elem), start_capacity);
+
+#endif
 
     bucket->size = 0;
     bucket->capacity = start_capacity;
@@ -31,33 +37,55 @@ void PushBackBucket (bucket_info* bucket, bucket_elem elem)
     {
         bucket->capacity = bucket->capacity * GROWTH_COEF;
 
-        //bucket->data = (bucket_elem*) realloc (bucket->data, bucket->capacity * sizeof (bucket_elem));
+#ifdef AVX_INSTRUCTIONS
 
         bucket_elem* new_data = (bucket_elem*) aligned_alloc (32, bucket->capacity * sizeof(bucket_elem));
         memcpy (new_data, bucket->data, bucket->size * sizeof (bucket_elem));
         free (bucket->data);
         bucket->data = new_data;
+
+#else
+
+        bucket->data = (bucket_elem*) realloc (bucket->data, bucket->capacity * sizeof (bucket_elem));
+
+#endif
+
     }  
 
     bucket->data[bucket->size] = elem;
     bucket->size++;   
 }
 
-/*hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
+#ifndef FindBucketOptimised
+
+hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
                                 int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
 {
     assert (bucket     != nullptr);
     assert (Comparator != nullptr);
 
+    #ifdef AVX_INSTRUCTIONS
+
     __m256i searchable_key_vector = CastStringToVector (key);
 
     for (size_t i = 0; i < bucket->size; i++)
     {
-        if (!(~Comparator (bucket->data[i].key, searchable_key_vector /*key))) return bucket->data[i].val;        
+        if (!(~Comparator (bucket->data[i].key, searchable_key_vector))) return bucket->data[i].val;        
     }
 
+    #else
+
+    for (size_t i = 0; i < bucket->size; i++)
+    {
+        if (!(Comparator (bucket->data[i].key, key))) return bucket->data[i].val;        
+    }
+
+    #endif
+
     return POISON;    
-}*/
+}
+
+#endif
 
 void DestroyBucket (bucket_info* bucket)
 {

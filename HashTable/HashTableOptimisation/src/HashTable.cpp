@@ -1,11 +1,26 @@
 #include "../include/HashTable.hpp"
 
-/*int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key)
+#ifndef StandartComparatorOptimised
+
+int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key)
 {
+    #ifdef AVX_INSTRUCTIONS
+
     return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (left_key, right_key));
 
-    //return strcmp (left_key, right_key);
-}*/
+    #else
+
+    return strcmp (left_key, right_key);
+
+    #endif
+}
+
+#endif
+
+extern "C" int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key)
+{
+    return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (left_key, right_key));   
+}
 
 void BuildHashTable (hash_table* hash_table, size_t length_of_table, 
                      hash (*CountHash) (hash_table_val_type elem), 
@@ -35,17 +50,36 @@ void InsertHashTable (hash_table* hash_table, hash_table_key_type key, hash_tabl
 
     hash hash = hash_table->CountHash (key);
 
+#ifdef AVX_INSTRUCTIONS
+
     PushBackBucket (&hash_table->columns[hash%hash_table->length_of_table], {CastStringToVector(key), val});
+
+#else
+
+    PushBackBucket (&hash_table->columns[hash%hash_table->length_of_table], {key, val});
+
+#endif
 }
+
+#ifndef FindHashTableOptimised
 
 hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type key)
 {
     assert (hash_table != nullptr);
 
-    hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
+    hash_table_val_type translated = nullptr;
 
-    return FindBucket (&hash_table->columns[hash], key, hash_table->Comparator);
+    for (size_t i = 0; i < num_of_repeat; i++)
+    {
+        hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
+
+        translated = FindBucket (&hash_table->columns[hash], key, hash_table->Comparator);
+    }
+
+    return translated;
 }
+
+#endif
 
 void DestroyHashTable (hash_table* hash_table)
 {

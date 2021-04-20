@@ -64,6 +64,8 @@ size_t CountPolynomialHash (hash_table_val_type elem)
 {
     assert (elem != nullptr);
 
+#ifdef CountPolynomialHashOptimised
+
     __asm__(
         ".intel_syntax noprefix\n"
 
@@ -96,8 +98,8 @@ size_t CountPolynomialHash (hash_table_val_type elem)
         
         ".att_syntax\n"
     );
-}
-/*    assert (elem != nullptr);
+
+#else
 
     hash hash = 0;
 
@@ -107,7 +109,10 @@ size_t CountPolynomialHash (hash_table_val_type elem)
     }
 
     return hash;
-}*/
+
+#endif
+
+}
 
 #undef ROR
 #undef ROL

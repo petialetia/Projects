@@ -2,6 +2,13 @@
 
 int main (int argC, char** argV)
 {
+
+#ifdef PRINTF_RUNTIME
+
+    time_t start_time = clock ();
+
+#endif
+
     text           dictionary     = {};
     for_hash_table for_hash_table = {}; 
 
@@ -21,6 +28,15 @@ int main (int argC, char** argV)
     DestroyHashTable (&hash_table);
     free (for_hash_table.translation_pairs);
     DestroyText (&dictionary);
+
+#ifdef PRINTF_RUNTIME
+
+    time_t end_time = clock ();
+
+    printf ("%f\n", (float)(end_time - start_time)/CLOCKS_PER_SEC); 
+
+#endif
+
 }
 
 void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, const char* output_file_name)
