@@ -16,6 +16,14 @@
 
 ![](EnglishTranslator/Screenshots/VectorInstructionsOptimisation.png)
 
+
+|                                | Average runtime |
+|--------------------------------|-----------------|
+| BeforeOptimisation             |    1.0223664    |
+| VectorInstructionsOptimisation |    1.0071754    |
+
+#### Процентный рост скорости: 1,49 %
+
 Время работы незначительно уменьшилось, одного этого точно не хватит, поэтому перепишем FindBucket
 
 2) Переписывание FindBucket на ассемблере в виде отдельного файла FindBucket.asm:
@@ -87,25 +95,45 @@ FindBucketExit:
 
 ![](EnglishTranslator/Screenshots/FindBucketOptimised.png)
 
-Имеем увеличение производительности на 15,5%. Уже неплохо. Теперь перепишем компаратор
+
+|                                | Average runtime |
+|--------------------------------|-----------------|
+| VectorInstructionsOptimisation |    1.0071754    |
+| FindBucketOptimised            |    0.8510366    |
+
+#### Процентный рост скорости: 15,5 %
+
+Имеем достаточно значительное увеличение производительности. Уже неплохо. Теперь перепишем компаратор
 
 3) Переписываю компаратор в отдельном файле: 
 
 ![](EnglishTranslator/Screenshots/ComparatorOnAsm.png)
 
-Имеем с этого выхлоп в почти 40%. 
+|                                | Average runtime |
+|--------------------------------|-----------------|
+| FindBucketOptimised            |    0.8510366    |
+| StandartComparatorOptimised    |    0.5281352    |
 
-![](EnglishTranslator/Screenshots/ComparatorOptimisation.png)
+#### Процентный рост скорости: 37,94 %
+
+![](EnglishTranslator/Screenshots/StandartComparatorOptimised.png)
 
 Поскольку компаратор часто вызывается, имеет смысл "заинлайнить" его внутри функции FindBucket
 
 4) Инлайним StandartComparator:
 
-Здесь вставка фотки, где изменилось у нас FindBuffer
+![](EnglishTranslator/Screenshots/FindBucketWithComparatorAsm.png)
 
-Имеем выхлоп в 18,76% только за счёт того, что избавились от многократных выховов небольшой функции.
+|                                | Average runtime |
+|--------------------------------|-----------------|
+| StandartComparatorOptimised    |    0.5281352    |
+| ComparatorInligned             |    0.4290328    |
 
-![](EnglishTranslator/Screenshots/ComparatorOptimisation.png)
+#### Процентный рост скорости: 18,76 %
+
+Имеем значительный выхлоп только за счёт того, что избавились от многократных вызовов небольшой функции.
+
+![](EnglishTranslator/Screenshots/StandartComparatorInligned.png)
 
 Следующая функция на очереди CountPolynomialHash
 
@@ -115,7 +143,12 @@ FindBucketExit:
 
 ![](EnglishTranslator/Screenshots/PolynomialHashOptimised.png)
 
-Выхлоп от моих действий: -21% от времени работы CountPolynomialHash
+|                                | Average runtime |
+|--------------------------------|-----------------|
+| ComparatorInligned             |    0.4290328    |
+| CountPolynomialHashOptimised   |    0.3381752    |
+
+#### Процентный рост скорости: 21,18 %
 
 ![](EnglishTranslator/Screenshots/CountPolynomialHashOptimised.png)
 
@@ -182,7 +215,14 @@ FindHashTableExit:
     
 ```
 
-![](EnglishTranslator/Screenshots/CountPolynomialHashOptimised.png)
+|                                | Average runtime |
+|--------------------------------|-----------------|
+| CountPolynomialHashOptimised   |    0.3381752    |
+| FindHashTableOptimised         |    0.3367566    |
+
+#### Процентный рост скорости: 0,42 %
+
+![](EnglishTranslator/Screenshots/FindHashTableOptimised.png)
 
 Функция теперь занимает меньше времени в процентном отношении, однако на деле ускорение едва ли ощутимо, мы выиграли всего 0,4%. Поэтому заключаем, что дальняйшая оптимизация не имеет особого смысла, мы потратим непропорционально много усилий на то, чтобы получить околонулевой выигрыш.
 
