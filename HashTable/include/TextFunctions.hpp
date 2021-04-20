@@ -1,3 +1,5 @@
+#define NDEBUG
+
 #pragma once
 
 #include <stdio.h>

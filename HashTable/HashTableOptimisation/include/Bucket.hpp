@@ -1,3 +1,5 @@
+#define NDEBUG
+
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -19,7 +21,7 @@ const size_t START_BUCKET_CAPACITY = 15;
 
 const hash_table_val_type POISON = nullptr;
 
-__m256i CastStringToVector (const char* string);
+extern "C" __m256i CastStringToVector (const char* string);
 
 void BuildBucket (bucket_info* bucket, size_t start_capacity = START_BUCKET_CAPACITY);
 

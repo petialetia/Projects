@@ -1,6 +1,6 @@
 #include "../include/Bucket.hpp"
 
-__m256i CastStringToVector (const char* string)
+extern "C" __m256i CastStringToVector (const char* string)
 {
     assert (string != nullptr);
 
@@ -43,7 +43,7 @@ void PushBackBucket (bucket_info* bucket, bucket_elem elem)
     bucket->size++;   
 }
 
-extern "C" hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
+/*extern "C" hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
                                            int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value))
 {
     assert (bucket     != nullptr);
@@ -53,11 +53,11 @@ extern "C" hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_t
 
     for (size_t i = 0; i < bucket->size; i++)
     {
-        if (!(~Comparator (bucket->data[i].key, searchable_key_vector /*key*/))) return bucket->data[i].val;        
+        if (!(~Comparator (bucket->data[i].key, searchable_key_vector /*key))) return bucket->data[i].val;        
     }
 
     return POISON;    
-}
+}*/
 
 void DestroyBucket (bucket_info* bucket)
 {

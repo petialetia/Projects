@@ -1,3 +1,5 @@
+#define NDEBUG
+
 #include "TextFunctions.hpp"
 #include "ForHashTable.hpp"
 #include "HashTable.hpp"

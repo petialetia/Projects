@@ -27,6 +27,22 @@ int main (int argC, char** argV)
     time_t end_time = clock ();
 
     printf ("%f\n", (float)(end_time - start_time)/CLOCKS_PER_SEC);
+
+    /*hash_table hash_table = {};
+
+    BuildHashTable (&hash_table, 1, CountPolynomialHash, StandartComparator);
+
+    InsertHashTable (&hash_table, "father", "отец");
+
+    InsertHashTable (&hash_table, "test", "тест");
+
+    printf ("%p\n", hash_table.columns[0].data[0].val);
+
+    printf ("%s\n", FindHashTable (&hash_table, "test"));
+
+    //FindHashTable (&hash_table, "test");
+
+    printf ("HEY\n");*/
 }
 
 void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, const char* output_file_name)
@@ -40,11 +56,11 @@ void TranslateText (int argC, char** argV, hash_table* hash_table, text* text, c
     translation_info.html_file = OpenFile (argC, argV, "out", "w", output_file_name);
     assert (translation_info.html_file != nullptr);
 
-    fprintf (translation_info.html_file, "<meta charset=\"UTF-8\">\n<html>\n<body>\n<pre>\n");
+    //fprintf (translation_info.html_file, "<meta charset=\"UTF-8\">\n<html>\n<body>\n<pre>\n");
 
     ProcessTranslation (&translation_info, text, hash_table);
 
-    fprintf (translation_info.html_file, "\n</pre>\n</body>\n</html>");
+    //fprintf (translation_info.html_file, "\n</pre>\n</body>\n</html>");
 }
 
 void ProcessTranslation (translation_info* translation_info, text* text, hash_table* hash_table)
@@ -89,7 +105,7 @@ void PrintSpaces (translation_info* translation_info, text* text)
 
         if (!isalpha (text->pointer_on_buffer[translation_info->index]))
         {
-            fprintf (translation_info->html_file, "%c", text->pointer_on_buffer[translation_info->index]);
+            //fprintf (translation_info->html_file, "%c", text->pointer_on_buffer[translation_info->index]);
 
             if (text->pointer_on_buffer[translation_info->index] == '\n') translation_info->line_length = 0;
             else                                                          translation_info->line_length++;
@@ -107,7 +123,7 @@ void CheckLineOverflow (translation_info* translation_info)
 
     if (translation_info->line_length > MAX_LINE_LENGTH)
     {   
-        fprintf (translation_info->html_file, "\n");
+        //fprintf (translation_info->html_file, "\n");
         translation_info->line_length = 0;   
     }
 }
@@ -216,11 +232,11 @@ void PrintSingleWord (translation_info* translation_info, text* text, const char
     assert (translation_info->html_file != nullptr);
     assert (translated                  != nullptr);
 
-    fprintf (translation_info->html_file, "<span title=\"%s\">", translated);
+    //fprintf (translation_info->html_file, "<span title=\"%s\">", translated);
 
     PrintWord (text, translation_info->html_file, translation_info->length_of_word, &translation_info->index);
 
-    fprintf (translation_info->html_file, "</span>"); 
+    //fprintf (translation_info->html_file, "</span>"); 
 
     translation_info->line_length += translation_info->length_of_word;
 }
@@ -232,14 +248,14 @@ void PrintTwoWords (translation_info* translation_info, text* text, for_combinat
     assert (comb_word_info   != nullptr);
 
     translation_info->line_length += translation_info->length_of_word + comb_word_info->num_of_spaces; 
-    fprintf (translation_info->html_file, "<span title=\"%s\">", comb_word_info->translated);
+    //fprintf (translation_info->html_file, "<span title=\"%s\">", comb_word_info->translated);
 
     if (comb_word_info->is_different_lines)
     {
         translation_info->index--;
 
         PrintWord (text, translation_info->html_file, translation_info->index - translation_info->old_index, &translation_info->old_index);
-        fprintf (translation_info->html_file, "\n");
+        //fprintf (translation_info->html_file, "\n");
 
         translation_info->line_length = 0;
         translation_info->index++;
@@ -252,7 +268,7 @@ void PrintTwoWords (translation_info* translation_info, text* text, for_combinat
 
     PrintWord (text, translation_info->html_file, comb_word_info->length_of_second_word, &translation_info->index);
 
-    fprintf (translation_info->html_file, "</span>");
+    //fprintf (translation_info->html_file, "</span>");
     translation_info->line_length += comb_word_info->length_of_second_word;
 }
 
@@ -266,7 +282,7 @@ void PrintWord (text* text, FILE* html_file, size_t length, size_t* offset)
 
     for (size_t i = 0; i < length; i++)
     {
-        fprintf (html_file, "%c", text->pointer_on_buffer[*offset]);
+        //fprintf (html_file, "%c", text->pointer_on_buffer[*offset]);
         (*offset)++;
     }
 }

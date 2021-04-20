@@ -38,14 +38,14 @@ void InsertHashTable (hash_table* hash_table, hash_table_key_type key, hash_tabl
     PushBackBucket (&hash_table->columns[hash%hash_table->length_of_table], {CastStringToVector(key), val});
 }
 
-/*hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type key)
+hash_table_val_type FindHashTable (hash_table* hash_table, hash_table_key_type key)
 {
     assert (hash_table != nullptr);
 
     hash hash = hash_table->CountHash (key) % hash_table->length_of_table;
 
     return FindBucket (&hash_table->columns[hash], key, hash_table->Comparator);
-}*/
+}
 
 void DestroyHashTable (hash_table* hash_table)
 {
