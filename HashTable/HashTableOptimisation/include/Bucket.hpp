@@ -30,6 +30,9 @@ void PushBackBucket (bucket_info* bucket, bucket_elem elem);
 extern "C" hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
                                            int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value));
 
+/*hash_table_val_type FindBucket (bucket_info* bucket, hash_table_key_type key, 
+                                           int (*Comparator) (hash_table_cmp_type left_value, hash_table_cmp_type right_value));*/
+
 void DestroyBucket (bucket_info* bucket);
 
 void DumpBucket (bucket_info* bucket, const char* const log_file_name = "BucketLog.txt");

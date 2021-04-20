@@ -8,9 +8,9 @@
 
 0) Тестируем на скорость изначальную версию 
 
-![](EnglishTranslator/Screenshots/BeforeOptimisation.jpg)
+![](EnglishTranslator/Screenshots/BeforeOptimisation.png)
 
-Замечаем, что одними из самых долгих функций является CountPolynomialHash и FindHashTable. Сперва я решил оптимизировать подсчёт хеша, поскольку к этой функции сводится почти любое взаимодействие с хеш-таблицей, в том числе и InsertHashTable.
+Замечаем, что одними из самых долгих функций является CountPolynomialHash.
 
 1) Переписывание CountPolynomialHash на ассемблере в виде ассемблерной вставки
 
@@ -18,34 +18,93 @@
 
 ![](EnglishTranslator/Screenshots/PolynomialHashOptimised.png)
 
-Выхлоп от моих действий: -4,7% от времени работы
+Выхлоп от моих действий: -6,1% от времени работы CountPolynomialHash
 
-![](EnglishTranslator/Screenshots/CountPolynomialHashOptimised.jpg)
+![](EnglishTranslator/Screenshots/CountPolynomialHashOptimised.png)
 
-Прирост в скорости работы достаточно значителен. Теперь нам надо ускорить FindHashTable. Учитывая специфику нашей задачи, мы часто пользуемся поиском и почти не пользуемся вставкой, потому временем работы вставки можно немного пожертвовать во благо времени работы поиска. Сделать так можно используя векторные инструкции, мы будем хранить не указатель на массив символов, а вектор, который сравнивается с другим вектором за один такт. Конечно, вставлять вектор чуть менее приятно, чем указатель, поэтому пострадает время вставки, но зато время поиска уменьшится очень значительно
+Прирост в скорости работы достаточно значителен. Теперь нам надо бы ускорить FindBucket. Но, почти сразу за ней по времени работы идёт компаратор, который из себя представляет вызов strcmp. Было бы очень логично переписать хеш-таблицу на векторные инструкции, чтобы компаратор мог за 1 такт сравнить 2 слова, которые даны ему в виде 32-битных векторов __m256i. Это сильно должно ускорить работы программы. Поскольку я всё равно собираюсь это сделать, первее переписывать FindBucket смысла не имеет, иначе потом придётся ещё раз переписывать FindBucket под работу с векторами.
 
-2) Переработка хеш-таблицы под хранение ключа в виде вектора типа __m256i. (-4,5% от времени работы)
+2) Переработка хеш-таблицы под хранение ключа в виде вектора типа __m256i.
 
-![](EnglishTranslator/Screenshots/VectorInstructionOptimisation.jpg)
+![](EnglishTranslator/Screenshots/VectorInstructionsOptimisation.png)
 
-Можно так же переписать сам FindHashTable. Если взглянуть на его вид в ассемблере, то можно заметить множество лишних обращений к стэку (оперативной памяти), перекладываний значений из регистров в регистры туда-сюда, чего можно избежать.
+Есть незначительный прирост в скорости работы FindBucket, но очень сильно упала скорость компаратора, это означает, что его тоже надо будет обязательно переписать. Но пока FindBucket приоритетнее.
 
-![](EnglishTranslator/Screenshots/FindHashTableAsm.jpg)
+3) Переписывание FindBucket на ассемблере в виде отдельного файла FindHashTable.asm : -4,6% от времени работы FindBucket
 
-3) Переписывание FindHashTable на ассемблере в виде отдельного файла FindHashTable.asm
+```
 
-Вот как я переписал FindHashTable:
+global FindBucket
+section .text
 
-![](EnglishTranslator/Screenshots/FindHashTableOptimised.png)
+extern CastStringToVector
 
-Выхлоп от моих действий: -0,3% от времени работы
+FindBucket:
 
-![](EnglishTranslator/Screenshots/FindHashTableOptimised.jpg)
+    push r12
+    push r13
+    push r14
 
-Да, это немного, но это честная работа.
+    mov r12, rdi       ; r12 = bucket pointer
+    mov r14, rdx       ; r14 = Comparator
 
-Вот как менялось общее время работы программы в ходе оптимизации:
+    mov rdi, rsi
+    call CastStringToVector
 
-![](EnglishTranslator/Screenshots/Runtimes.jpg)
+    vmovdqa ymm2, ymm0 ; saving vector
 
-В совокупности имеем прирост в скорости работы на 9,5%, что достаточно много, это не может не радовать.
+    mov r13, [r12 + 8] ; r13 = size of bucket
+
+    mov r12, [r12]     ; pointer to current node
+
+FindBucketLoop:
+
+    test r13, r13      ; check if list is ended
+
+    jz NothingFound
+
+    vmovdqa ymm0, [r12]
+    vmovdqa ymm1, ymm2
+
+    call r14           ; call Comparator
+
+    cmp eax, -1
+    je WordFound
+
+    dec r13            ; reducing num of nodes remain in bucket
+    add r12, 64        ; 64 is size of node in bucket
+
+    jmp FindBucketLoop
+
+WordFound: 
+
+    add r12, 32
+    mov rax, [r12]     ; rax = rus translation
+
+    jmp FindBucketExit
+
+NothingFound:
+
+    xor rax, rax       ; rax = nullptr
+
+FindBucketExit:
+
+    pop r14
+    pop r13
+    pop r12
+
+    ret
+
+```
+
+![](EnglishTranslator/Screenshots/FindBucketOptimised.png)
+
+4) Переписываю компаратор в отдельном файле: 
+
+![](EnglishTranslator/Screenshots/ComparatorOnAsm.png)
+
+Имеем с этого -8,15% от времени работы
+
+![](EnglishTranslator/Screenshots/ComparatorOptimisation.png)
+
+Остальные функции, имеющие отношение к хеш-таблице, имеют менее 2,5% от времени работы программы, поэтому таких больших выигрышей от их оптимизации я не получу, следовательно считаю процесс оптимизации завершённым. 

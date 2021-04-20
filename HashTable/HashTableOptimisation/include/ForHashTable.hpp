@@ -22,4 +22,4 @@ struct hash_table_node
     void*               placeholder3 = nullptr; //placeholders are needed for hash_table_node to be 64 byte size
 };
 
-int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key);
+extern "C" int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key);

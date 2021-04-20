@@ -1,11 +1,11 @@
 #include "../include/HashTable.hpp"
 
-int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key)
+/*int StandartComparator (hash_table_cmp_type left_key, hash_table_cmp_type right_key)
 {
     return _mm256_movemask_epi8 (_mm256_cmpeq_epi8 (left_key, right_key));
 
     //return strcmp (left_key, right_key);
-}
+}*/
 
 void BuildHashTable (hash_table* hash_table, size_t length_of_table, 
                      hash (*CountHash) (hash_table_val_type elem), 
