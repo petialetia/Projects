@@ -1,20 +1,14 @@
-> First of all:
-
->> Всем, кто разумеет, что написано в этом предложении, советую читать ридми в оригинале, т.е. на русском языке, см. RusReadMe.md 
-
-> Second of all:
-
->> Pardon my English
+> [Original russian version](RusReadMe.md)
 
 # Hash-table
 
 This task consists of 3 pats:
 
-1) Comparison of hash functions
+1) [Comparison of hash functions](#comparison-of-hash-functions)
 
-2) English translator 
+2) [English translator](#english-translator) 
 
-3) Hash-table optimisation 
+3) [Hash-table optimisation](#hash-table-optimisation) 
 
 This is general ReadMe, you can find personal ReadMe abouth each subtask in folder for it. 
 
