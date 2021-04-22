@@ -110,7 +110,7 @@ Programm analyses text in Text.txt and creates file Translated.html, which can b
 
 2) Processing word with the next word, trying ro find combination of them in dictionary, if programm finds it, translation to those words will be written.
 
-3) Forgetting next word and trying to shorten current word, firstly by 1 letter, secondly - by 2. It makes translation of such words as "faster", "does" and "learned" possible. But there are some word forms, which can't be translated by my programm, like "happier", or can be translated incorrectly, for example "begun" will be shorted to "beg" and translated incorrectly. There is nothing I can do with this if I do not want to overcomplicate this task, main point was to work with hash-table, not to create perfect translator.
+3) Forgetting next word and trying to shorten current word, firstly by 1 letter, secondly - by 2. It makes translation of such words as "faster", "does" and "learned" possible. But there are some word forms, which can't be translated with my programm, like "happier", or can be translated incorrectly, for example "begun" will be shorted to "beg" and translated incorrectly. There is nothing I can do with this if I do not want to overcomplicate this task, main point was to work with hash-table, not to create perfect translator.
 
 So there is processing of current line length, so lines won't be too long. Shift to the next line is perfomed correctly, even if there wasn't shift in original text.
 
