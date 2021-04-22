@@ -1,4 +1,4 @@
-> [English version](ReadMe.md)
+> [Translated english version](ReadMe.md)
 
 # Хеш-таблица
 
