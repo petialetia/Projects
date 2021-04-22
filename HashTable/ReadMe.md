@@ -288,7 +288,7 @@ Change of runtime:
 
 Here function 0x0000000000002de0 is FindBucket
 
-Next function to be optimised if FindHashTable, but is already obvious, that it takes not that much time, so we won't have big increase out of rewriting it, nevertheless, for purity of experiment, I have done this.
+Next function to be optimised if FindHashTable, but it's already obvious, that it takes not that much time, so we won't have big increase out of rewriting it, nevertheless, for purity of experiment, I have done this.
 
 6) Rewriting FindHashTable in separate file
 
