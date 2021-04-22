@@ -104,8 +104,6 @@ Polynomial hash is approximately 1,5 times longer than Rol hash, but the distrib
 
 Programm analyses text in Text.txt and creates file Translated.html, which can be opened in browser. You should aim cursor on confusing word, and you will get russian translation, if it existes in dictionary, or else you will get "ERROR".
 
-Programm tends to translate almost all words, except for proper nouns and word forms like "happier", which isn't just like "happy" you can find in dictionary. You can find details about how does translator work in ReadMe in folder EnglishTranslator.
-
 ### Programm description:
 
 1) Processing word, trying to find in dictionary.
