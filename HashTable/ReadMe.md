@@ -364,6 +364,6 @@ Change of runtime:
 
 Here function 0x0000000000002d50 is FindBucket, 0x0000000000002db0 - FindHashTable
 
-Function runtime is reduced. But the speed increase hardly noticeably, I won only 0,42 %. So I conclude that futher optimisation is almost pointless, I won't get significant outcome out of it. Optimisation is completed.
+Function runtime is reduced. But the speed increase hardly noticeable, I won only 0,42 %. So I conclude that futher optimisation is almost pointless, I won't get significant outcome out of it. Optimisation is completed.
 
 Totaly I increased the speed of programm on 67 %. So I think my time was worth it.
