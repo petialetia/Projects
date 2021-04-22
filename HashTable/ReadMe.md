@@ -28,7 +28,7 @@ Distribution graphic:
 
 Graphic was zoomed in for little spike in right edge to be observed.
 
-2) Length hash: returns length of word
+2) Length hash: returns length of word (graphic is zoomed in for shape of spike to be observed)
 
 ![](ComparisonOfHashFunctions/Graphics/CountFirstAsciiHash.png)
 
