@@ -2,6 +2,8 @@
 
 [click on this link](#my-multi-word-header)
 
+[my link](FullRusReadMe.md)
+
 Это задача поделена на 3 части:
 
 1) Сравнение хеш функций
