@@ -38,7 +38,7 @@ Distribution graphic:
 
 Graphic was zoomed in for little spikes to be observed.
 
-3) First ASCII hash: returns ASCII code of first symbol in word
+3) First ASCII hash: returns ASCII code of first symbol in word (graphic is zoomed in for shape of spike to be observed)
 
 ![](ComparisonOfHashFunctions/Graphics/CountLengthHash.png)
 
