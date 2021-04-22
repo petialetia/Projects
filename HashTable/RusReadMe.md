@@ -1,5 +1,7 @@
 # Хеш-таблица
 
+[click on this link](#my-multi-word-header)
+
 Это задача поделена на 3 части:
 
 1) Сравнение хеш функций
@@ -47,6 +49,8 @@
 ![](ComparisonOfHashFunctions/Results/Dispersion.png)
 
 #### Графики распределений
+
+### My Multi Word Header
 
 ![](ComparisonOfHashFunctions/Graphics/CountUnaryHash.png)
 
