@@ -118,7 +118,7 @@ Also there is processing of current line length, so lines won't be too long. Shi
 
 ### Task: this task based on english translator. It was needed to pick big enough text ("The Jungle Book" in my case) for programm work long enough so we could collect statistics about functions, which make programm work slow. 
 
-### Importantly: it was needed to optimize the work of hash-table but not translator as a whole, so I ignored functions, which worked long, but wasn't connected with hash-table (those, for example, functions, which processing translation), also with the same purpose I commented calls of "fprinf" and made every FindHashTable to do it's job 100 times, translation will be just the same, but hash-table functions will be called 100 times bigger num of times.
+### Importantly: it was needed to optimize the work of hash-table but not translator as a whole, so I ignored functions, which worked long, but weren't connected with hash-table (those, for example, functions, which processing translation), also with the same purpose I commented calls of "fprinf" and made every FindHashTable to do it's job 100 times, translation will be just the same, but hash-table functions will be called 100 times bigger num of times.
 
 Optimisation went through in 6 steps:
 
