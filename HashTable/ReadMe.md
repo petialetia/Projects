@@ -106,7 +106,7 @@ Programm analyses text in Text.txt and creates file Translated.html, which can b
 
 ### Programm description:
 
-1) Processing word, trying to find in dictionary.
+1) Processing word, trying to find in dictionary, if programm finds it, translation to this word will be written.
 
 2) Processing word with the next word, trying ro find combination of them in dictionary, if programm finds it, translation to those words will be written.
 
