@@ -1,27 +1,303 @@
 digraph PL
 {
 rankdir=HR;
-"0000000000D06D10" [style="filled", fillcolor="#FF7700", label="USER_FUNC | sum"];
-"0000000000D06E00" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
-"0000000000D06D40" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
-"0000000000D06D70" [style="filled", fillcolor="#FF3030", label="VAR | first_term"];
-"0000000000D06D40" -> "0000000000D06D70"
-"0000000000D06DA0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
-"0000000000D06DD0" [style="filled", fillcolor="#FF3030", label="VAR | second_term"];
-"0000000000D06DA0" -> "0000000000D06DD0"
-"0000000000D06D40" -> "0000000000D06DA0"
-"0000000000D06E00" -> "0000000000D06D40"
-"0000000000D06EF0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
-"0000000000D06E30" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
-"0000000000D06EC0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | +"];
-"0000000000D06E60" [style="filled", fillcolor="#FF3030", label="VAR | first_term"];
-"0000000000D06EC0" -> "0000000000D06E60"
-"0000000000D06E90" [style="filled", fillcolor="#FF3030", label="VAR | second_term"];
-"0000000000D06EC0" -> "0000000000D06E90"
-"0000000000D06E30" -> "0000000000D06EC0"
-"0000000000D06EF0" -> "0000000000D06E30"
-"0000000000D06F20" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | hlt"];
-"0000000000D06EF0" -> "0000000000D06F20"
-"0000000000D06E00" -> "0000000000D06EF0"
-"0000000000D06D10" -> "0000000000D06E00"
+"0x55a76418e0b0" [style="filled", fillcolor="#FF7700", label="USER_FUNC | quadratic_equation"];
+"0x55a76418e200" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e0e0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0x55a76418e110" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0x55a76418e0e0" -> "0x55a76418e110"
+"0x55a76418e140" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0x55a76418e170" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418e140" -> "0x55a76418e170"
+"0x55a76418e1a0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Required"];
+"0x55a76418e1d0" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0x55a76418e1a0" -> "0x55a76418e1d0"
+"0x55a76418e140" -> "0x55a76418e1a0"
+"0x55a76418e0e0" -> "0x55a76418e140"
+"0x55a76418e200" -> "0x55a76418e0e0"
+"0x55a76418e440" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e230" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0x55a76418e290" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0x55a76418e260" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0x55a76418e290" -> "0x55a76418e260"
+"0x55a76418e2c0" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0x55a76418e290" -> "0x55a76418e2c0"
+"0x55a76418e230" -> "0x55a76418e290"
+"0x55a76418e410" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0x55a76418e350" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e2f0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418e320" [style="filled", fillcolor="#FF3030", label="VAR | solving_of_linear_equation"];
+"0x55a76418e2f0" -> "0x55a76418e320"
+"0x55a76418e350" -> "0x55a76418e2f0"
+"0x55a76418e410" -> "0x55a76418e350"
+"0x55a76418e3e0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e380" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418e3b0" [style="filled", fillcolor="#FF3030", label="VAR | producing_a_dsp"];
+"0x55a76418e380" -> "0x55a76418e3b0"
+"0x55a76418e3e0" -> "0x55a76418e380"
+"0x55a76418e410" -> "0x55a76418e3e0"
+"0x55a76418e230" -> "0x55a76418e410"
+"0x55a76418e440" -> "0x55a76418e230"
+"0x55a76418e470" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | hlt"];
+"0x55a76418e440" -> "0x55a76418e470"
+"0x55a76418e200" -> "0x55a76418e440"
+"0x55a76418e0b0" -> "0x55a76418e200"
+"0x55a76418e4a0" [style="filled", fillcolor="#FF7700", label="USER_FUNC | solving_of_linear_equation"];
+"0x55a76418e830" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e4d0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0x55a76418e530" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0x55a76418e500" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418e530" -> "0x55a76418e500"
+"0x55a76418e560" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0x55a76418e530" -> "0x55a76418e560"
+"0x55a76418e4d0" -> "0x55a76418e530"
+"0x55a76418e800" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0x55a76418e5f0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e590" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418e5c0" [style="filled", fillcolor="#FF3030", label="VAR | solving_of_equation_without_variable"];
+"0x55a76418e590" -> "0x55a76418e5c0"
+"0x55a76418e5f0" -> "0x55a76418e590"
+"0x55a76418e800" -> "0x55a76418e5f0"
+"0x55a76418e680" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e620" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418e650" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0x55a76418e620" -> "0x55a76418e650"
+"0x55a76418e680" -> "0x55a76418e620"
+"0x55a76418e7d0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e6b0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418e7a0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0x55a76418e740" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418e6e0" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0x55a76418e740" -> "0x55a76418e6e0"
+"0x55a76418e710" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0x55a76418e740" -> "0x55a76418e710"
+"0x55a76418e7a0" -> "0x55a76418e740"
+"0x55a76418e770" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418e7a0" -> "0x55a76418e770"
+"0x55a76418e6b0" -> "0x55a76418e7a0"
+"0x55a76418e7d0" -> "0x55a76418e6b0"
+"0x55a76418e680" -> "0x55a76418e7d0"
+"0x55a76418e800" -> "0x55a76418e680"
+"0x55a76418e4d0" -> "0x55a76418e800"
+"0x55a76418e830" -> "0x55a76418e4d0"
+"0x55a76418e860" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a76418e830" -> "0x55a76418e860"
+"0x55a76418e4a0" -> "0x55a76418e830"
+"0x55a76418e890" [style="filled", fillcolor="#FF7700", label="USER_FUNC | solving_of_equation_without_variable"];
+"0x55a76418ead0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e8c0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0x55a76418e920" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0x55a76418e8f0" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0x55a76418e920" -> "0x55a76418e8f0"
+"0x55a76418e950" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0x55a76418e920" -> "0x55a76418e950"
+"0x55a76418e8c0" -> "0x55a76418e920"
+"0x55a76418eaa0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0x55a76418e9e0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418e980" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418e9b0" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_infinit_roots_case"];
+"0x55a76418e980" -> "0x55a76418e9b0"
+"0x55a76418e9e0" -> "0x55a76418e980"
+"0x55a76418eaa0" -> "0x55a76418e9e0"
+"0x55a76418ea70" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418ea10" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418ea40" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_no_roots_case"];
+"0x55a76418ea10" -> "0x55a76418ea40"
+"0x55a76418ea70" -> "0x55a76418ea10"
+"0x55a76418eaa0" -> "0x55a76418ea70"
+"0x55a76418e8c0" -> "0x55a76418eaa0"
+"0x55a76418ead0" -> "0x55a76418e8c0"
+"0x55a76418eb00" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a76418ead0" -> "0x55a76418eb00"
+"0x55a76418e890" -> "0x55a76418ead0"
+"0x55a76418eb30" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_infinit_roots_case"];
+"0x55a76418ebc0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418eb60" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418eb90" [style="filled", fillcolor="#00FF00", label="NUM | 8"];
+"0x55a76418eb60" -> "0x55a76418eb90"
+"0x55a76418ebc0" -> "0x55a76418eb60"
+"0x55a76418ebf0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a76418ebc0" -> "0x55a76418ebf0"
+"0x55a76418eb30" -> "0x55a76418ebc0"
+"0x55a76418ec20" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_no_roots_case"];
+"0x55a76418ecb0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418ec50" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418ec80" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0x55a76418ec50" -> "0x55a76418ec80"
+"0x55a76418ecb0" -> "0x55a76418ec50"
+"0x55a76418ece0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a76418ecb0" -> "0x55a76418ece0"
+"0x55a76418ec20" -> "0x55a76418ecb0"
+"0x55a76418ed10" [style="filled", fillcolor="#FF7700", label="USER_FUNC | producing_a_dsp"];
+"0x55a76418ef50" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418ed40" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | ="];
+"0x55a76418ed70" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0x55a76418ed40" -> "0x55a76418ed70"
+"0x55a76418ef20" [style="filled", fillcolor="#FFFF00", label="MATH_OP | -"];
+"0x55a76418ee00" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418eda0" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418ee00" -> "0x55a76418eda0"
+"0x55a76418edd0" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418ee00" -> "0x55a76418edd0"
+"0x55a76418ef20" -> "0x55a76418ee00"
+"0x55a76418eef0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418ee90" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418ee30" [style="filled", fillcolor="#00FF00", label="NUM | 4"];
+"0x55a76418ee90" -> "0x55a76418ee30"
+"0x55a76418ee60" [style="filled", fillcolor="#FF3030", label="VAR | cement"];
+"0x55a76418ee90" -> "0x55a76418ee60"
+"0x55a76418eef0" -> "0x55a76418ee90"
+"0x55a76418eec0" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0x55a76418eef0" -> "0x55a76418eec0"
+"0x55a76418ef20" -> "0x55a76418eef0"
+"0x55a76418ed40" -> "0x55a76418ef20"
+"0x55a76418ef50" -> "0x55a76418ed40"
+"0x55a76418f8e0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418ef80" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0x55a76418efe0" [style="filled", fillcolor="#EECFA1", label="COMPARING | <"];
+"0x55a76418efb0" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0x55a76418efe0" -> "0x55a76418efb0"
+"0x55a76418f010" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0x55a76418efe0" -> "0x55a76418f010"
+"0x55a76418ef80" -> "0x55a76418efe0"
+"0x55a76418f8b0" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0x55a76418f640" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418f040" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418f070" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_no_roots_case"];
+"0x55a76418f040" -> "0x55a76418f070"
+"0x55a76418f640" -> "0x55a76418f040"
+"0x55a76418f8b0" -> "0x55a76418f640"
+"0x55a76418f880" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418f670" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If"];
+"0x55a76418f6d0" [style="filled", fillcolor="#EECFA1", label="COMPARING | =="];
+"0x55a76418f6a0" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0x55a76418f6d0" -> "0x55a76418f6a0"
+"0x55a76418f700" [style="filled", fillcolor="#00FF00", label="NUM | 0"];
+"0x55a76418f6d0" -> "0x55a76418f700"
+"0x55a76418f670" -> "0x55a76418f6d0"
+"0x55a76418f850" [style="filled", fillcolor="#FFC0CB", label="CONDITION | If-Else"];
+"0x55a76418f790" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418f730" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418f760" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_one_root_case"];
+"0x55a76418f730" -> "0x55a76418f760"
+"0x55a76418f790" -> "0x55a76418f730"
+"0x55a76418f850" -> "0x55a76418f790"
+"0x55a76418f820" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418f7c0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | See"];
+"0x55a76418f7f0" [style="filled", fillcolor="#FF3030", label="VAR | proccessing_two_roots_case"];
+"0x55a76418f7c0" -> "0x55a76418f7f0"
+"0x55a76418f820" -> "0x55a76418f7c0"
+"0x55a76418f850" -> "0x55a76418f820"
+"0x55a76418f670" -> "0x55a76418f850"
+"0x55a76418f880" -> "0x55a76418f670"
+"0x55a76418f8b0" -> "0x55a76418f880"
+"0x55a76418ef80" -> "0x55a76418f8b0"
+"0x55a76418f8e0" -> "0x55a76418ef80"
+"0x55a76418f910" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a76418f8e0" -> "0x55a76418f910"
+"0x55a76418ef50" -> "0x55a76418f8e0"
+"0x55a76418ed10" -> "0x55a76418ef50"
+"0x55a76418f940" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_one_root_case"];
+"0x55a76418f9d0" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418f970" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418f9a0" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0x55a76418f970" -> "0x55a76418f9a0"
+"0x55a76418f9d0" -> "0x55a76418f970"
+"0x55a76418fb80" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418fa00" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418fb50" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0x55a76418fa90" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418fa30" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0x55a76418fa90" -> "0x55a76418fa30"
+"0x55a76418fa60" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418fa90" -> "0x55a76418fa60"
+"0x55a76418fb50" -> "0x55a76418fa90"
+"0x55a76418fb20" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418fac0" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0x55a76418fb20" -> "0x55a76418fac0"
+"0x55a76418faf0" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0x55a76418fb20" -> "0x55a76418faf0"
+"0x55a76418fb50" -> "0x55a76418fb20"
+"0x55a76418fa00" -> "0x55a76418fb50"
+"0x55a76418fb80" -> "0x55a76418fa00"
+"0x55a76418fbb0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a76418fb80" -> "0x55a76418fbb0"
+"0x55a76418f9d0" -> "0x55a76418fb80"
+"0x55a76418f940" -> "0x55a76418f9d0"
+"0x55a76418fbe0" [style="filled", fillcolor="#FF7700", label="USER_FUNC | proccessing_two_roots_case"];
+"0x55a76418fc70" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418fc10" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418fc40" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0x55a76418fc10" -> "0x55a76418fc40"
+"0x55a76418fc70" -> "0x55a76418fc10"
+"0x55a76418ff40" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418fca0" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a76418ff10" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0x55a76418fe50" [style="filled", fillcolor="#FFFF00", label="MATH_OP | +"];
+"0x55a76418fd30" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418fcd0" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0x55a76418fd30" -> "0x55a76418fcd0"
+"0x55a76418fd00" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a76418fd30" -> "0x55a76418fd00"
+"0x55a76418fe50" -> "0x55a76418fd30"
+"0x55a76418fe20" [style="filled", fillcolor="#FFFF00", label="MATH_OP | ^"];
+"0x55a76418fd60" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0x55a76418fe20" -> "0x55a76418fd60"
+"0x55a76418fdf0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0x55a76418fd90" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0x55a76418fdf0" -> "0x55a76418fd90"
+"0x55a76418fdc0" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0x55a76418fdf0" -> "0x55a76418fdc0"
+"0x55a76418fe20" -> "0x55a76418fdf0"
+"0x55a76418fe50" -> "0x55a76418fe20"
+"0x55a76418ff10" -> "0x55a76418fe50"
+"0x55a76418fee0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418fe80" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0x55a76418fee0" -> "0x55a76418fe80"
+"0x55a76418feb0" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0x55a76418fee0" -> "0x55a76418feb0"
+"0x55a76418ff10" -> "0x55a76418fee0"
+"0x55a76418fca0" -> "0x55a76418ff10"
+"0x55a76418ff40" -> "0x55a76418fca0"
+"0x55a764190210" [style="filled", fillcolor="#00FFFF", label="COMMAND"];
+"0x55a76418ff70" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Write"];
+"0x55a7641901e0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0x55a764190120" [style="filled", fillcolor="#FFFF00", label="MATH_OP | -"];
+"0x55a764190000" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a76418ffa0" [style="filled", fillcolor="#00FF00", label="NUM | -1"];
+"0x55a764190000" -> "0x55a76418ffa0"
+"0x55a76418ffd0" [style="filled", fillcolor="#FF3030", label="VAR | bricks"];
+"0x55a764190000" -> "0x55a76418ffd0"
+"0x55a764190120" -> "0x55a764190000"
+"0x55a7641900f0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | ^"];
+"0x55a764190030" [style="filled", fillcolor="#FF3030", label="VAR | dsp"];
+"0x55a7641900f0" -> "0x55a764190030"
+"0x55a7641900c0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | /"];
+"0x55a764190060" [style="filled", fillcolor="#00FF00", label="NUM | 1"];
+"0x55a7641900c0" -> "0x55a764190060"
+"0x55a764190090" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0x55a7641900c0" -> "0x55a764190090"
+"0x55a7641900f0" -> "0x55a7641900c0"
+"0x55a764190120" -> "0x55a7641900f0"
+"0x55a7641901e0" -> "0x55a764190120"
+"0x55a7641901b0" [style="filled", fillcolor="#FFFF00", label="MATH_OP | *"];
+"0x55a764190150" [style="filled", fillcolor="#00FF00", label="NUM | 2"];
+"0x55a7641901b0" -> "0x55a764190150"
+"0x55a764190180" [style="filled", fillcolor="#FF3030", label="VAR | architector"];
+"0x55a7641901b0" -> "0x55a764190180"
+"0x55a7641901e0" -> "0x55a7641901b0"
+"0x55a76418ff70" -> "0x55a7641901e0"
+"0x55a764190210" -> "0x55a76418ff70"
+"0x55a764190240" [style="filled", fillcolor="#4876FF", label="SYS_FUNC | Return"];
+"0x55a764190210" -> "0x55a764190240"
+"0x55a76418ff40" -> "0x55a764190210"
+"0x55a76418fc70" -> "0x55a76418ff40"
+"0x55a76418fbe0" -> "0x55a76418fc70"
+"0x55a76418f940" -> "0x55a76418fbe0"
+"0x55a76418ed10" -> "0x55a76418f940"
+"0x55a76418ec20" -> "0x55a76418ed10"
+"0x55a76418eb30" -> "0x55a76418ec20"
+"0x55a76418e890" -> "0x55a76418eb30"
+"0x55a76418e4a0" -> "0x55a76418e890"
+"0x55a76418e0b0" -> "0x55a76418e4a0"
 }

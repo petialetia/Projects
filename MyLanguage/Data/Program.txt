@@ -2,8 +2,120 @@ in
 pop rax
 in
 pop rbx
+in
+pop rcx
 push rax
-push rbx
-add
-out
+push 0
+jne :1
+call solving_of_linear_equation
+jmp :2
+1:
+call producing_a_dsp
+2:
 hlt
+solving_of_linear_equation:
+push rbx
+push 0
+jne :3
+call solving_of_equation_without_variable
+jmp :4
+3:
+push 1
+out
+push -1
+push rcx
+mul
+push rbx
+div
+out
+4:
+ret
+solving_of_equation_without_variable:
+push rcx
+push 0
+jne :5
+call proccessing_infinit_roots_case
+jmp :6
+5:
+call proccessing_no_roots_case
+6:
+ret
+proccessing_infinit_roots_case:
+push 8
+out
+ret
+proccessing_no_roots_case:
+push 0
+out
+ret
+producing_a_dsp:
+push rbx
+push rbx
+mul
+push 4
+push rcx
+mul
+push rax
+mul
+sub
+pop rdx
+push rdx
+push 0
+jae :7
+call proccessing_no_roots_case
+jmp :8
+7:
+push rdx
+push 0
+jne :9
+call proccessing_one_root_case
+jmp :10
+9:
+call proccessing_two_roots_case
+10:
+8:
+ret
+proccessing_one_root_case:
+push 1
+out
+push -1
+push rbx
+mul
+push 2
+push rax
+mul
+div
+out
+ret
+proccessing_two_roots_case:
+push 2
+out
+push -1
+push rbx
+mul
+push rdx
+push 1
+push 2
+div
+pow
+add
+push 2
+push rax
+mul
+div
+out
+push -1
+push rbx
+mul
+push rdx
+push 1
+push 2
+div
+pow
+sub
+push 2
+push rax
+mul
+div
+out
+ret
