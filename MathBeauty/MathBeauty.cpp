@@ -137,20 +137,20 @@ void CheckEvent (sdl_window_info* win_info, screen_info* scr_info, SDL_Event* ev
     assert (is_programm_ended != nullptr);
 
     while (SDL_PollEvent (event))
+    {
+        if (event->type == SDL_QUIT) 
         {
-            if (event->type == SDL_QUIT) 
+            ProcessEndEvent (win_info, is_programm_ended);
+        }
+        else 
+        {
+            if (event->type == SDL_KEYDOWN)
             {
-                ProcessEndEvent (win_info, is_programm_ended);
-            }
-            else 
-            {
-                if (event->type == SDL_KEYDOWN)
-                {
-                    if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) ProcessEndEvent (win_info, is_programm_ended);
-                    else MoveSet (event, scr_info);
-                }
+                if (event->key.keysym.scancode == SDL_SCANCODE_ESCAPE) ProcessEndEvent (win_info, is_programm_ended);
+                else MoveSet (event, scr_info);
             }
         }
+    }
 }
 
 void ProcessEndEvent (sdl_window_info* win_info, bool* is_programm_ended)
